@@ -24,8 +24,7 @@ export default function CategoriesPage() {
       <section className="mb-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.keys(categories).map((category) => (
-            <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} legacyBehavior>
-              <a className="block group">
+            <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} className="block group">
                 <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                   <CardContent className="p-0">
                     <div className="relative h-48 w-full">
@@ -43,7 +42,6 @@ export default function CategoriesPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </a>
             </Link>
           ))}
         </div>
@@ -54,10 +52,8 @@ export default function CategoriesPage() {
           <section key={category} id={`${category.toLowerCase().replace(/\s/g, '-')}`} className="scroll-mt-20">
              <div className="flex justify-between items-center mb-8">
                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline">{category}</h2>
-                 <Link href={`#`} legacyBehavior>
-                    <a className="text-primary hover:underline flex items-center text-sm">
-                        Voir tout <ArrowRight className="ml-1 h-4 w-4" />
-                    </a>
+                 <Link href={`#`} className="text-primary hover:underline flex items-center text-sm">
+                    Voir tout <ArrowRight className="ml-1 h-4 w-4" />
                  </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
