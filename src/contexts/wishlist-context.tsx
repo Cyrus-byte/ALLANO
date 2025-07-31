@@ -18,33 +18,40 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { toast } = useToast();
 
   useEffect(() => {
-    const storedWishlist = localStorage.getItem('wishlist');
-    if (storedWishlist) {
-      setWishlist(JSON.parse(storedWishlist));
+    try {
+      const storedWishlist = localStorage.getItem('wishlist');
+      if (storedWishlist) {
+        setWishlist(JSON.parse(storedWishlist));
+      }
+    } catch (error) {
+        console.error("Failed to parse wishlist from localStorage", error);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    try {
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    } catch (error) {
+        console.error("Failed to save wishlist to localStorage", error);
+    }
   }, [wishlist]);
 
   const toggleWishlist = (product: Product) => {
-    setWishlist(prevWishlist => {
-      const existingItem = prevWishlist.find(item => item.id === product.id);
-      if (existingItem) {
-        toast({
-          title: "Retiré des favoris",
-          description: `${product.name} a été retiré de vos favoris.`,
-        });
-        return prevWishlist.filter(item => item.id !== product.id);
-      } else {
-        toast({
-          title: "Ajouté aux favoris",
-          description: `${product.name} a été ajouté à vos favoris.`,
-        });
-        return [...prevWishlist, product];
-      }
-    });
+    const existingItem = wishlist.find(item => item.id === product.id);
+
+    if (existingItem) {
+      setWishlist(prevWishlist => prevWishlist.filter(item => item.id !== product.id));
+      toast({
+        title: "Retiré des favoris",
+        description: `${product.name} a été retiré de vos favoris.`,
+      });
+    } else {
+      setWishlist(prevWishlist => [...prevWishlist, product]);
+      toast({
+        title: "Ajouté aux favoris",
+        description: `${product.name} a été ajouté à vos favoris.`,
+      });
+    }
   };
 
   const isInWishlist = (productId: string) => {
