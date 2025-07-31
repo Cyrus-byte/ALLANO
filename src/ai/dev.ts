@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/product-recommendation.ts';
+// Import your flows here
+import './flows/product-recommendation';
