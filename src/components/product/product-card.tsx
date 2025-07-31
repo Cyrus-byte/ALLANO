@@ -8,12 +8,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useWishlist } from '@/contexts/wishlist-context';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { wishlist, toggleWishlist } = useWishlist();
+  const isInWishlist = wishlist.some(item => item.id === product.id);
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
+  }
+
   return (
     <Card className="overflow-hidden border-0 shadow-none bg-transparent group">
       <CardContent className="p-0">
@@ -32,14 +42,20 @@ export function ProductCard({ product }: ProductCardProps) {
             size="icon"
             className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/70 hover:bg-background"
             aria-label="Ajouter aux favoris"
+            onClick={handleWishlistClick}
           >
-            <Heart className="h-4 w-4" />
+            <Heart className={cn("h-4 w-4", isInWishlist ? "fill-red-500 text-red-500" : "")} />
           </Button>
           {product.isNew && (
             <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
               NOUVEAU
             </div>
           )}
+           {product.onSale && (
+             <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-full">
+              PROMO
+            </div>
+           )}
         </div>
       </CardContent>
       <CardFooter className="flex-col items-start p-4">

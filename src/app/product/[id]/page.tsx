@@ -10,10 +10,12 @@ import { Separator } from '@/components/ui/separator';
 import { Star, Minus, Plus, Heart, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/cart-context';
+import { useWishlist } from '@/contexts/wishlist-context';
 import type { Product } from '@/lib/types';
 
 export default function ProductPage({ params }: { params: { id: string } }) {
   const { addToCart } = useCart();
+  const { wishlist, toggleWishlist } = useWishlist();
   const product = PRODUCTS.find(p => p.id === params.id);
 
   const [quantity, setQuantity] = useState(1);
@@ -24,6 +26,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   if (!product) {
     notFound();
   }
+
+  const isInWishlist = wishlist.some(item => item.id === product.id);
 
   const handleAddToCart = () => {
     if (selectedSize && selectedColor) {
@@ -124,8 +128,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedSize || !selectedColor}>
               <ShoppingCart className="mr-2 h-5 w-5" /> Ajouter au panier
             </Button>
-            <Button variant="outline" size="icon" aria-label="Ajouter aux favoris">
-              <Heart className="h-5 w-5" />
+            <Button variant="outline" size="icon" aria-label="Ajouter aux favoris" onClick={() => toggleWishlist(product)}>
+              <Heart className={cn("h-5 w-5", isInWishlist ? "fill-red-500 text-red-500" : "")} />
             </Button>
           </div>
         </div>
