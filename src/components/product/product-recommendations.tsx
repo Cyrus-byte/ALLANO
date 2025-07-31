@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { runFlow } from '@genkit-ai/next/client';
-import { getProductRecommendations } from '@/ai/flows/product-recommendation';
+import { productRecommendationFlow } from '@/ai/flows/product-recommendation';
 import { ProductCard } from './product-card';
 import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
@@ -18,7 +18,7 @@ export function ProductRecommendations() {
       try {
         setLoading(true);
         // In a real app, user data would come from session/context
-        const result = await runFlow(getProductRecommendations, {
+        const result = await runFlow(productRecommendationFlow, {
           userId: 'user-123',
           browsingHistory: ['Robe d\'été florale', 'Sandales en cuir'],
           pastPurchases: ['T-shirt en coton bio'],

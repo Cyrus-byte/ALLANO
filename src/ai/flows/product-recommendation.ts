@@ -1,10 +1,10 @@
-// product-recommendation.ts
 'use server';
 /**
  * @fileOverview Provides personalized product recommendations based on user history.
  *
  * This file exports:
  * - `getProductRecommendations`: A function to retrieve product recommendations.
+ * - `productRecommendationFlow`: The Genkit flow for recommendations.
  * - `ProductRecommendationInput`: The input type for `getProductRecommendations`.
  * - `ProductRecommendationOutput`: The output type for `getProductRecommendations`.
  */
@@ -45,7 +45,7 @@ const productRecommendationPrompt = ai.definePrompt({
   `,
 });
 
-const productRecommendationFlow = ai.defineFlow(
+export const productRecommendationFlow = ai.defineFlow(
   {
     name: 'productRecommendationFlow',
     inputSchema: ProductRecommendationInputSchema,
