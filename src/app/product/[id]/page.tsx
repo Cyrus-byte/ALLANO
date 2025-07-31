@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { PRODUCTS } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,10 @@ import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import type { Product } from '@/lib/types';
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+export default function ProductPage() {
   const { addToCart } = useCart();
   const { wishlist, toggleWishlist } = useWishlist();
+  const params = useParams();
   const product = PRODUCTS.find(p => p.id === params.id);
 
   const [quantity, setQuantity] = useState(1);
