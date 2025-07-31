@@ -5,6 +5,7 @@ import { ProductCard } from '@/components/product/product-card';
 import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 export default function CategoriesPage() {
@@ -19,29 +20,38 @@ export default function CategoriesPage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <h1 className="text-3xl md:text-4xl font-bold font-headline mb-8">Catégories</h1>
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-extrabold font-headline tracking-tight">Explorez Nos Catégories</h1>
+        <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+          Trouvez exactement ce que vous cherchez, des vêtements aux accessoires.
+        </p>
+      </div>
 
-      <section className="mb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {Object.keys(categories).map((category) => (
-            <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} className="block group">
-                <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                  <CardContent className="p-0">
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src={categories[category].image}
-                        alt={category}
-                        layout="fill"
-                        objectFit="cover"
-                        className="transition-transform duration-300 group-hover:scale-105"
-                      />
-                       <div className="absolute inset-0 bg-black/40" />
+            <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} passHref>
+              <Card className="relative block group overflow-hidden rounded-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
+                <CardContent className="p-0">
+                  <div className="relative h-64 w-full">
+                    <Image
+                      src={categories[category].image}
+                      alt={category}
+                      layout="fill"
+                      objectFit="cover"
+                      className="transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                  </div>
+                  <div className="absolute bottom-0 left-0 p-6">
+                    <h2 className="text-3xl font-bold text-white tracking-tight">{category}</h2>
+                     <div className="flex items-center mt-2 text-primary-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span>Voir la collection</span>
+                        <ArrowRight className="ml-2 h-4 w-4" />
                     </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <h2 className="text-2xl font-bold text-white text-center p-4">{category}</h2>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>
@@ -49,15 +59,17 @@ export default function CategoriesPage() {
 
       <div className="space-y-16">
         {Object.entries(categories).map(([category, { products }]) => (
-          <section key={category} id={`${category.toLowerCase().replace(/\s/g, '-')}`} className="scroll-mt-20">
-             <div className="flex justify-between items-center mb-8">
-                 <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline">{category}</h2>
-                 <Link href={`#`} className="text-primary hover:underline flex items-center text-sm">
-                    Voir tout <ArrowRight className="ml-1 h-4 w-4" />
-                 </Link>
+          <section key={category} id={`${category.toLowerCase().replace(/\s/g, '-')}`} className="scroll-mt-24">
+             <div className="flex justify-between items-end mb-8 border-b pb-4">
+                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">{category}</h2>
+                 <Button asChild variant="link" className="text-primary pr-0">
+                    <Link href={`#`}>
+                        Voir tout <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                 </Button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-              {products.map(product => (
+              {products.slice(0,4).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
