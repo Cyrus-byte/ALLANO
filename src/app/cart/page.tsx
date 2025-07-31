@@ -46,7 +46,7 @@ export default function CartPage() {
                     Taille: {item.size} / Couleur: {item.color}
                   </p>
                   <p className="font-bold mt-1">
-                    {(item.product.onSale ? item.product.salePrice! : item.product.price).toLocaleString()} FCFA
+                    {(item.product.onSale ? item.product.salePrice! : item.product.price).toLocaleString('fr-FR')} FCFA
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -76,16 +76,16 @@ export default function CartPage() {
             <CardContent className="grid gap-4">
               <div className="flex justify-between">
                 <span>Sous-total ({totalItems} articles)</span>
-                <span className="font-semibold">{totalPrice.toLocaleString()} FCFA</span>
+                <span className="font-semibold">{totalPrice.toLocaleString('fr-FR')} FCFA</span>
               </div>
               <div className="flex justify-between">
                 <span>Livraison</span>
-                <span className="font-semibold">{shippingCost.toLocaleString()} FCFA</span>
+                <span className="font-semibold">{shippingCost.toLocaleString('fr-FR')} FCFA</span>
               </div>
               <Separator />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span>{grandTotal.toLocaleString()} FCFA</span>
+                <span>{grandTotal.toLocaleString('fr-FR')} FCFA</span>
               </div>
             </CardContent>
             <CardFooter className="flex-col gap-2">

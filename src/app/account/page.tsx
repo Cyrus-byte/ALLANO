@@ -37,7 +37,7 @@ export default function AccountPage() {
                       <p className="text-sm text-muted-foreground">{order.date} - {order.items} article(s)</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{order.total.toLocaleString()} FCFA</p>
+                      <p className="font-semibold">{order.total.toLocaleString('fr-FR')} FCFA</p>
                       <Badge variant={order.status === 'Livré' ? 'secondary' : order.status === 'Annulé' ? 'destructive' : 'default'} className="mt-1">
                         {order.status}
                       </Badge>

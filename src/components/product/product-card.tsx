@@ -64,11 +64,11 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
         <div className="flex items-center gap-2 mt-1">
           <p className={cn("font-bold", product.onSale && "text-destructive")}>
-            {product.onSale ? product.salePrice?.toLocaleString() : product.price.toLocaleString()} FCFA
+            {product.onSale ? product.salePrice?.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR')} FCFA
           </p>
           {product.onSale && (
             <p className="text-sm text-muted-foreground line-through">
-              {product.price.toLocaleString()} FCFA
+              {product.price.toLocaleString('fr-FR')} FCFA
             </p>
           )}
         </div>

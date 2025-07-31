@@ -74,7 +74,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             </div>
             <span className="text-muted-foreground text-sm">{product.reviews} avis</span>
           </div>
-          <p className="text-3xl font-bold mt-4">{product.price.toLocaleString()} FCFA</p>
+          <p className="text-3xl font-bold mt-4">{product.price.toLocaleString('fr-FR')} FCFA</p>
           <p className="text-muted-foreground mt-4">{product.description}</p>
           <Separator className="my-6" />
 
