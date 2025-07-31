@@ -1,0 +1,102 @@
+
+"use client";
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { useCart } from '@/contexts/cart-context';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
+
+export default function CartPage() {
+  const { cart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+
+  const shippingCost = totalItems > 0 ? 2000 : 0;
+  const grandTotal = totalPrice + shippingCost;
+
+  if (cart.length === 0) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <ShoppingCart className="mx-auto h-24 w-24 text-muted-foreground" />
+        <h1 className="mt-4 text-2xl font-bold">Votre panier est vide</h1>
+        <p className="mt-2 text-muted-foreground">Il est temps de faire du shopping !</p>
+        <Button asChild className="mt-6">
+          <Link href="/">Continuer vos achats</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <h1 className="text-3xl md:text-4xl font-bold font-headline mb-8">Votre Panier</h1>
+      <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+        <div className="lg:col-span-2">
+          <div className="flex flex-col gap-4">
+            {cart.map(item => (
+              <Card key={item.id} className="flex items-center p-4">
+                <div className="relative w-24 h-32 rounded-md overflow-hidden">
+                  <Image src={item.product.images[0]} alt={item.product.name} fill objectFit="cover" />
+                </div>
+                <div className="flex-1 ml-4">
+                  <h2 className="font-semibold">{item.product.name}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Taille: {item.size} / Couleur: {item.color}
+                  </p>
+                  <p className="font-bold mt-1">
+                    {(item.product.onSale ? item.product.salePrice! : item.product.price).toLocaleString()} FCFA
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center border rounded-md">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)}>
+                            <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="w-8 text-center text-sm">{item.quantity}</span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                            <Plus className="h-4 w-4" />
+                        </Button>
+                    </div>
+                  <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)}>
+                    <Trash2 className="h-5 w-5 text-destructive" />
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Résumé de la commande</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="flex justify-between">
+                <span>Sous-total ({totalItems} articles)</span>
+                <span className="font-semibold">{totalPrice.toLocaleString()} FCFA</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Livraison</span>
+                <span className="font-semibold">{shippingCost.toLocaleString()} FCFA</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span>{grandTotal.toLocaleString()} FCFA</span>
+              </div>
+            </CardContent>
+            <CardFooter className="flex-col gap-2">
+              <Button size="lg" className="w-full">
+                Passer au paiement
+              </Button>
+               <p className="text-xs text-muted-foreground text-center">Paiements sécurisés par CinetPay</p>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
