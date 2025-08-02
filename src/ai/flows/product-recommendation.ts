@@ -25,7 +25,7 @@ const ProductRecommendationOutputSchema = z.object({
 export type ProductRecommendationOutput = z.infer<typeof ProductRecommendationOutputSchema>;
 
 export async function getProductRecommendations(input: ProductRecommendationInput): Promise<ProductRecommendationOutput> {
-  return productRecommendationFlow(input);
+  return await productRecommendationFlow(input);
 }
 
 const productRecommendationPrompt = ai.definePrompt({

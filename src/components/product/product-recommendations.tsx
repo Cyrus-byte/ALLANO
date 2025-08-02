@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { runFlow } from '@genkit-ai/next/client';
 import { ProductCard } from './product-card';
 import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wand2 } from 'lucide-react';
-import { type ProductRecommendationOutput } from '@/ai/flows/product-recommendation';
+import { getProductRecommendations, type ProductRecommendationOutput } from '@/ai/flows/product-recommendation';
 
 export function ProductRecommendations() {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
@@ -18,7 +17,7 @@ export function ProductRecommendations() {
       try {
         setLoading(true);
         // In a real app, user data would come from session/context
-        const result = await runFlow<ProductRecommendationOutput>('productRecommendationFlow', {
+        const result = await getProductRecommendations({
           userId: 'user-123',
           browsingHistory: ['Robe d\'été florale', 'Sandales en cuir'],
           pastPurchases: ['T-shirt en coton bio'],
