@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { ProductCard } from '@/components/product/product-card';
 import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
@@ -28,30 +27,21 @@ export default function CategoriesPage() {
       </div>
 
       <section className="mb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
           {Object.keys(categories).map((category) => (
             <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} passHref>
-              <Card className="relative block group overflow-hidden rounded-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
-                <CardContent className="p-0">
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={categories[category].image}
-                      alt={category}
-                      layout="fill"
-                      objectFit="cover"
-                      className="transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                  </div>
-                  <div className="absolute bottom-0 left-0 p-6">
-                    <h2 className="text-2xl font-bold text-white tracking-tight">{category}</h2>
-                     <div className="flex items-center mt-2 text-primary-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span>Voir la collection</span>
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+               <div className="group relative aspect-square overflow-hidden rounded-lg">
+                <Image
+                  src={categories[category].image}
+                  alt={category}
+                  layout="fill"
+                  objectFit="cover"
+                  className="transition-transform duration-300 ease-in-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <h2 className="text-lg font-bold text-white text-center p-2">{category}</h2>
+                </div>
+              </div>
             </Link>
           ))}
         </div>
