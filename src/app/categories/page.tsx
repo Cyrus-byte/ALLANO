@@ -27,7 +27,7 @@ export default function CategoriesPage() {
       </div>
 
       <section className="mb-16">
-        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2 md:gap-4">
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
           {Object.keys(categories).map((category) => (
             <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} passHref>
                <div className="group relative aspect-square overflow-hidden rounded-lg">
@@ -39,7 +39,7 @@ export default function CategoriesPage() {
                   className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h2 className="text-lg font-bold text-white text-center p-2">{category}</h2>
+                  <h2 className="text-sm font-bold text-white text-center p-1">{category}</h2>
                 </div>
               </div>
             </Link>
