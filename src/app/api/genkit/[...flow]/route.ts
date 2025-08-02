@@ -1,4 +1,4 @@
 import {nextHandler} from '@genkit-ai/next';
-import '@/ai/flows/product-recommendation';
+import '@/ai/dev';
 
-export {nextHandler as POST};
+export const POST = nextHandler();
