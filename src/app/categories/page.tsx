@@ -33,7 +33,7 @@ export default function CategoriesPage() {
             <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} passHref>
               <Card className="relative block group overflow-hidden rounded-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
                 <CardContent className="p-0">
-                  <div className="relative h-64 w-full">
+                  <div className="relative h-48 w-full">
                     <Image
                       src={categories[category].image}
                       alt={category}
@@ -44,7 +44,7 @@ export default function CategoriesPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                   </div>
                   <div className="absolute bottom-0 left-0 p-6">
-                    <h2 className="text-3xl font-bold text-white tracking-tight">{category}</h2>
+                    <h2 className="text-2xl font-bold text-white tracking-tight">{category}</h2>
                      <div className="flex items-center mt-2 text-primary-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <span>Voir la collection</span>
                         <ArrowRight className="ml-2 h-4 w-4" />
