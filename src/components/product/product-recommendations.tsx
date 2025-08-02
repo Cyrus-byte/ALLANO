@@ -7,7 +7,7 @@ import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wand2 } from 'lucide-react';
-import { ProductRecommendationOutput } from '@/ai/flows/product-recommendation';
+import { type ProductRecommendationOutput } from '@/ai/flows/product-recommendation';
 
 export function ProductRecommendations() {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
@@ -29,6 +29,9 @@ export function ProductRecommendations() {
         setRecommendations(recommendedProducts);
       } catch (error) {
         console.error("Erreur lors de la récupération des recommandations:", error);
+        // In case of error, you might want to show some fallback content
+        // or just hide the component. For now, we'll just have no recommendations.
+        setRecommendations([]);
       } finally {
         setLoading(false);
       }
