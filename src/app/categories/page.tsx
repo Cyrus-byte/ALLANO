@@ -27,7 +27,7 @@ export default function CategoriesPage() {
       </div>
 
       <section className="mb-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2 md:gap-4">
           {Object.keys(categories).map((category) => (
             <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} passHref>
                <div className="group relative aspect-square overflow-hidden rounded-lg">
