@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/layout/header';
-import { MobileNav } from '@/components/ui/mobile-nav';
+import { MobileNav } from '@/components/layout/mobile-nav';
 import { CartProvider } from '@/contexts/cart-context';
 import { WishlistProvider } from '@/contexts/wishlist-context';
 import { AuthProvider } from '@/contexts/auth-context';
