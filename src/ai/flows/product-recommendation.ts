@@ -20,13 +20,10 @@ const ProductRecommendationInputSchema = z.object({
 export type ProductRecommendationInput = z.infer<typeof ProductRecommendationInputSchema>;
 
 const ProductRecommendationOutputSchema = z.object({
-  recommendations: z.array(z.string()).describe('A list of recommended product IDs.')
+  recommendations: z.array(z.string()).describe('A list of recommended product names.')
 });
 export type ProductRecommendationOutput = z.infer<typeof ProductRecommendationOutputSchema>;
 
-export async function getProductRecommendations(input: ProductRecommendationInput): Promise<ProductRecommendationOutput> {
-  return await productRecommendationFlow(input);
-}
 
 const productRecommendationPrompt = ai.definePrompt({
   name: 'productRecommendationPrompt',
@@ -41,7 +38,7 @@ const productRecommendationPrompt = ai.definePrompt({
   Browsing History: {{#if browsingHistory}}{{#each browsingHistory}}- {{{this}}}{{/each}}{{else}}None{{/if}}
   Past Purchases: {{#if pastPurchases}}{{#each pastPurchases}}- {{{this}}}{{/each}}{{else}}None{{/if}}
 
-  Recommend a diverse range of products. Only return the product IDs as a JSON array.
+  Recommend a diverse range of products. Only return the product names as a JSON array of strings in the 'recommendations' field.
   `,
 });
 
@@ -56,3 +53,7 @@ export const productRecommendationFlow = ai.defineFlow(
     return output!;
   }
 );
+
+export async function getProductRecommendations(input: ProductRecommendationInput): Promise<ProductRecommendationOutput> {
+  return await productRecommendationFlow(input);
+}

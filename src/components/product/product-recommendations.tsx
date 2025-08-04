@@ -6,7 +6,7 @@ import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wand2 } from 'lucide-react';
-import { getProductRecommendations, type ProductRecommendationOutput } from '@/ai/flows/product-recommendation';
+import { getProductRecommendations } from '@/ai/flows/product-recommendation';
 
 export function ProductRecommendations() {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
@@ -23,7 +23,7 @@ export function ProductRecommendations() {
           pastPurchases: ['T-shirt en coton bio'],
         });
         
-        // The flow returns product names or IDs. We find the full product objects.
+        // The flow returns product names. We find the full product objects.
         const recommendedProducts = PRODUCTS.filter(p => result.recommendations.includes(p.name));
         setRecommendations(recommendedProducts);
       } catch (error) {
