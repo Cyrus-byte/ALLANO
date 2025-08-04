@@ -28,7 +28,7 @@ export function ProductRecommendations() {
         const result = await getProductRecommendations({
           userId: user.uid,
           browsingHistory: ['Robe d\'été florale', 'Sandales en cuir'],
-          pastPurchases: ['T-shirt en coton bio'],
+          pastPurchases: ['Chemise en lin'],
         });
         
         // Le flux renvoie des noms de produits. Nous trouvons les objets produits complets.
