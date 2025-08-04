@@ -1,9 +1,13 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import type { CartItem, Product } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from './auth-context';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { PRODUCTS } from '@/lib/data';
 
 interface CartContextType {
   cart: CartItem[];
@@ -13,24 +17,126 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  loading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const mapCartItems = (cartItems: CartItem[]): CartItem[] => {
+    return cartItems.map(item => ({
+        ...item,
+        product: PRODUCTS.find(p => p.id === item.productId)
+    })).filter(item => item.product) as (CartItem & { product: Product })[];
+}
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+
+  const getCartFromLocalStorage = (): CartItem[] => {
+    try {
+      const storedCart = localStorage.getItem('cart');
+      if (storedCart) {
+        return JSON.parse(storedCart);
+      }
+    } catch (error) {
+      console.error("Failed to parse cart from localStorage", error);
+    }
+    return [];
+  };
+
+  const getCartFromFirestore = useCallback(async () => {
+    if (!user) return;
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const firestoreCart = userDoc.data().cart as CartItem[];
+        const localCart = getCartFromLocalStorage();
+
+        // Merge logic
+        const mergedCartMap = new Map<string, CartItem>();
+        
+        [...firestoreCart, ...localCart].forEach(item => {
+            const existing = mergedCartMap.get(item.id);
+            if (existing) {
+                mergedCartMap.set(item.id, { ...existing, quantity: existing.quantity + item.quantity });
+            } else {
+                mergedCartMap.set(item.id, item);
+            }
+        });
+
+        const mergedCart = Array.from(mergedCartMap.values());
+        
+        if (mergedCart.length > 0) {
+            const cartForFirestore = mergedCart.map(({ product, ...rest }) => rest);
+            await updateDoc(userRef, { cart: cartForFirestore });
+        }
+        
+        setCart(mapCartItems(mergedCart));
+        localStorage.removeItem('cart');
+      }
+    } catch (error) {
+      console.error("Error fetching/merging cart from Firestore:", error);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const loadCart = async () => {
+        setLoading(true);
+        if (user) {
+            await getCartFromFirestore();
+        } else {
+            setCart(mapCartItems(getCartFromLocalStorage()));
+        }
+        setLoading(false);
+    };
+    loadCart();
+  }, [user, getCartFromFirestore]);
+
+
+  const updateFirestoreCart = async (newCart: CartItem[]) => {
+    if (!user) return;
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const cartForFirestore = newCart.map(({ product, ...rest }) => rest);
+        await updateDoc(userRef, { cart: cartForFirestore });
+    } catch (error) {
+        console.error("Error updating firestore cart", error);
+        toast({ title: "Erreur", description: "Impossible de mettre à jour le panier.", variant: "destructive" });
+    }
+  }
+
+  useEffect(() => {
+    if (!user) {
+        try {
+            const cartToStore = cart.map(({ product, ...rest}) => rest);
+            localStorage.setItem('cart', JSON.stringify(cartToStore));
+        } catch (error) {
+            console.error("Failed to save cart to localStorage", error);
+        }
+    }
+  }, [cart, user]);
+
 
   const addToCart = (product: Product, size: string, color: string) => {
     const itemId = `${product.id}-${size}-${color}`;
+    
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === itemId);
+      let newCart;
       if (existingItem) {
-        return prevCart.map(item =>
+        newCart = prevCart.map(item =>
           item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
         );
+      } else {
+        newCart = [...prevCart, { id: itemId, productId: product.id, product, size, color, quantity: 1 }];
       }
-      return [...prevCart, { id: itemId, product, size, color, quantity: 1 }];
+      if (user) updateFirestoreCart(newCart);
+      return newCart;
     });
     toast({
       title: "Ajouté au panier",
@@ -39,7 +145,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const removeFromCart = (itemId: string) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== itemId));
+    const newCart = cart.filter(item => item.id !== itemId)
+    setCart(newCart);
+    if (user) updateFirestoreCart(newCart);
+
     toast({
         title: "Article supprimé",
         description: "L'article a été retiré de votre panier.",
@@ -52,13 +161,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       removeFromCart(itemId);
       return;
     }
-    setCart(prevCart =>
-      prevCart.map(item => (item.id === itemId ? { ...item, quantity } : item))
-    );
+    const newCart = cart.map(item => (item.id === itemId ? { ...item, quantity } : item));
+    setCart(newCart);
+    if (user) updateFirestoreCart(newCart);
   };
 
   const clearCart = () => {
     setCart([]);
+    if (user) updateFirestoreCart([]);
   };
 
   const totalItems = useMemo(() => {
@@ -67,6 +177,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const totalPrice = useMemo(() => {
     return cart.reduce((total, item) => {
+      if (!item.product) return total;
       const price = item.product.onSale ? item.product.salePrice! : item.product.price;
       return total + price * item.quantity;
     }, 0);
@@ -80,6 +191,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearCart,
     totalItems,
     totalPrice,
+    loading
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

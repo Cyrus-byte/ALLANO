@@ -1,10 +1,11 @@
+
 "use client";
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Search, ShoppingCart, User } from 'lucide-react';
+import { Heart, Search, ShoppingCart, User, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
@@ -12,8 +13,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export function Header() {
-  const { totalItems } = useCart();
-  const { wishlist } = useWishlist();
+  const { totalItems, loading: cartLoading } = useCart();
+  const { wishlist, loading: wishlistLoading } = useWishlist();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -64,8 +65,8 @@ export function Header() {
             <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits">
               <Link href="/wishlist">
                 <div className="relative">
-                  <Heart />
-                  {wishlist.length > 0 && (
+                  {wishlistLoading ? <Loader2 className="animate-spin"/> : <Heart />}
+                  {!wishlistLoading && wishlist.length > 0 && (
                     <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full p-0">
                       {wishlist.length}
                     </Badge>
@@ -76,8 +77,8 @@ export function Header() {
             <Button variant="ghost" size="icon" asChild aria-label="Panier">
               <Link href="/cart">
                 <div className="relative">
-                  <ShoppingCart />
-                  {totalItems > 0 && (
+                  {cartLoading ? <Loader2 className="animate-spin"/> : <ShoppingCart />}
+                  {!cartLoading && totalItems > 0 && (
                     <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full p-0">
                       {totalItems}
                     </Badge>

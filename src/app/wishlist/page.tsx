@@ -6,9 +6,27 @@ import { ProductCard } from '@/components/product/product-card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function WishlistPage() {
-  const { wishlist } = useWishlist();
+  const { wishlist, loading } = useWishlist();
+
+  if (loading) {
+    return (
+         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+            <Skeleton className="h-12 w-1/3 mb-8" />
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i}>
+                        <Skeleton className="aspect-[3/4] w-full" />
+                        <Skeleton className="h-5 w-3/4 mt-4" />
+                        <Skeleton className="h-5 w-1/2 mt-2" />
+                    </div>
+                ))}
+            </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">

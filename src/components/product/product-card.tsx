@@ -15,8 +15,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { wishlist, toggleWishlist } = useWishlist();
-  const isInWishlist = wishlist.some(item => item.id === product.id);
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const isProductInWishlist = isInWishlist(product.id);
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ export function ProductCard({ product }: ProductCardProps) {
             aria-label="Ajouter aux favoris"
             onClick={handleWishlistClick}
           >
-            <Heart className={cn("h-4 w-4", isInWishlist ? "fill-red-500 text-red-500" : "")} />
+            <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-red-500 text-red-500" : "")} />
           </Button>
           {product.isNew && (
             <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">

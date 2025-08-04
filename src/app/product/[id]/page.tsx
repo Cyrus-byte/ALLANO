@@ -15,7 +15,7 @@ import type { Product } from '@/lib/types';
 
 export default function ProductPage() {
   const { addToCart } = useCart();
-  const { wishlist, toggleWishlist } = useWishlist();
+  const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
   const params = useParams();
   const product = PRODUCTS.find(p => p.id === params.id);
 
@@ -28,13 +28,11 @@ export default function ProductPage() {
     notFound();
   }
 
-  const isInWishlist = wishlist.some(item => item.id === product.id);
+  const isProductInWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
     if (selectedSize && selectedColor) {
-      for (let i = 0; i < quantity; i++) {
         addToCart(product, selectedSize, selectedColor);
-      }
     } else {
         alert("Veuillez sélectionner une taille et une couleur.");
     }
@@ -118,21 +116,22 @@ export default function ProductPage() {
           {/* Actions */}
           <div className="mt-8 flex items-center gap-4">
             <div className="flex items-center border rounded-md">
-              <Button variant="ghost" size="icon" onClick={() => setQuantity(q => Math.max(1, q - 1))}>
+              <Button variant="ghost" size="icon" onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled>
                 <Minus className="h-4 w-4" />
               </Button>
               <span className="w-12 text-center">{quantity}</span>
-              <Button variant="ghost" size="icon" onClick={() => setQuantity(q => q + 1)}>
+              <Button variant="ghost" size="icon" onClick={() => setQuantity(q => q + 1)} disabled>
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedSize || !selectedColor}>
+            <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedSize || !selectedColor || quantity > 1}>
               <ShoppingCart className="mr-2 h-5 w-5" /> Ajouter au panier
             </Button>
             <Button variant="outline" size="icon" aria-label="Ajouter aux favoris" onClick={() => toggleWishlist(product)}>
-              <Heart className={cn("h-5 w-5", isInWishlist ? "fill-red-500 text-red-500" : "")} />
+              <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "")} />
             </Button>
           </div>
+           {quantity > 1 && <p className="text-sm text-muted-foreground mt-2">Pour ajouter plusieurs quantités, veuillez ajuster dans le panier.</p>}
         </div>
       </div>
     </div>

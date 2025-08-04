@@ -3,7 +3,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { doc, setDoc, getDoc } from "firebase/firestore"; 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 
@@ -32,12 +33,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+  const createUserDocument = async (user: User) => {
+    const userRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+        await setDoc(userRef, {
+            email: user.email,
+            displayName: user.displayName,
+            createdAt: new Date(),
+            cart: [],
+            wishlist: [],
+        });
+    }
+  }
+
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, {
-        displayName: `${firstName} ${lastName}`
-      });
+      const displayName = `${firstName} ${lastName}`;
+      await updateProfile(userCredential.user, { displayName });
+      
+      const userWithProfile = { ...userCredential.user, displayName };
+      await createUserDocument(userWithProfile);
+
       setUser(userCredential.user);
       router.push('/');
       toast({ title: "Compte créé", description: "Bienvenue sur Allano !" });
@@ -61,7 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      await createUserDocument(result.user);
       router.push('/account');
       toast({ title: "Connexion réussie", description: "Heureux de vous revoir !" });
     } catch (error: any) {

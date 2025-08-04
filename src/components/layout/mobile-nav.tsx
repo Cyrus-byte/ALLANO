@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, ShoppingCart, User, Heart, Tag } from 'lucide-react';
+import { Home, LayoutGrid, ShoppingCart, User, Heart, Tag, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/cart-context';
@@ -11,15 +11,15 @@ import { useWishlist } from '@/contexts/wishlist-context';
 
 export function MobileNav() {
   const pathname = usePathname();
-  const { totalItems } = useCart();
-  const { wishlist } = useWishlist();
+  const { totalItems, loading: cartLoading } = useCart();
+  const { wishlist, loading: wishlistLoading } = useWishlist();
 
   const navItems = [
     { href: '/', label: 'Accueil', icon: Home, exact: true },
     { href: '/categories', label: 'Catégories', icon: LayoutGrid },
     { href: '/promotions', label: 'Promos', icon: Tag },
-    { href: '/wishlist', label: 'Favoris', icon: Heart },
-    { href: '/cart', label: 'Panier', icon: ShoppingCart },
+    { href: '/wishlist', label: 'Favoris', icon: Heart, loading: wishlistLoading, count: wishlist.length },
+    { href: '/cart', label: 'Panier', icon: ShoppingCart, loading: cartLoading, count: totalItems },
     { href: '/account', label: 'Profil', icon: User },
   ];
 
@@ -31,15 +31,10 @@ export function MobileNav() {
           return (
             <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
               <div className="relative">
-                <item.icon className={cn("h-6 w-6", isActive ? "text-primary" : "text-muted-foreground")} />
-                {item.href === '/cart' && totalItems > 0 && (
+                {item.loading ? <Loader2 className={cn("h-6 w-6 animate-spin", isActive ? "text-primary" : "text-muted-foreground")} /> : <item.icon className={cn("h-6 w-6", isActive ? "text-primary" : "text-muted-foreground")} />}
+                {!item.loading && item.count && item.count > 0 && (
                   <Badge variant="destructive" className="absolute -top-2 -right-3 h-5 w-5 justify-center rounded-full p-0">
-                    {totalItems}
-                  </Badge>
-                )}
-                 {item.href === '/wishlist' && wishlist.length > 0 && (
-                  <Badge variant="destructive" className="absolute -top-2 -right-3 h-5 w-5 justify-center rounded-full p-0">
-                    {wishlist.length}
+                    {item.count}
                   </Badge>
                 )}
               </div>

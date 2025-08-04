@@ -8,13 +8,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart, Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CartPage() {
-  const { cart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+  const { cart, removeFromCart, updateQuantity, totalPrice, totalItems, loading } = useCart();
 
   const shippingCost = totalItems > 0 ? 2000 : 0;
   const grandTotal = totalPrice + shippingCost;
+
+  if (loading) {
+      return (
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+            <Skeleton className="h-12 w-1/3 mb-8" />
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+                <div className="lg:col-span-2 space-y-4">
+                    <Skeleton className="h-36 w-full" />
+                    <Skeleton className="h-36 w-full" />
+                </div>
+                <div className="lg:col-span-1">
+                    <Skeleton className="h-64 w-full" />
+                </div>
+            </div>
+          </div>
+      )
+  }
 
   if (cart.length === 0) {
     return (
@@ -35,7 +53,7 @@ export default function CartPage() {
       <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
         <div className="lg:col-span-2">
           <div className="flex flex-col gap-4">
-            {cart.map(item => (
+            {cart.map(item => item.product && (
               <Card key={item.id} className="flex items-center p-4">
                 <div className="relative w-24 h-32 rounded-md overflow-hidden">
                   <Image src={item.product.images[0]} alt={item.product.name} fill objectFit="cover" />

@@ -19,8 +19,13 @@ export type Product = {
 
 export type CartItem = {
   id: string; // combination of product.id, size, and color
-  product: Product;
+  productId: string;
   size: string;
   color: string;
   quantity: number;
+  product?: Product; // This will be populated client-side
 };
+
+export type WishlistItem = {
+    productId: string;
+}
