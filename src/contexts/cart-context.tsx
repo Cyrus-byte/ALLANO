@@ -54,7 +54,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
-        const firestoreCart = userDoc.data().cart as CartItem[];
+        const firestoreCart = (userDoc.data()?.cart || []) as CartItem[];
         const localCart = getCartFromLocalStorage();
 
         // Merge logic

@@ -43,7 +43,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const userRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
-        const wishlistData = userDoc.data().wishlist as { productId: string }[];
+        const wishlistData = (userDoc.data()?.wishlist || []) as { productId: string }[];
         const productIds = wishlistData.map(item => item.productId);
         const userWishlist = PRODUCTS.filter(p => productIds.includes(p.id));
         
