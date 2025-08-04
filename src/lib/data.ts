@@ -96,7 +96,7 @@ export const PRODUCTS: Product[] = [
     name: 'Chemise en lin',
     description: "Une chemise légère en lin, parfaite pour rester au frais avec style. Coupe décontractée et confortable.",
     price: 22000,
-    images: ['allano-app/linen-shirt_kgdrlj'],
+    images: ['allano-app/linen-shirt'],
     category: 'Vêtements',
     subcategory: 'Chemises',
     brand: 'Allano Basics',
