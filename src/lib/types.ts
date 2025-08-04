@@ -29,3 +29,22 @@ export type CartItem = {
 export type WishlistItem = {
     productId: string;
 }
+
+export type ShippingDetails = {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  phone: string;
+};
+
+export type Order = {
+  id: string; // CinetPay transaction_id
+  userId: string;
+  items: Omit<CartItem, 'product'>[];
+  shippingDetails: ShippingDetails;
+  totalAmount: number;
+  status: 'Payée' | 'Expédiée' | 'Livrée' | 'Annulée';
+  createdAt: any; // Firestore timestamp
+  paymentDetails?: any;
+};

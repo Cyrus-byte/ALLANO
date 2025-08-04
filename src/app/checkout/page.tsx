@@ -15,6 +15,9 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { createOrder } from '@/lib/order-service';
+import type { Order } from '@/lib/types';
+
 
 declare global {
     interface Window {
@@ -58,6 +61,10 @@ export default function CheckoutPage() {
         });
         return;
     }
+     if (!user) {
+        toast({ title: "Utilisateur non connecté", description: "Veuillez vous connecter pour continuer.", variant: "destructive" });
+        return;
+    }
 
     setPaymentLoading(true);
 
@@ -89,16 +96,33 @@ export default function CheckoutPage() {
             customer_zip_code: '01'
         });
 
-        window.CinetPay.waitResponse(function(data: any) {
+        window.CinetPay.waitResponse(async (data: any) => {
             if (data.status === "REFUSED") {
                 toast({ title: "Paiement refusé", description: "Votre paiement a été refusé.", variant: "destructive" });
                 setPaymentLoading(false);
             } else if (data.status === "ACCEPTED") {
-                toast({ title: "Paiement réussi", description: "Merci pour votre commande !" });
-                // TODO: Save order to firestore
-                clearCart();
-                router.push('/account');
-                setPaymentLoading(false);
+                try {
+                     const orderData: Omit<Order, 'createdAt'> = {
+                        id: transactionId,
+                        userId: user.uid,
+                        items: cart.map(({ product, ...rest }) => rest),
+                        shippingDetails: { firstName, lastName, address, city, phone },
+                        totalAmount: grandTotal,
+                        status: 'Payée',
+                        paymentDetails: data,
+                    };
+
+                    await createOrder(orderData);
+                    
+                    toast({ title: "Paiement réussi", description: "Merci pour votre commande !" });
+                    clearCart();
+                    router.push('/account');
+                } catch (orderError) {
+                     console.error("Erreur lors de la création de la commande:", orderError);
+                     toast({ title: "Erreur de commande", description: "Votre paiement a réussi, mais nous n'avons pas pu enregistrer votre commande. Veuillez nous contacter.", variant: "destructive" });
+                } finally {
+                    setPaymentLoading(false);
+                }
             }
         });
 
