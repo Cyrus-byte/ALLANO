@@ -102,8 +102,7 @@ export default function CheckoutPage() {
                 setPaymentLoading(false);
             } else if (data.status === "ACCEPTED") {
                 try {
-                     const orderData: Omit<Order, 'createdAt'> = {
-                        id: transactionId,
+                     const orderData: Omit<Order, 'id' | 'createdAt'> = {
                         userId: user.uid,
                         items: cart.map(({ product, ...rest }) => rest),
                         shippingDetails: { firstName, lastName, address, city, phone },

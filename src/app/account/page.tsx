@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,24 +11,44 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from '@/components/ui/skeleton';
+import { getOrdersByUserId } from '@/lib/order-service';
+import type { Order } from '@/lib/types';
+import { Loader2 } from 'lucide-react';
 
-const orders = [
-  { id: 'ORD-00124', date: '12 Juil. 2024', total: 41500, status: 'Livré', items: 2 },
-  { id: 'ORD-00119', date: '28 Juin 2024', total: 9500, status: 'Livré', items: 1 },
-  { id: 'ORD-00105', date: '05 Mai 2024', total: 55000, status: 'Annulé', items: 1 },
-];
 
 export default function AccountPage() {
-    const { user, loading, logOut } = useAuth();
+    const { user, loading: authLoading, logOut } = useAuth();
     const router = useRouter();
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [ordersLoading, setOrdersLoading] = useState(true);
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!authLoading && !user) {
             router.push('/login');
         }
-    }, [user, loading, router]);
+    }, [user, authLoading, router]);
 
-    if (loading || !user) {
+    useEffect(() => {
+        if (user) {
+            const fetchOrders = async () => {
+                setOrdersLoading(true);
+                try {
+                    const userOrders = await getOrdersByUserId(user.uid);
+                    setOrders(userOrders);
+                } catch (error) {
+                    console.error("Failed to fetch orders:", error);
+                } finally {
+                    setOrdersLoading(false);
+                }
+            };
+            fetchOrders();
+        }
+    }, [user]);
+
+
+    const isLoading = authLoading || !user;
+
+    if (isLoading) {
         return (
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
                 <Skeleton className="h-12 w-1/3 mb-8" />
@@ -69,23 +89,33 @@ export default function AccountPage() {
               <CardDescription>Consultez l'état et les détails de vos commandes récentes.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-4">
-                {orders.map(order => (
-                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-bold">{order.id}</p>
-                      <p className="text-sm text-muted-foreground">{order.date} - {order.items} article(s)</p>
+              {ordersLoading ? (
+                <div className="flex justify-center items-center h-40">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : orders.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  {orders.map(order => (
+                    <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <p className="font-bold">#{order.id.substring(0, 8)}...</p>
+                        <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleDateString('fr-FR')} - {order.items.reduce((acc, item) => acc + item.quantity, 0)} article(s)</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold">{order.totalAmount.toLocaleString('fr-FR')} FCFA</p>
+                        <Badge variant={order.status === 'Livrée' ? 'secondary' : order.status === 'Annulée' ? 'destructive' : 'default'} className="mt-1">
+                          {order.status}
+                        </Badge>
+                      </div>
+                      <Button variant="outline" size="sm">Voir les détails</Button>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold">{order.total.toLocaleString('fr-FR')} FCFA</p>
-                      <Badge variant={order.status === 'Livré' ? 'secondary' : order.status === 'Annulé' ? 'destructive' : 'default'} className="mt-1">
-                        {order.status}
-                      </Badge>
-                    </div>
-                    <Button variant="outline" size="sm">Voir les détails</Button>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                    <p className="text-muted-foreground">Vous n'avez pas encore passé de commande.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

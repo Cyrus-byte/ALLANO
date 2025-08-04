@@ -39,12 +39,12 @@ export type ShippingDetails = {
 };
 
 export type Order = {
-  id: string; // CinetPay transaction_id
+  id: string; // Firestore document ID
   userId: string;
   items: Omit<CartItem, 'product'>[];
   shippingDetails: ShippingDetails;
   totalAmount: number;
   status: 'Payée' | 'Expédiée' | 'Livrée' | 'Annulée';
-  createdAt: any; // Firestore timestamp
+  createdAt: any; // Firestore timestamp, will be Date object on client
   paymentDetails?: any;
 };
