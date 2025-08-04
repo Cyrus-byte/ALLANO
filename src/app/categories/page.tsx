@@ -1,4 +1,6 @@
 
+"use client";
+
 import Link from 'next/link';
 import { CldImage } from 'next-cloudinary';
 import { ProductCard } from '@/components/product/product-card';
