@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { createOrder } from '@/lib/order-service';
 import type { Order } from '@/lib/types';
@@ -210,7 +210,7 @@ export default function CheckoutPage() {
                     {cart.map(item => item.product && (
                         <div key={item.id} className="flex items-center gap-4">
                             <div className="relative w-16 h-20 rounded-md overflow-hidden border">
-                                <CldImage src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
+                                <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                                 <div className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
                                     {item.quantity}
                                 </div>

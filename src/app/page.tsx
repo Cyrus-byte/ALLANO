@@ -1,5 +1,5 @@
 
-import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
 import { ProductRecommendations } from '@/components/product/product-recommendations';
@@ -12,8 +12,8 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
-        <CldImage
-          src="allano-app/hero-background_bquwnv"
+        <Image
+          src="https://res.cloudinary.com/dhjcx6ckx/image/upload/v1721757879/allano-app/hero-background_bquwnv.jpg"
           alt="Hero background"
           fill
           className="object-cover"

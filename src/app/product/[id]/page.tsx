@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { notFound, useParams } from 'next/navigation';
-import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import { PRODUCTS } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -59,12 +59,12 @@ export default function ProductPage() {
                 )}
                 onClick={() => setMainImage(img)}
               >
-                <CldImage src={img} alt={`${product.name} thumbnail ${index + 1}`} fill className="object-cover" />
+                <Image src={img} alt={`${product.name} thumbnail ${index + 1}`} fill className="object-cover" />
               </button>
             ))}
           </div>
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-            <CldImage src={mainImage} alt={product.name} fill className="object-cover" width={800} height={1067}/>
+            <Image src={mainImage} alt={product.name} fill className="object-cover" width={800} height={1067}/>
           </div>
         </div>
 
