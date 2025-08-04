@@ -31,10 +31,9 @@ export default function ProductPage() {
   const isProductInWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
+    // La vérification est désormais gérée par l'état `disabled` du bouton.
     if (selectedSize && selectedColor) {
         addToCart(product, selectedSize, selectedColor, quantity);
-    } else {
-        alert("Veuillez sélectionner une taille et une couleur.");
     }
   };
 
