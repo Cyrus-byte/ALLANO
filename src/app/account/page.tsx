@@ -1,10 +1,16 @@
 
+"use client";
+
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from '@/components/ui/skeleton';
 
 const orders = [
   { id: 'ORD-00124', date: '12 Juil. 2024', total: 41500, status: 'Livré', items: 2 },
@@ -13,9 +19,43 @@ const orders = [
 ];
 
 export default function AccountPage() {
+    const { user, loading, logOut } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login');
+        }
+    }, [user, loading, router]);
+
+    if (loading || !user) {
+        return (
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+                <Skeleton className="h-12 w-1/3 mb-8" />
+                <div className="w-full">
+                    <Skeleton className="h-10 w-1/3 mb-6" />
+                    <Card>
+                        <CardHeader>
+                            <Skeleton className="h-6 w-1/4 mb-2" />
+                            <Skeleton className="h-4 w-1/2" />
+                        </CardHeader>
+                        <CardContent>
+                           <Skeleton className="h-24 w-full" />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
+    
+    const [firstName, lastName] = user.displayName?.split(' ') || ['',''];
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <h1 className="text-3xl md:text-4xl font-bold font-headline mb-8">Mon Compte</h1>
+      <div className='flex justify-between items-center mb-8'>
+        <h1 className="text-3xl md:text-4xl font-bold font-headline">Mon Compte</h1>
+        <Button onClick={logOut} variant="outline">Se déconnecter</Button>
+      </div>
       <Tabs defaultValue="orders" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="orders">Mes Commandes</TabsTrigger>
@@ -59,16 +99,16 @@ export default function AccountPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label htmlFor="firstName">Prénom</Label>
-                  <Input id="firstName" defaultValue="John" />
+                  <Input id="firstName" defaultValue={firstName} />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="lastName">Nom</Label>
-                  <Input id="lastName" defaultValue="Doe" />
+                  <Input id="lastName" defaultValue={lastName} />
                 </div>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="john.doe@example.com" />
+                <Input id="email" type="email" defaultValue={user.email || ''} readOnly />
               </div>
             </CardContent>
             <CardFooter>
