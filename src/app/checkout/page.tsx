@@ -14,11 +14,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
+
+declare global {
+    interface Window {
+        CinetPay: any;
+    }
+}
 
 export default function CheckoutPage() {
-  const { cart, totalPrice, totalItems, loading: cartLoading } = useCart();
+  const { cart, totalPrice, totalItems, loading: cartLoading, clearCart } = useCart();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -42,10 +50,69 @@ export default function CheckoutPage() {
   }, [user]);
 
   const handlePayment = async () => {
+    if(!firstName || !lastName || !address || !phone) {
+        toast({
+            title: "Formulaire incomplet",
+            description: "Veuillez remplir tous les champs de livraison.",
+            variant: "destructive",
+        });
+        return;
+    }
+
     setPaymentLoading(true);
-    // TODO: Implement CinetPay logic
-    alert('Logique de paiement CinetPay à implémenter ici !');
-    setPaymentLoading(false);
+
+    const transactionId = `ALLANO-${Date.now()}`;
+    const shippingCost = totalItems > 0 ? 2000 : 0;
+    const grandTotal = totalPrice + shippingCost;
+    
+    try {
+        window.CinetPay.setConfig({
+            apikey: process.env.NEXT_PUBLIC_CINETPAY_API_KEY,
+            site_id: parseInt(process.env.NEXT_PUBLIC_CINETPAY_SITE_ID || '0'),
+            notify_url: window.location.origin,
+            mode: 'PRODUCTION'
+        });
+
+        window.CinetPay.getCheckout({
+            transaction_id: transactionId,
+            amount: grandTotal,
+            currency: 'XOF',
+            channels: 'ALL',
+            description: `Achat sur Allano - Commande ${transactionId}`,
+            customer_name: firstName,
+            customer_surname: lastName,
+            customer_email: user?.email,
+            customer_phone_number: phone,
+            customer_address: address,
+            customer_city: city,
+            customer_country: 'BF',
+            customer_zip_code: '01'
+        });
+
+        window.CinetPay.waitResponse(function(data: any) {
+            if (data.status === "REFUSED") {
+                toast({ title: "Paiement refusé", description: "Votre paiement a été refusé.", variant: "destructive" });
+                setPaymentLoading(false);
+            } else if (data.status === "ACCEPTED") {
+                toast({ title: "Paiement réussi", description: "Merci pour votre commande !" });
+                // TODO: Save order to firestore
+                clearCart();
+                router.push('/account');
+                setPaymentLoading(false);
+            }
+        });
+
+        window.CinetPay.onError(function(err: any) {
+            console.error('CinetPay Error:', err);
+            toast({ title: "Erreur de paiement", description: "Une erreur est survenue. Veuillez réessayer.", variant: "destructive" });
+            setPaymentLoading(false);
+        });
+
+    } catch(e) {
+        console.error("CinetPay initialization error", e);
+        toast({ title: "Erreur", description: "Impossible d'initialiser le paiement.", variant: "destructive" });
+        setPaymentLoading(false);
+    }
   }
 
   const isLoading = cartLoading || authLoading;
