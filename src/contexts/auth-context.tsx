@@ -34,6 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const createUserDocument = async (user: User) => {
+    if (!user) return;
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists()) {
@@ -103,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const value = { user, loading, signUp, logIn, logInWithGoogle, logOut };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
