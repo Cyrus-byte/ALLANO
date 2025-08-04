@@ -11,7 +11,7 @@ import { PRODUCTS } from '@/lib/data';
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: Product, size: string, color: string) => void;
+  addToCart: (product: Product, size: string, color: string, quantity?: number) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -122,7 +122,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [cart, user]);
 
 
-  const addToCart = (product: Product, size: string, color: string) => {
+  const addToCart = (product: Product, size: string, color: string, quantity: number = 1) => {
     const itemId = `${product.id}-${size}-${color}`;
     
     setCart(prevCart => {
@@ -130,17 +130,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let newCart;
       if (existingItem) {
         newCart = prevCart.map(item =>
-          item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === itemId ? { ...item, quantity: item.quantity + quantity } : item
         );
       } else {
-        newCart = [...prevCart, { id: itemId, productId: product.id, product, size, color, quantity: 1 }];
+        newCart = [...prevCart, { id: itemId, productId: product.id, product, size, color, quantity: quantity }];
       }
       if (user) updateFirestoreCart(newCart);
       return newCart;
     });
     toast({
       title: "Ajouté au panier",
-      description: `${product.name} a été ajouté à votre panier.`,
+      description: `${quantity} x ${product.name} a été ajouté à votre panier.`,
     });
   };
 
