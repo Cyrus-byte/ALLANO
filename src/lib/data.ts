@@ -81,7 +81,7 @@ export const PRODUCTS: Product[] = [
     name: 'Sandales en cuir',
     description: "Des sandales confortables et stylées pour l'été. Fabriquées en cuir véritable avec une semelle souple.",
     price: 18000,
-    images: ['allano-app/leather-sandals_fl3hrc'],
+    images: ['allano-app/leather-sandals'],
     category: 'Chaussures',
     subcategory: 'Sandales',
     brand: 'Allano Chic',
