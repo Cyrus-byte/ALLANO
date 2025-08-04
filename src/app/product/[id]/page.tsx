@@ -20,7 +20,7 @@ export default function ProductPage() {
   const product = PRODUCTS.find(p => p.id === params.id);
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState<string | null>(product?.colors[0].name || null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(product?.colors[0]?.name || null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [mainImage, setMainImage] = useState(product?.images[0] || '');
 
