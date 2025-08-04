@@ -64,7 +64,7 @@ export default function ProductPage() {
             ))}
           </div>
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-            <Image src={mainImage} alt={product.name} fill className="object-cover" width={800} height={1067}/>
+            <Image src={mainImage} alt={product.name} fill className="object-cover" />
           </div>
         </div>
 
