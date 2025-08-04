@@ -13,7 +13,7 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
         <Image
-          src="https://placehold.co/1800x900.png"
+          src="https://res.cloudinary.com/dhjcx6ckx/image/upload/v1721232384/allano-app/hero-background_bquwnv.png"
           alt="Hero background"
           layout="fill"
           objectFit="cover"
