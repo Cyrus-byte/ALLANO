@@ -7,6 +7,17 @@ import type { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
+const slugify = (text: string) =>
+  text
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-');
+
 export default function CategoriesPage() {
   const categories = PRODUCTS.reduce((acc, product) => {
     const category = product.category;
@@ -29,12 +40,12 @@ export default function CategoriesPage() {
       <section className="mb-16">
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
           {Object.keys(categories).map((category) => (
-            <Link key={category} href={`#${category.toLowerCase().replace(/\s/g, '-')}`} passHref>
+            <Link key={category} href={`/category/${slugify(category)}`} passHref>
                <div className="group relative aspect-square overflow-hidden rounded-lg">
                 <Image
                   src={categories[category].image}
                   alt={category}
-                  layout="fill"
+                  fill
                   objectFit="cover"
                   className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                 />
@@ -49,11 +60,11 @@ export default function CategoriesPage() {
 
       <div className="space-y-16">
         {Object.entries(categories).map(([category, { products }]) => (
-          <section key={category} id={`${category.toLowerCase().replace(/\s/g, '-')}`} className="scroll-mt-24">
+          <section key={category} id={`${slugify(category)}`} className="scroll-mt-24">
              <div className="flex justify-between items-end mb-8 border-b pb-4">
                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">{category}</h2>
                  <Button asChild variant="link" className="text-primary pr-0">
-                    <Link href={`#`}>
+                    <Link href={`/category/${slugify(category)}`}>
                         Voir tout <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                  </Button>
