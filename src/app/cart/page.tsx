@@ -107,8 +107,8 @@ export default function CartPage() {
               </div>
             </CardContent>
             <CardFooter className="flex-col gap-2">
-              <Button size="lg" className="w-full">
-                Passer au paiement
+              <Button asChild size="lg" className="w-full">
+                <Link href="/checkout">Passer au paiement</Link>
               </Button>
                <p className="text-xs text-muted-foreground text-center">Paiements sécurisés par CinetPay</p>
             </CardFooter>
