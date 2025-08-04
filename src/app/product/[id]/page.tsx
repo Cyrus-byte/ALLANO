@@ -15,7 +15,7 @@ import type { Product } from '@/lib/types';
 
 export default function ProductPage() {
   const { addToCart } = useCart();
-  const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const params = useParams();
   const product = PRODUCTS.find(p => p.id === params.id);
 
@@ -31,9 +31,8 @@ export default function ProductPage() {
   const isProductInWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
-    // La vérification est désormais gérée par l'état `disabled` du bouton.
-    if (selectedSize && selectedColor) {
-        addToCart(product, selectedSize, selectedColor, quantity);
+    if (product && selectedSize && selectedColor) {
+      addToCart(product, selectedSize, selectedColor, quantity);
     }
   };
 
