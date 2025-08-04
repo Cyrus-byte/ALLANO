@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import { ProductCard } from '@/components/product/product-card';
 import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
@@ -42,12 +42,11 @@ export default function CategoriesPage() {
           {Object.keys(categories).map((category) => (
             <Link key={category} href={`/category/${slugify(category)}`} passHref>
                <div className="group relative aspect-square overflow-hidden rounded-lg">
-                <Image
+                <CldImage
                   src={categories[category].image}
                   alt={category}
                   fill
-                  objectFit="cover"
-                  className="transition-transform duration-300 ease-in-out group-hover:scale-105"
+                  className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <h2 className="text-sm font-bold text-white text-center p-1">{category}</h2>

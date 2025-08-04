@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { notFound, useParams } from 'next/navigation';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import { PRODUCTS } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -12,12 +12,14 @@ import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import type { Product } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProductPage() {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const params = useParams();
   const product = PRODUCTS.find(p => p.id === params.id);
+  const { toast } = useToast();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState<string | null>(product?.colors[0]?.name || null);
@@ -33,6 +35,12 @@ export default function ProductPage() {
   const handleAddToCart = () => {
     if (product && selectedSize && selectedColor) {
       addToCart(product, selectedSize, selectedColor, quantity);
+    } else {
+        toast({
+            title: "Sélection requise",
+            description: "Veuillez sélectionner une taille et une couleur.",
+            variant: "destructive"
+        })
     }
   };
 
@@ -51,12 +59,12 @@ export default function ProductPage() {
                 )}
                 onClick={() => setMainImage(img)}
               >
-                <Image src={img} alt={`${product.name} thumbnail ${index + 1}`} fill objectFit="cover" />
+                <CldImage src={img} alt={`${product.name} thumbnail ${index + 1}`} fill className="object-cover" />
               </button>
             ))}
           </div>
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-            <Image src={mainImage} alt={product.name} fill objectFit="cover" />
+            <CldImage src={mainImage} alt={product.name} fill className="object-cover" width={800} height={1067}/>
           </div>
         </div>
 
