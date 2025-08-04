@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,39 +8,48 @@ import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wand2 } from 'lucide-react';
 import { getProductRecommendations } from '@/ai/flows/product-recommendation';
+import { useAuth } from '@/contexts/auth-context';
 
 export function ProductRecommendations() {
+  const { user, loading: authLoading } = useAuth();
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRecommendations() {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       try {
         setLoading(true);
-        // In a real app, user data would come from session/context
+        // Dans une future version, l'historique de navigation et les achats passés
+        // pourraient être récupérés depuis la base de données.
         const result = await getProductRecommendations({
-          userId: 'user-123',
+          userId: user.uid,
           browsingHistory: ['Robe d\'été florale', 'Sandales en cuir'],
           pastPurchases: ['T-shirt en coton bio'],
         });
         
-        // The flow returns product names. We find the full product objects.
+        // Le flux renvoie des noms de produits. Nous trouvons les objets produits complets.
         const recommendedProducts = PRODUCTS.filter(p => result.recommendations.includes(p.name));
         setRecommendations(recommendedProducts);
       } catch (error) {
         console.error("Erreur lors de la récupération des recommandations:", error);
-        // In case of error, you might want to show some fallback content
-        // or just hide the component. For now, we'll just have no recommendations.
         setRecommendations([]);
       } finally {
         setLoading(false);
       }
     }
-    fetchRecommendations();
-  }, []);
+    
+    if(!authLoading) {
+        fetchRecommendations();
+    }
+  }, [user, authLoading]);
 
-  if (loading) {
-    return (
+  if (authLoading || loading) {
+    // Affiche un squelette de chargement uniquement si un utilisateur est potentiellement connecté
+    return !authLoading && !user ? null : (
       <section className="py-12 md:py-16">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline mb-8 flex items-center gap-2">
             <Wand2 className="text-primary" /> Pour vous
@@ -57,7 +67,7 @@ export function ProductRecommendations() {
     );
   }
 
-  if (recommendations.length === 0) {
+  if (!user || recommendations.length === 0) {
     return null;
   }
 
