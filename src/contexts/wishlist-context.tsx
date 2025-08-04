@@ -6,7 +6,7 @@ import type { Product } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from './auth-context';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { doc, getDoc, setDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { PRODUCTS } from '@/lib/data';
 
 interface WishlistContextType {
@@ -52,7 +52,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const mergedWishlist = [...new Map([...localWishlist, ...userWishlist].map(item => [item.id, item])).values()];
         if(mergedWishlist.length > userWishlist.length) {
             const updatedFirestoreWishlist = mergedWishlist.map(p => ({ productId: p.id }));
-            await updateDoc(userRef, { wishlist: updatedFirestoreWishlist });
+            await setDoc(userRef, { wishlist: updatedFirestoreWishlist }, { merge: true });
         }
 
         setWishlist(mergedWishlist);
@@ -84,13 +84,13 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const userRef = doc(db, 'users', user.uid);
         try {
             if (isInWishlist) {
-                await updateDoc(userRef, {
+                await setDoc(userRef, {
                     wishlist: arrayRemove({ productId: product.id })
-                });
+                }, { merge: true });
             } else {
-                 await updateDoc(userRef, {
+                 await setDoc(userRef, {
                     wishlist: arrayUnion({ productId: product.id })
-                });
+                }, { merge: true });
             }
         } catch (error) {
             console.error("Error updating firestore wishlist", error);

@@ -6,7 +6,7 @@ import type { CartItem, Product } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from './auth-context';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { PRODUCTS } from '@/lib/data';
 
 interface CartContextType {
@@ -73,7 +73,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (mergedCart.length > 0) {
             const cartForFirestore = mergedCart.map(({ product, ...rest }) => rest);
-            await updateDoc(userRef, { cart: cartForFirestore });
+            await setDoc(userRef, { cart: cartForFirestore }, { merge: true });
         }
         
         setCart(mapCartItems(mergedCart));
@@ -103,7 +103,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
         const userRef = doc(db, 'users', user.uid);
         const cartForFirestore = newCart.map(({ product, ...rest }) => rest);
-        await updateDoc(userRef, { cart: cartForFirestore });
+        await setDoc(userRef, { cart: cartForFirestore }, { merge: true });
     } catch (error) {
         console.error("Error updating firestore cart", error);
         toast({ title: "Erreur", description: "Impossible de mettre à jour le panier.", variant: "destructive" });

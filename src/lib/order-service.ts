@@ -1,6 +1,6 @@
 
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc, arrayUnion } from 'firebase/firestore';
 import type { Order } from './types';
 
 export const createOrder = async (orderData: Omit<Order, 'createdAt'>) => {
@@ -15,11 +15,12 @@ export const createOrder = async (orderData: Omit<Order, 'createdAt'>) => {
 
   const orderRef = await addDoc(collection(db, 'orders'), orderWithTimestamp);
   
-  // Add the order to the user's subcollection of orders for easy lookup
-  const userOrderRef = doc(db, 'users', orderData.userId, 'orders', orderRef.id);
-  await updateDoc(doc(db, 'users', orderData.userId), {
-      orders: userOrderRef
-  });
+  const userRef = doc(db, 'users', orderData.userId);
+
+  // Atomically add a new order to the "orders" array field.
+  await setDoc(userRef, { 
+    orders: arrayUnion({ orderId: orderRef.id, createdAt: new Date() }) 
+  }, { merge: true });
 
 
   return orderRef.id;
