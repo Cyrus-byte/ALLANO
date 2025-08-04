@@ -25,7 +25,7 @@ export const PRODUCTS: Product[] = [
     name: 'T-shirt en coton bio',
     description: "Un t-shirt basique et essentiel, incroyablement doux et confortable. Fabriqué à partir de coton 100% biologique, il est parfait pour un usage quotidien.",
     price: 9500,
-    images: ['https://res.cloudinary.com/dhjcx6ckx/image/upload/v1721232384/allano-app/organic-cotton-tshirt_szq3ce.png', 'https://res.cloudinary.com/dhjcx6ckx/image/upload/v1721232384/allano-app/organic-cotton-tshirt-2_vo3axt.png'],
+    images: ['https://res.cloudinary.com/dhjcx6ckx/image/upload/v1754321688/03bb9eea5f37d5ccdafcf7142fea0f59_hgxvpr.jpg', 'https://res.cloudinary.com/dhjcx6ckx/image/upload/v1721232384/allano-app/organic-cotton-tshirt-2_vo3axt.png'],
     category: 'Vêtements',
     subcategory: 'T-shirts',
     brand: 'Allano Basics',
@@ -206,3 +206,5 @@ export const PRODUCTS: Product[] = [
     isNew: false,
   }
 ];
+
+    
