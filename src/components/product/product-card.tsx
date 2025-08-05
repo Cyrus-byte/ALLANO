@@ -1,7 +1,7 @@
 
 "use client";
 
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
 import { Star, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <CardContent className="p-0">
         <div className="relative aspect-[3/4] overflow-hidden">
           <Link href={`/product/${product.id}`}>
-            <Image
+            <CldImage
               src={product.images[0]}
               alt={product.name}
               fill
@@ -81,3 +81,5 @@ export function ProductCard({ product }: ProductCardProps) {
     </Card>
   );
 }
+
+    

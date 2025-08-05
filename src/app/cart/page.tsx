@@ -1,7 +1,7 @@
 
 "use client";
 
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
 import { useCart } from '@/contexts/cart-context';
 import { Button } from '@/components/ui/button';
@@ -56,7 +56,7 @@ export default function CartPage() {
             {cart.map(item => item.product && (
               <Card key={item.id} className="flex items-center p-4">
                 <div className="relative w-24 h-32 rounded-md overflow-hidden">
-                   <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
+                   <CldImage src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                 </div>
                 <div className="flex-1 ml-4">
                   <h2 className="font-semibold">{item.product.name}</h2>
@@ -118,3 +118,5 @@ export default function CartPage() {
     </div>
   );
 }
+
+    
