@@ -1,4 +1,6 @@
 
+"use client";
+
 import { CldImage } from 'next-cloudinary';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
@@ -54,5 +56,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
