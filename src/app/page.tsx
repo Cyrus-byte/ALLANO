@@ -7,6 +7,7 @@ import { ProductCard } from '@/components/product/product-card';
 import { ProductRecommendations } from '@/components/product/product-recommendations';
 import { PRODUCTS } from '@/lib/data';
 import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Home() {
   const newArrivals = PRODUCTS.filter(p => p.isNew).slice(0, 8);
@@ -14,8 +15,8 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
-        <CldImage
-          src="allano-app/hero-background"
+        <Image
+          src="https://placehold.co/1600x900.png"
           alt="Hero background"
           fill
           className="object-cover"
