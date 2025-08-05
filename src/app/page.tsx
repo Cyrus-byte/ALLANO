@@ -15,7 +15,7 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
         <CldImage
-          src="allano-app/hero-background_bquwnv"
+          src="allano-app/hero-background"
           alt="Hero background"
           fill
           className="object-cover"
