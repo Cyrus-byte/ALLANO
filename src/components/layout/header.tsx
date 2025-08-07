@@ -23,6 +23,7 @@ export function Header() {
     { href: '/', label: 'Accueil' },
     { href: '/categories', label: 'Catégories' },
     { href: '/promotions', label: 'Promotions' },
+    { href: '/admin/upload', label: 'Admin' },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
