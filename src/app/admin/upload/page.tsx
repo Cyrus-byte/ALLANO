@@ -41,8 +41,8 @@ export default function AdminUploadPage() {
       return;
     }
      if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées.", variant: 'destructive' });
-      console.error("Cloudinary cloud name or upload preset is not configured in .env.local");
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées dans le fichier .env", variant: 'destructive' });
+      console.error("Cloudinary cloud name or upload preset is not configured in .env");
       return;
     }
 
@@ -70,7 +70,7 @@ export default function AdminUploadPage() {
         toast({ title: "Erreur de téléversement", description: "L'image n'a pas pu être téléversée. Vérifiez votre configuration Cloudinary.", variant: 'destructive' });
       }
       // La fenêtre se ferme, que ce soit un succès ou non
-      if (result.event === 'close') {
+      if (result.event === 'close' || result.event === 'abort') {
           setIsUploading(false);
       }
     });
@@ -182,4 +182,10 @@ export default function AdminUploadPage() {
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     2. Enregistrer le produit
                 </Button>
-            </
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+    </>
+  );
+}
