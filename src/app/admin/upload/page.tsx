@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { createProduct } from '@/lib/product-service';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
 const categories = [
   'Vêtements',
@@ -30,7 +30,7 @@ export default function AdminUploadPage() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
-  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -53,10 +53,11 @@ export default function AdminUploadPage() {
       uploadPreset: CLOUDINARY_UPLOAD_PRESET,
       folder: category.toLowerCase(),
       language: 'fr',
-      buttonCaption: "Téléverser une image",
+      multiple: true,
+      buttonCaption: "Téléverser des images",
       text: {
         "sources.local.title": "Fichiers locaux",
-        "sources.local.drop_file": "Glissez-déposez un fichier ici",
+        "sources.local.drop_file": "Glissez-déposez des fichiers ici",
         "sources.local.browse": "Parcourir",
       }
     }, (error: any, result: any) => { 
@@ -65,25 +66,28 @@ export default function AdminUploadPage() {
       }
       if (error) {
         console.error("Erreur de téléversement Cloudinary:", error);
-        toast({ title: "Erreur de téléversement", description: "L'image n'a pas pu être téléversée. Vérifiez votre configuration Cloudinary.", variant: 'destructive' });
+        toast({ title: "Erreur de téléversement", description: "Une ou plusieurs images n'ont pas pu être téléversées.", variant: 'destructive' });
         setIsUploading(false);
         return;
       }
       if (result.event === "success") { 
         console.log('Image téléversée avec succès: ', result.info);
-        setUploadedImageUrl(result.info.secure_url);
-        toast({ title: "Image téléversée", description: "L'image est prête. Vous pouvez maintenant enregistrer le produit."});
-        setIsUploading(false);
+        setUploadedImageUrls(prev => [...prev, result.info.secure_url]);
+        toast({ title: "Image ajoutée", description: "L'image est prête. Vous pouvez en ajouter d'autres ou enregistrer le produit."});
       }
     });
 
     myWidget.open();
   };
   
+  const handleRemoveImage = (urlToRemove: string) => {
+    setUploadedImageUrls(prev => prev.filter(url => url !== urlToRemove));
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productName || !price || !category || !uploadedImageUrl) {
-      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs et téléverser une image.", variant: "destructive" });
+    if (!productName || !price || !category || uploadedImageUrls.length === 0) {
+      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs et téléverser au moins une image.", variant: "destructive" });
       return;
     }
 
@@ -94,7 +98,7 @@ export default function AdminUploadPage() {
         description,
         price: parseFloat(price),
         category,
-        images: [uploadedImageUrl],
+        images: uploadedImageUrls,
         sizes: ['S', 'M', 'L', 'XL'], // Valeurs par défaut
         colors: [{name: 'Default', hex: '#FFFFFF'}], // Valeur par défaut
       };
@@ -105,7 +109,7 @@ export default function AdminUploadPage() {
       setDescription('');
       setPrice('');
       setCategory('');
-      setUploadedImageUrl('');
+      setUploadedImageUrls([]);
     } catch (error) {
       console.error("Erreur lors de la création du produit:", error);
       toast({ title: "Erreur", description: "Le produit n'a pas pu être créé.", variant: "destructive" });
@@ -126,7 +130,7 @@ export default function AdminUploadPage() {
           <CardHeader>
             <CardTitle>Ajouter un nouveau produit</CardTitle>
             <CardDescription>
-              Remplissez les informations, téléversez l'image, et enregistrez pour ajouter le produit à la base de données.
+              Remplissez les informations, téléversez les images, et enregistrez pour ajouter le produit.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -164,21 +168,34 @@ export default function AdminUploadPage() {
 
                 <Button onClick={handleUploadClick} type="button" variant="outline" className="w-full" disabled={!category || isUploading}>
                     {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {uploadedImageUrl ? "Changer l'image" : "1. Téléverser l'image"}
+                    {uploadedImageUrls.length > 0 ? "Ajouter d'autres images" : "1. Téléverser les images"}
                 </Button>
               </div>
 
-              {uploadedImageUrl && (
-                <div className="space-y-2 pt-4 border-t">
-                  <h3 className="font-semibold text-center">Image prête !</h3>
-                  <div className="relative aspect-square w-full max-w-xs mx-auto rounded-md overflow-hidden border">
-                      <img src={uploadedImageUrl} alt="Aperçu du téléversement" className="object-contain w-full h-full" />
-                  </div>
+              {uploadedImageUrls.length > 0 && (
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold text-center">{uploadedImageUrls.length} image(s) prête(s) !</h3>
+                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                      {uploadedImageUrls.map((url) => (
+                        <div key={url} className="relative aspect-square w-full mx-auto rounded-md overflow-hidden border">
+                          <img src={url} alt="Aperçu du téléversement" className="object-contain w-full h-full" />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                            onClick={() => handleRemoveImage(url)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                 </div>
               )}
             </CardContent>
             <CardFooter>
-                 <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || !uploadedImageUrl}>
+                 <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || uploadedImageUrls.length === 0}>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     2. Enregistrer le produit
                 </Button>
