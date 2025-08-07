@@ -11,7 +11,7 @@ export type Product = {
   rating: number;
   reviews: number;
   sizes: string[];
-  colors: { name: string; hex: string }[];
+  colors: { name: string; hex: string; imageUrl?: string }[];
   isNew?: boolean;
   onSale?: boolean;
   salePrice?: number;

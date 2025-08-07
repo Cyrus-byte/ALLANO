@@ -38,6 +38,10 @@ export default function ProductPage() {
           setMainImage(fetchedProduct.images[0] || '');
           if (fetchedProduct.colors.length > 0) {
             setSelectedColor(fetchedProduct.colors[0].name);
+            // If the first color has an associated image, set it as the main image
+            if (fetchedProduct.colors[0].imageUrl) {
+              setMainImage(fetchedProduct.colors[0].imageUrl);
+            }
           }
         } else {
             notFound();
@@ -92,6 +96,14 @@ export default function ProductPage() {
         })
     }
   };
+  
+  const handleColorSelect = (color: Product['colors'][0]) => {
+    setSelectedColor(color.name);
+    if (color.imageUrl) {
+        setMainImage(color.imageUrl);
+    }
+  }
+
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -139,7 +151,7 @@ export default function ProductPage() {
               {product.colors.map(color => (
                 <button
                   key={color.name}
-                  onClick={() => setSelectedColor(color.name)}
+                  onClick={() => handleColorSelect(color)}
                   className={cn(
                     "h-8 w-8 rounded-full border-2 ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring",
                     selectedColor === color.name ? "ring-2 ring-primary" : "border-transparent"

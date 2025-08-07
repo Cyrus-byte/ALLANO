@@ -12,9 +12,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getProductById, updateProduct } from '@/lib/product-service';
-import { Loader2, X, PlusCircle } from 'lucide-react';
+import { Loader2, X, PlusCircle, Link as LinkIcon } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Image from 'next/image';
 
 const categories = [
   'Vêtements',
@@ -39,7 +41,7 @@ export default function AdminEditProductPage() {
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
   const [sizes, setSizes] = useState('');
-  const [colors, setColors] = useState<{ name: string; hex: string }[]>([{ name: '', hex: '#ffffff' }]);
+  const [colors, setColors] = useState<{ name: string; hex: string; imageUrl?: string }[]>([{ name: '', hex: '#ffffff' }]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +61,7 @@ export default function AdminEditProductPage() {
           setPrice(fetchedProduct.price.toString());
           setCategory(fetchedProduct.category);
           setSizes(fetchedProduct.sizes.join(', '));
-          setColors(fetchedProduct.colors);
+          setColors(fetchedProduct.colors || [{ name: '', hex: '#ffffff' }]);
           setUploadedImageUrls(fetchedProduct.images);
         } else {
           notFound();
@@ -123,10 +125,12 @@ export default function AdminEditProductPage() {
   
   const handleRemoveImage = (urlToRemove: string) => {
     setUploadedImageUrls(prev => prev.filter(url => url !== urlToRemove));
+    setColors(prev => prev.map(color => color.imageUrl === urlToRemove ? { ...color, imageUrl: undefined } : color));
   };
 
-  const handleColorChange = (index: number, field: 'name' | 'hex', value: string) => {
+  const handleColorChange = (index: number, field: 'name' | 'hex' | 'imageUrl', value: string) => {
     const newColors = [...colors];
+    // @ts-ignore
     newColors[index][field] = value;
     setColors(newColors);
   };
@@ -228,7 +232,7 @@ export default function AdminEditProductPage() {
                      <Input id="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL (séparées par une virgule)" required />
                 </div>
 
-                <div className="space-y-4">
+                 <div className="space-y-4">
                     <Label>Couleurs disponibles</Label>
                     {colors.map((color, index) => (
                         <div key={index} className="flex items-center gap-2">
@@ -245,6 +249,27 @@ export default function AdminEditProductPage() {
                                 onChange={(e) => handleColorChange(index, 'hex', e.target.value)}
                                 className="w-16 p-1 h-10"
                             />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button type="button" variant="outline" size="icon" disabled={uploadedImageUrls.length === 0}>
+                                  {color.imageUrl ? <Image src={color.imageUrl} alt="miniature" width={20} height={20} /> : <LinkIcon className="h-4 w-4" />}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-2">
+                                <div className="grid grid-cols-3 gap-2">
+                                  {uploadedImageUrls.map(url => (
+                                    <button
+                                      key={url}
+                                      type="button"
+                                      className="relative aspect-square w-16 h-16 rounded-md overflow-hidden border focus:ring-2 focus:ring-primary"
+                                      onClick={() => handleColorChange(index, 'imageUrl', url)}
+                                    >
+                                      <Image src={url} alt="Aperçu" fill className="object-cover" />
+                                    </button>
+                                  ))}
+                                </div>
+                              </PopoverContent>
+                            </Popover>
                             {colors.length > 1 && (
                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeColor(index)}>
                                     <X className="h-4 w-4 text-destructive" />
@@ -286,7 +311,7 @@ export default function AdminEditProductPage() {
                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                       {uploadedImageUrls.map((url) => (
                         <div key={url} className="relative aspect-square w-full mx-auto rounded-md overflow-hidden border">
-                          <img src={url} alt="Aperçu du téléversement" className="object-contain w-full h-full" />
+                          <Image src={url} alt="Aperçu du téléversement" fill className="object-contain w-full h-full" />
                           <Button
                             type="button"
                             variant="destructive"
