@@ -22,7 +22,7 @@ const categories = [
   'Accessoires'
 ];
 
-const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!; 
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
 
 export default function AdminUploadPage() {
@@ -40,7 +40,7 @@ export default function AdminUploadPage() {
       toast({ title: "Catégorie requise", description: "Veuillez d'abord sélectionner une catégorie.", variant: 'destructive' });
       return;
     }
-     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
       toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées.", variant: 'destructive' });
       console.error("Cloudinary cloud name or upload preset is not configured.");
       return;
