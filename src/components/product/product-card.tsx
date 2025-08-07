@@ -46,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
           >
             <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-red-500 text-red-500" : "")} />
           </Button>
-          {product.isNew && (
+          {product.isNew && !product.onSale && (
             <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
               NOUVEAU
             </div>
@@ -64,7 +64,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
         <div className="flex items-center gap-2 mt-1">
           <p className={cn("font-bold", product.onSale && "text-destructive")}>
-            {product.onSale ? product.salePrice?.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR')} FCFA
+            {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
           </p>
           {product.onSale && (
             <p className="text-sm text-muted-foreground line-through">

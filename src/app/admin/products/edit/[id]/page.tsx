@@ -12,11 +12,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getProductById, updateProduct } from '@/lib/product-service';
-import { Loader2, X, PlusCircle, Link as LinkIcon } from 'lucide-react';
+import { Loader2, X, PlusCircle, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Image from 'next/image';
+import { Switch } from '@/components/ui/switch';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const categories = [
   'Vêtements',
@@ -46,6 +48,8 @@ export default function AdminEditProductPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [onSale, setOnSale] = useState(false);
+  const [salePrice, setSalePrice] = useState('');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,6 +67,8 @@ export default function AdminEditProductPage() {
           setSizes(fetchedProduct.sizes.join(', '));
           setColors(fetchedProduct.colors || [{ name: '', hex: '#ffffff' }]);
           setUploadedImageUrls(fetchedProduct.images);
+          setOnSale(fetchedProduct.onSale || false);
+          setSalePrice(fetchedProduct.salePrice?.toString() || '');
         } else {
           notFound();
         }
@@ -150,10 +156,14 @@ export default function AdminEditProductPage() {
       toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs (nom, prix, catégorie, tailles, couleurs) et téléverser au moins une image.", variant: "destructive" });
       return;
     }
+     if (onSale && !salePrice) {
+        toast({ title: "Prix manquant", description: "Veuillez indiquer le prix promotionnel.", variant: "destructive" });
+        return;
+    }
 
     setIsSubmitting(true);
     try {
-      const updatedProduct: Partial<Product> = {
+      const updatedProductData: Partial<Product> = {
         name: productName,
         description,
         price: parseFloat(price),
@@ -161,8 +171,10 @@ export default function AdminEditProductPage() {
         images: uploadedImageUrls,
         sizes: sizes.split(',').map(s => s.trim()),
         colors: colors,
+        onSale: onSale,
+        salePrice: onSale ? parseFloat(salePrice) : undefined,
       };
-      await updateProduct(productId, updatedProduct);
+      await updateProduct(productId, updatedProductData);
       toast({ title: "Produit mis à jour !", description: `${productName} a été modifié avec succès.` });
       router.push('/admin/products');
     } catch (error) {
@@ -211,16 +223,36 @@ export default function AdminEditProductPage() {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="productName">Nom du produit</Label>
-                        <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="price">Prix (FCFA)</Label>
-                        <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 9000" required/>
-                    </div>
+                <div className="space-y-2">
+                    <Label htmlFor="productName">Nom du produit</Label>
+                    <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
                 </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                     <div className="space-y-2">
+                        <Label htmlFor="price">Prix d'origine (FCFA)</Label>
+                        <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 12000" required/>
+                    </div>
+                     {onSale && (
+                        <div className="space-y-2">
+                            <Label htmlFor="salePrice" className="text-destructive">Prix promotionnel (FCFA)</Label>
+                            <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Ex: 9000" required={onSale}/>
+                        </div>
+                     )}
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Switch id="onSale" checked={onSale} onCheckedChange={setOnSale} />
+                    <Label htmlFor="onSale">Mettre ce produit en promotion</Label>
+                </div>
+                
+                 {onSale && parseFloat(salePrice) >= parseFloat(price) && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                            Le prix promotionnel doit être inférieur au prix d'origine.
+                        </AlertDescription>
+                    </Alert>
+                 )}
 
                 <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>

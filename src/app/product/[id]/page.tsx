@@ -36,7 +36,7 @@ export default function ProductPage() {
         if (fetchedProduct) {
           setProduct(fetchedProduct);
           setMainImage(fetchedProduct.images[0] || '');
-          if (fetchedProduct.colors.length > 0) {
+          if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
             setSelectedColor(fetchedProduct.colors[0].name);
             // If the first color has an associated image, set it as the main image
             if (fetchedProduct.colors[0].imageUrl) {
@@ -104,6 +104,8 @@ export default function ProductPage() {
     }
   }
 
+  const currentPrice = (product.onSale && product.salePrice) ? product.salePrice : product.price;
+
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -125,6 +127,11 @@ export default function ProductPage() {
             ))}
           </div>
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
+             {product.onSale && (
+                <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-sm font-bold px-3 py-1.5 rounded-full z-10">
+                    PROMO
+                </div>
+             )}
             <Image src={mainImage} alt={product.name} fill className="object-cover" />
           </div>
         </div>
@@ -140,7 +147,18 @@ export default function ProductPage() {
             </div>
             <span className="text-muted-foreground text-sm">{product.reviews} avis</span>
           </div>
-          <p className="text-3xl font-bold mt-4">{product.price.toLocaleString('fr-FR')} FCFA</p>
+          
+          <div className="flex items-baseline gap-4 mt-4">
+            <p className={cn("text-3xl font-bold", product.onSale && "text-destructive")}>
+                {currentPrice.toLocaleString('fr-FR')} FCFA
+            </p>
+            {product.onSale && (
+                <p className="text-xl text-muted-foreground line-through">
+                    {product.price.toLocaleString('fr-FR')} FCFA
+                </p>
+            )}
+           </div>
+
           <p className="text-muted-foreground mt-4">{product.description}</p>
           <Separator className="my-6" />
 
