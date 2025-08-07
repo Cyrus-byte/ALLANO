@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { createProduct } from '@/lib/product-service';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, PlusCircle } from 'lucide-react';
+import type { Product } from '@/lib/types';
 
 const categories = [
   'Vêtements',
@@ -30,6 +31,8 @@ export default function AdminUploadPage() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
+  const [sizes, setSizes] = useState('');
+  const [colors, setColors] = useState<{ name: string; hex: string }[]>([{ name: '', hex: '#ffffff' }]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +44,7 @@ export default function AdminUploadPage() {
       return;
     }
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées. Vérifiez votre fichier next.config.ts", variant: 'destructive' });
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées. Vérifiez votre fichier .env.local", variant: 'destructive' });
       console.error("Cloudinary cloud name or upload preset is not configured.");
       return;
     }
@@ -83,24 +86,39 @@ export default function AdminUploadPage() {
   const handleRemoveImage = (urlToRemove: string) => {
     setUploadedImageUrls(prev => prev.filter(url => url !== urlToRemove));
   };
+
+  const handleColorChange = (index: number, field: 'name' | 'hex', value: string) => {
+    const newColors = [...colors];
+    newColors[index][field] = value;
+    setColors(newColors);
+  };
+
+  const addColor = () => {
+    setColors([...colors, { name: '', hex: '#ffffff' }]);
+  };
+
+  const removeColor = (index: number) => {
+    const newColors = colors.filter((_, i) => i !== index);
+    setColors(newColors);
+  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productName || !price || !category || uploadedImageUrls.length === 0) {
-      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs et téléverser au moins une image.", variant: "destructive" });
+    if (!productName || !price || !category || uploadedImageUrls.length === 0 || !sizes || colors.some(c => !c.name)) {
+      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs (nom, prix, catégorie, tailles, couleurs) et téléverser au moins une image.", variant: "destructive" });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const newProduct = {
+      const newProduct: Partial<Product> = {
         name: productName,
         description,
         price: parseFloat(price),
         category,
         images: uploadedImageUrls,
-        sizes: ['S', 'M', 'L', 'XL'], // Valeurs par défaut
-        colors: [{name: 'Default', hex: '#FFFFFF'}], // Valeur par défaut
+        sizes: sizes.split(',').map(s => s.trim()),
+        colors: colors,
       };
       await createProduct(newProduct);
       toast({ title: "Produit créé !", description: `${productName} a été ajouté à la boutique.` });
@@ -109,6 +127,8 @@ export default function AdminUploadPage() {
       setDescription('');
       setPrice('');
       setCategory('');
+      setSizes('');
+      setColors([{ name: '', hex: '#ffffff' }]);
       setUploadedImageUrls([]);
     } catch (error) {
       console.error("Erreur lors de la création du produit:", error);
@@ -126,7 +146,7 @@ export default function AdminUploadPage() {
         strategy="lazyOnload"
       />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <Card className="max-w-2xl mx-auto">
+        <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Ajouter un nouveau produit</CardTitle>
             <CardDescription>
@@ -150,8 +170,44 @@ export default function AdminUploadPage() {
                     <Label htmlFor="description">Description</Label>
                     <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Décrivez le produit..." />
                 </div>
+                
+                 <div className="space-y-2">
+                    <Label htmlFor="sizes">Tailles disponibles</Label>
+                     <Input id="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL (séparées par une virgule)" required />
+                </div>
 
-              <div className="grid sm:grid-cols-2 gap-4 items-end">
+                <div className="space-y-4">
+                    <Label>Couleurs disponibles</Label>
+                    {colors.map((color, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <Input 
+                                type="text" 
+                                placeholder="Nom de la couleur (ex: Bleu Ciel)" 
+                                value={color.name}
+                                onChange={(e) => handleColorChange(index, 'name', e.target.value)}
+                                required
+                            />
+                            <Input 
+                                type="color" 
+                                value={color.hex}
+                                onChange={(e) => handleColorChange(index, 'hex', e.target.value)}
+                                className="w-16 p-1 h-10"
+                            />
+                            {colors.length > 1 && (
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeColor(index)}>
+                                    <X className="h-4 w-4 text-destructive" />
+                                </Button>
+                            )}
+                        </div>
+                    ))}
+                     <Button type="button" variant="outline" size="sm" onClick={addColor} className="mt-2">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter une couleur
+                    </Button>
+                </div>
+
+
+              <div className="grid sm:grid-cols-2 gap-4 items-end pt-4 border-t">
                 <div className="space-y-2">
                     <Label htmlFor="category">Catégorie</Label>
                     <Select onValueChange={setCategory} value={category}>
