@@ -1,15 +1,17 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import { ProductCard } from '@/components/product/product-card';
-import { PRODUCTS } from '@/lib/data';
-import { SearchX } from 'lucide-react';
+import { getProducts } from '@/lib/product-service';
+import type { Product } from '@/lib/types';
+import { SearchX, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Helper to generate a URL-friendly slug from a category name
+
 const slugify = (text: string) =>
   text
     .toString()
@@ -24,19 +26,62 @@ const slugify = (text: string) =>
 export default function CategoryPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categoryName, setCategoryName] = useState<string | null>(null);
 
-  // Find the original category name that matches the slug
-  const categoryName = Object.keys(
-    PRODUCTS.reduce((acc, p) => ({ ...acc, [p.category]: true }), {})
-  ).find(cat => slugify(cat) === slug);
-  
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const fetchedProducts = await getProducts();
+        
+        const allCategories = [...new Set(fetchedProducts.map(p => p.category))];
+        const foundCategoryName = allCategories.find(cat => slugify(cat) === slug);
+
+        if (foundCategoryName) {
+          setCategoryName(foundCategoryName);
+          setProducts(fetchedProducts.filter(p => p.category === foundCategoryName));
+        } else {
+          setCategoryName(null);
+          setProducts([]);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (slug) {
+        fetchProducts();
+    }
+  }, [slug]);
+
+  if (loading) {
+    return (
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+            <Skeleton className="h-8 w-48 mb-8" />
+            <Skeleton className="h-10 w-1/3 mb-2" />
+            <Skeleton className="h-5 w-1/4 mb-8" />
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i}>
+                        <Skeleton className="aspect-[3/4] w-full" />
+                        <Skeleton className="h-5 w-3/4 mt-4" />
+                        <Skeleton className="h-5 w-1/2 mt-2" />
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+  }
+
   if (!categoryName) {
     notFound();
   }
 
-  const filteredProducts = PRODUCTS.filter(product => 
-    product.category === categoryName
-  );
+  const filteredProducts = products;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -74,3 +119,4 @@ export default function CategoryPage() {
     </div>
   );
 }
+

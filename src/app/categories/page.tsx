@@ -1,13 +1,16 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ProductCard } from '@/components/product/product-card';
-import { PRODUCTS } from '@/lib/data';
+import { getProducts } from '@/lib/product-service';
 import type { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const slugify = (text: string) =>
   text
@@ -21,7 +24,25 @@ const slugify = (text: string) =>
     .replace(/--+/g, '-');
 
 export default function CategoriesPage() {
-  const categories = PRODUCTS.reduce((acc, product) => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const fetchedProducts = await getProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const categories = products.reduce((acc, product) => {
     const category = product.category;
     if (!acc[category]) {
       acc[category] = { products: [], image: product.images[0] };
@@ -29,6 +50,38 @@ export default function CategoriesPage() {
     acc[category].products.push(product);
     return acc;
   }, {} as Record<string, { products: Product[], image: string }>);
+
+  if (loading) {
+     return (
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+            <div className="text-center mb-12">
+                <Skeleton className="h-12 w-2/3 mx-auto" />
+                <Skeleton className="h-6 w-1/3 mx-auto mt-4" />
+            </div>
+            <section className="mb-16">
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
+                    {Array.from({length: 6}).map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}
+                </div>
+            </section>
+            <div className="space-y-16">
+                {Array.from({length: 2}).map((_, i) => (
+                    <section key={i}>
+                        <Skeleton className="h-10 w-1/4 mb-8" />
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                            {Array.from({ length: 4 }).map((_, j) => (
+                                <div key={j}>
+                                    <Skeleton className="aspect-[3/4] w-full" />
+                                    <Skeleton className="h-5 w-3/4 mt-4" />
+                                    <Skeleton className="h-5 w-1/2 mt-2" />
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                ))}
+            </div>
+        </div>
+     )
+  }
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">

@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from './auth-context';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { PRODUCTS } from '@/lib/data';
+import { getProducts } from '@/lib/product-service';
 
 interface WishlistContextType {
   wishlist: Product[];
@@ -24,12 +24,13 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const getWishlistFromLocalStorage = () => {
+  const getWishlistFromLocalStorage = async (): Promise<Product[]> => {
     try {
       const storedWishlist = localStorage.getItem('wishlist');
       if (storedWishlist) {
         const productIds = JSON.parse(storedWishlist) as string[];
-        return PRODUCTS.filter(p => productIds.includes(p.id));
+        const allProducts = await getProducts();
+        return allProducts.filter(p => productIds.includes(p.id));
       }
     } catch (error) {
       console.error("Failed to parse wishlist from localStorage", error);
@@ -43,12 +44,14 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const userRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
+        const allProducts = await getProducts();
+        const productMap = new Map(allProducts.map(p => [p.id, p]));
+        
         const wishlistData = (userDoc.data()?.wishlist || []) as { productId: string }[];
         const productIds = wishlistData.map(item => item.productId);
-        const userWishlist = PRODUCTS.filter(p => productIds.includes(p.id));
+        const userWishlist = productIds.map(id => productMap.get(id)).filter(Boolean) as Product[];
         
-        // Merge with local wishlist and update firestore
-        const localWishlist = getWishlistFromLocalStorage();
+        const localWishlist = await getWishlistFromLocalStorage();
         const mergedWishlist = [...new Map([...localWishlist, ...userWishlist].map(item => [item.id, item])).values()];
         if(mergedWishlist.length > userWishlist.length) {
             const updatedFirestoreWishlist = mergedWishlist.map(p => ({ productId: p.id }));
@@ -69,7 +72,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (user) {
             await getWishlistFromFirestore();
         } else {
-            setWishlist(getWishlistFromLocalStorage());
+            setWishlist(await getWishlistFromLocalStorage());
         }
         setLoading(false);
     };

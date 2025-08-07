@@ -1,16 +1,36 @@
 
 "use client";
 
-import { CldImage } from 'next-cloudinary';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
 import { ProductRecommendations } from '@/components/product/product-recommendations';
-import { PRODUCTS } from '@/lib/data';
-import { ArrowRight } from 'lucide-react';
+import { getProducts } from '@/lib/product-service';
+import type { Product } from '@/lib/types';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
-  const newArrivals = PRODUCTS.filter(p => p.isNew).slice(0, 8);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const fetchedProducts = await getProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const newArrivals = products.filter(p => p.isNew).slice(0, 8);
 
   return (
     <div className="flex flex-col">
@@ -43,15 +63,29 @@ export default function Home() {
         <section className="py-12 md:py-16">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline">Nouveautés</h2>
-            <Button variant="link" className="text-primary">
-              Voir tout <ArrowRight className="ml-2 h-4 w-4" />
+            <Button variant="link" asChild className="text-primary">
+              <Link href="/promotions">
+                Voir tout <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-            {newArrivals.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i}>
+                        <Skeleton className="aspect-[3/4] w-full" />
+                        <Skeleton className="h-5 w-3/4 mt-4" />
+                        <Skeleton className="h-5 w-1/2 mt-2" />
+                    </div>
+                ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+              {newArrivals.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>

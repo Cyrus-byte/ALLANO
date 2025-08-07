@@ -3,12 +3,12 @@
 
 import { useState, useEffect } from 'react';
 import { ProductCard } from './product-card';
-import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wand2 } from 'lucide-react';
 import { getProductRecommendations } from '@/ai/flows/product-recommendation';
 import { useAuth } from '@/contexts/auth-context';
+import { getProducts } from '@/lib/product-service';
 
 export function ProductRecommendations() {
   const { user, loading: authLoading } = useAuth();
@@ -23,16 +23,14 @@ export function ProductRecommendations() {
       }
       try {
         setLoading(true);
-        // Dans une future version, l'historique de navigation et les achats passés
-        // pourraient être récupérés depuis la base de données.
         const result = await getProductRecommendations({
           userId: user.uid,
           browsingHistory: ['Robe d\'été florale', 'Sandales en cuir'],
           pastPurchases: ['Chemise en lin'],
         });
         
-        // Le flux renvoie des noms de produits. Nous trouvons les objets produits complets.
-        const recommendedProducts = PRODUCTS.filter(p => result.recommendations.includes(p.name));
+        const allProducts = await getProducts();
+        const recommendedProducts = allProducts.filter(p => result.recommendations.includes(p.name));
         setRecommendations(recommendedProducts);
       } catch (error) {
         console.error("Erreur lors de la récupération des recommandations:", error);
@@ -48,7 +46,6 @@ export function ProductRecommendations() {
   }, [user, authLoading]);
 
   if (authLoading || loading) {
-    // Affiche un squelette de chargement uniquement si un utilisateur est potentiellement connecté
     return !authLoading && !user ? null : (
       <section className="py-12 md:py-16">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline mb-8 flex items-center gap-2">

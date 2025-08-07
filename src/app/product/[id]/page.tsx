@@ -1,39 +1,88 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
-import { PRODUCTS } from '@/lib/data';
+import { getProductById } from '@/lib/product-service';
+import type { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Star, Minus, Plus, Heart, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
-import type { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProductPage() {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const params = useParams();
-  const product = PRODUCTS.find(p => p.id === params.id);
   const { toast } = useToast();
-
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState<string | null>(product?.colors[0]?.name || null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [mainImage, setMainImage] = useState(product?.images[0] || '');
+  const [mainImage, setMainImage] = useState<string>('');
 
-  if (!product) {
-    notFound();
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const fetchedProduct = await getProductById(params.id as string);
+        if (fetchedProduct) {
+          setProduct(fetchedProduct);
+          setMainImage(fetchedProduct.images[0] || '');
+          if (fetchedProduct.colors.length > 0) {
+            setSelectedColor(fetchedProduct.colors[0].name);
+          }
+        } else {
+            notFound();
+        }
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+    if(params.id) {
+        fetchProduct();
+    }
+  }, [params.id]);
+
+
+  if (loading || !product) {
+    return (
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+            <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
+                <div className="flex flex-col-reverse md:flex-row gap-4">
+                    <div className="flex md:flex-col gap-2 justify-center">
+                        <Skeleton className="w-16 h-20 rounded-lg" />
+                        <Skeleton className="w-16 h-20 rounded-lg" />
+                        <Skeleton className="w-16 h-20 rounded-lg" />
+                    </div>
+                    <Skeleton className="aspect-[3/4] w-full rounded-lg" />
+                </div>
+                <div>
+                    <Skeleton className="h-10 w-3/4 mb-4" />
+                    <Skeleton className="h-6 w-1/4 mb-4" />
+                    <Skeleton className="h-8 w-1/3 mb-4" />
+                    <Skeleton className="h-20 w-full mb-6" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            </div>
+        </div>
+    );
   }
 
   const isProductInWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
-    if (product && selectedSize && selectedColor) {
+    if (selectedSize && selectedColor) {
       addToCart(product, selectedSize, selectedColor, quantity);
     } else {
         toast({

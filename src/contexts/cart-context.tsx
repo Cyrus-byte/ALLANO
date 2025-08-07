@@ -7,7 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from './auth-context';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { PRODUCTS } from '@/lib/data';
+import { getProducts } from '@/lib/product-service';
+
 
 interface CartContextType {
   cart: CartItem[];
@@ -22,10 +23,14 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const mapCartItems = (cartItems: Omit<CartItem, 'product'>[]): CartItem[] => {
+const mapCartItems = async (cartItems: Omit<CartItem, 'product'>[]): Promise<CartItem[]> => {
+    if (cartItems.length === 0) return [];
+    const allProducts = await getProducts();
+    const productMap = new Map(allProducts.map(p => [p.id, p]));
+
     return cartItems.map(item => ({
         ...item,
-        product: PRODUCTS.find(p => p.id === item.productId)
+        product: productMap.get(item.productId)
     })).filter(item => item.product) as (CartItem & { product: Product })[];
 }
 
@@ -57,7 +62,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const firestoreCart = (userDoc.data()?.cart || []) as Omit<CartItem, 'product'>[];
         const localCart = getCartFromLocalStorage();
 
-        // Merge logic
         const mergedCartMap = new Map<string, Omit<CartItem, 'product'>>();
         
         [...firestoreCart, ...localCart].forEach(item => {
@@ -75,7 +79,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await setDoc(userRef, { cart: mergedCart }, { merge: true });
         }
         
-        setCart(mapCartItems(mergedCart));
+        setCart(await mapCartItems(mergedCart));
         localStorage.removeItem('cart');
       }
     } catch (error) {
@@ -89,7 +93,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (user) {
             await getCartFromFirestore();
         } else {
-            setCart(mapCartItems(getCartFromLocalStorage()));
+            setCart(await mapCartItems(getCartFromLocalStorage()));
         }
         setLoading(false);
     };
