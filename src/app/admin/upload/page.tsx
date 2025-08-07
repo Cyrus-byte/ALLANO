@@ -22,8 +22,8 @@ const categories = [
   'Accessoires'
 ];
 
-const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export default function AdminUploadPage() {
   const [productName, setProductName] = useState('');
@@ -41,7 +41,7 @@ export default function AdminUploadPage() {
       return;
     }
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées.", variant: 'destructive' });
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées dans next.config.ts.", variant: 'destructive' });
       console.error("Cloudinary cloud name or upload preset is not configured.");
       return;
     }
@@ -60,18 +60,20 @@ export default function AdminUploadPage() {
         "sources.local.browse": "Parcourir",
       }
     }, (error: any, result: any) => { 
-      if (!error && result && result.event === "success") { 
-        console.log('Image téléversée avec succès: ', result.info);
-        setUploadedImageUrl(result.info.secure_url);
-        toast({ title: "Image téléversée", description: "L'image est prête. Vous pouvez maintenant enregistrer le produit."});
+      if (result.event === 'close' || result.event === 'abort') {
+          setIsUploading(false);
       }
       if (error) {
         console.error("Erreur de téléversement Cloudinary:", error);
         toast({ title: "Erreur de téléversement", description: "L'image n'a pas pu être téléversée. Vérifiez votre configuration Cloudinary.", variant: 'destructive' });
+        setIsUploading(false);
+        return;
       }
-      // La fenêtre se ferme, que ce soit un succès ou non
-      if (result.event === 'close' || result.event === 'abort') {
-          setIsUploading(false);
+      if (result.event === "success") { 
+        console.log('Image téléversée avec succès: ', result.info);
+        setUploadedImageUrl(result.info.secure_url);
+        toast({ title: "Image téléversée", description: "L'image est prête. Vous pouvez maintenant enregistrer le produit."});
+        setIsUploading(false);
       }
     });
 
@@ -93,8 +95,6 @@ export default function AdminUploadPage() {
         price: parseFloat(price),
         category,
         images: [uploadedImageUrl],
-        rating: 0,
-        reviews: 0,
         sizes: ['S', 'M', 'L', 'XL'], // Valeurs par défaut
         colors: [{name: 'Default', hex: '#FFFFFF'}], // Valeur par défaut
       };
