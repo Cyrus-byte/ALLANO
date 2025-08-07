@@ -37,7 +37,7 @@ export const PRODUCTS: Product[] = [
     name: "Claquettes Benassi Nike",
     description: "Les claquettes Nike Benassi offrent un confort léger dans un design classique.",
     price: 18000,
-    images: ['chaussures/claquettes-benassi-nike'],
+    images: ['chaussures/claquettes-nike'],
     category: 'Chaussures',
     brand: 'Nike',
     rating: 4.9,
@@ -202,7 +202,7 @@ export const PRODUCTS: Product[] = [
     name: "Apple Watch Series 10",
     description: "Votre santé au poignet. L'Apple Watch Series 10 est plus intelligente et plus robuste que jamais.",
     price: 350000,
-    images: ['bijoux/apple-watch'],
+    images: ['bijoux/apple-watch-s10'],
     category: 'Bijoux',
     brand: 'Apple',
     rating: 4.9,
@@ -335,5 +335,3 @@ export const PRODUCTS: Product[] = [
     isNew: false,
   }
 ];
-
-    
