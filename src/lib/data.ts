@@ -120,7 +120,7 @@ export const PRODUCTS: Product[] = [
     name: "Tote bag",
     description: "Le sac fourre-tout simple et pratique pour vos courses ou vos sorties.",
     price: 7500,
-    images: ['sacs/tote-bag'],
+    images: ['sacs/tote-bague'],
     category: 'Sacs',
     brand: 'Allano Basic',
     rating: 4.4,
