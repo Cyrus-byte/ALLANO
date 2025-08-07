@@ -36,6 +36,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from 'next/link';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -130,9 +131,11 @@ export default function AdminProductsPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Modifier
+                      <DropdownMenuItem asChild>
+                        <Link href={`/admin/products/edit/${product.id}`}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Modifier
+                        </Link>
                       </DropdownMenuItem>
                       <AlertDialogTrigger asChild>
                         <DropdownMenuItem className="text-destructive">

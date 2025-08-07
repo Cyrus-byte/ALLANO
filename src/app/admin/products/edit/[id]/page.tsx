@@ -1,0 +1,316 @@
+
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter, notFound } from 'next/navigation';
+import Script from 'next/script';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { getProductById, updateProduct } from '@/lib/product-service';
+import { Loader2, X, PlusCircle } from 'lucide-react';
+import type { Product } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const categories = [
+  'Vêtements',
+  'Chaussures',
+  'Sacs',
+  'Bijoux',
+  'Chapeaux',
+  'Accessoires'
+];
+
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+export default function AdminEditProductPage() {
+  const params = useParams();
+  const router = useRouter();
+  const productId = params.id as string;
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [productName, setProductName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [category, setCategory] = useState('');
+  const [sizes, setSizes] = useState('');
+  const [colors, setColors] = useState<{ name: string; hex: string }[]>([{ name: '', hex: '#ffffff' }]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!productId) return;
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const fetchedProduct = await getProductById(productId);
+        if (fetchedProduct) {
+          setProduct(fetchedProduct);
+          setProductName(fetchedProduct.name);
+          setDescription(fetchedProduct.description);
+          setPrice(fetchedProduct.price.toString());
+          setCategory(fetchedProduct.category);
+          setSizes(fetchedProduct.sizes.join(', '));
+          setColors(fetchedProduct.colors);
+          setUploadedImageUrls(fetchedProduct.images);
+        } else {
+          notFound();
+        }
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+        toast({ title: "Erreur", description: "Impossible de charger le produit.", variant: "destructive" });
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [productId, toast]);
+
+
+  const handleUploadClick = () => {
+    if (!category) {
+      toast({ title: "Catégorie requise", description: "Veuillez d'abord sélectionner une catégorie.", variant: 'destructive' });
+      return;
+    }
+     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées. Vérifiez votre fichier .env", variant: 'destructive' });
+      console.error("Cloudinary cloud name or upload preset is not configured.");
+      return;
+    }
+
+    setIsUploading(true);
+    // @ts-ignore
+    const myWidget = window.cloudinary.createUploadWidget({
+      cloudName: CLOUDINARY_CLOUD_NAME,
+      uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+      folder: category.toLowerCase(),
+      language: 'fr',
+      multiple: true,
+      buttonCaption: "Téléverser des images",
+      text: {
+        "sources.local.title": "Fichiers locaux",
+        "sources.local.drop_file": "Glissez-déposez des fichiers ici",
+        "sources.local.browse": "Parcourir",
+      }
+    }, (error: any, result: any) => { 
+      if (result.event === 'close' || result.event === 'abort') {
+          setIsUploading(false);
+      }
+      if (error) {
+        console.error("Erreur de téléversement Cloudinary:", error);
+        toast({ title: "Erreur de téléversement", description: "Une ou plusieurs images n'ont pas pu être téléversées.", variant: 'destructive' });
+        setIsUploading(false);
+        return;
+      }
+      if (result.event === "success") { 
+        console.log('Image téléversée avec succès: ', result.info);
+        setUploadedImageUrls(prev => [...prev, result.info.secure_url]);
+        toast({ title: "Image ajoutée", description: "L'image est prête. Vous pouvez en ajouter d'autres ou enregistrer le produit."});
+      }
+    });
+
+    myWidget.open();
+  };
+  
+  const handleRemoveImage = (urlToRemove: string) => {
+    setUploadedImageUrls(prev => prev.filter(url => url !== urlToRemove));
+  };
+
+  const handleColorChange = (index: number, field: 'name' | 'hex', value: string) => {
+    const newColors = [...colors];
+    newColors[index][field] = value;
+    setColors(newColors);
+  };
+
+  const addColor = () => {
+    setColors([...colors, { name: '', hex: '#ffffff' }]);
+  };
+
+  const removeColor = (index: number) => {
+    const newColors = colors.filter((_, i) => i !== index);
+    setColors(newColors);
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!productName || !price || !category || uploadedImageUrls.length === 0 || !sizes || colors.some(c => !c.name)) {
+      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs (nom, prix, catégorie, tailles, couleurs) et téléverser au moins une image.", variant: "destructive" });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const updatedProduct: Partial<Product> = {
+        name: productName,
+        description,
+        price: parseFloat(price),
+        category,
+        images: uploadedImageUrls,
+        sizes: sizes.split(',').map(s => s.trim()),
+        colors: colors,
+      };
+      await updateProduct(productId, updatedProduct);
+      toast({ title: "Produit mis à jour !", description: `${productName} a été modifié avec succès.` });
+      router.push('/admin/products');
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du produit:", error);
+      toast({ title: "Erreur", description: "Le produit n'a pas pu être mis à jour.", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+      return (
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+            <Card className="max-w-3xl mx-auto">
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                </CardContent>
+                <CardFooter>
+                    <Skeleton className="h-12 w-full" />
+                </CardFooter>
+            </Card>
+          </div>
+      )
+  }
+
+  return (
+    <>
+      <Script
+        src="https://upload-widget.cloudinary.com/global/all.js"
+        type="text/javascript"
+        strategy="lazyOnload"
+      />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <Card className="max-w-3xl mx-auto">
+          <CardHeader>
+            <CardTitle>Modifier le produit</CardTitle>
+            <CardDescription>
+              Mettez à jour les informations du produit ci-dessous.
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-6">
+                <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="productName">Nom du produit</Label>
+                        <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="price">Prix (FCFA)</Label>
+                        <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 9000" required/>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Décrivez le produit..." />
+                </div>
+                
+                 <div className="space-y-2">
+                    <Label htmlFor="sizes">Tailles disponibles</Label>
+                     <Input id="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL (séparées par une virgule)" required />
+                </div>
+
+                <div className="space-y-4">
+                    <Label>Couleurs disponibles</Label>
+                    {colors.map((color, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <Input 
+                                type="text" 
+                                placeholder="Nom de la couleur (ex: Bleu Ciel)" 
+                                value={color.name}
+                                onChange={(e) => handleColorChange(index, 'name', e.target.value)}
+                                required
+                            />
+                            <Input 
+                                type="color" 
+                                value={color.hex}
+                                onChange={(e) => handleColorChange(index, 'hex', e.target.value)}
+                                className="w-16 p-1 h-10"
+                            />
+                            {colors.length > 1 && (
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeColor(index)}>
+                                    <X className="h-4 w-4 text-destructive" />
+                                </Button>
+                            )}
+                        </div>
+                    ))}
+                     <Button type="button" variant="outline" size="sm" onClick={addColor} className="mt-2">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter une couleur
+                    </Button>
+                </div>
+
+
+              <div className="grid sm:grid-cols-2 gap-4 items-end pt-4 border-t">
+                <div className="space-y-2">
+                    <Label htmlFor="category">Catégorie</Label>
+                    <Select onValueChange={setCategory} value={category}>
+                        <SelectTrigger id="category">
+                        <SelectValue placeholder="Sélectionner une catégorie..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                        {categories.map(cat => (
+                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <Button onClick={handleUploadClick} type="button" variant="outline" className="w-full" disabled={!category || isUploading}>
+                    {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {uploadedImageUrls.length > 0 ? "Ajouter d'autres images" : "Téléverser des images"}
+                </Button>
+              </div>
+
+              {uploadedImageUrls.length > 0 && (
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold text-center">{uploadedImageUrls.length} image(s) prête(s) !</h3>
+                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                      {uploadedImageUrls.map((url) => (
+                        <div key={url} className="relative aspect-square w-full mx-auto rounded-md overflow-hidden border">
+                          <img src={url} alt="Aperçu du téléversement" className="object-contain w-full h-full" />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                            onClick={() => handleRemoveImage(url)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                </div>
+              )}
+            </CardContent>
+            <CardFooter>
+                 <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || uploadedImageUrls.length === 0}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Enregistrer les modifications
+                </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+    </>
+  );
+}
