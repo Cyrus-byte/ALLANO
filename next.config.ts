@@ -29,8 +29,10 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_CINETPAY_API_KEY: process.env.NEXT_PUBLIC_CINETPAY_API_KEY,
     NEXT_PUBLIC_CINETPAY_SITE_ID: process.env.NEXT_PUBLIC_CINETPAY_SITE_ID,
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: 'dhjcx6ckx',
-    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: 'allano-unsigned',
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: 'allano.unsigned',
   },
 };
 
 export default nextConfig;
+
+    
