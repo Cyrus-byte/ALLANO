@@ -22,7 +22,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const mapCartItems = (cartItems: CartItem[]): CartItem[] => {
+const mapCartItems = (cartItems: Omit<CartItem, 'product'>[]): CartItem[] => {
     return cartItems.map(item => ({
         ...item,
         product: PRODUCTS.find(p => p.id === item.productId)
@@ -36,7 +36,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user } = useAuth();
 
 
-  const getCartFromLocalStorage = (): CartItem[] => {
+  const getCartFromLocalStorage = (): Omit<CartItem, 'product'>[] => {
     try {
       const storedCart = localStorage.getItem('cart');
       if (storedCart) {
@@ -54,11 +54,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
-        const firestoreCart = (userDoc.data()?.cart || []) as CartItem[];
+        const firestoreCart = (userDoc.data()?.cart || []) as Omit<CartItem, 'product'>[];
         const localCart = getCartFromLocalStorage();
 
         // Merge logic
-        const mergedCartMap = new Map<string, CartItem>();
+        const mergedCartMap = new Map<string, Omit<CartItem, 'product'>>();
         
         [...firestoreCart, ...localCart].forEach(item => {
             const existing = mergedCartMap.get(item.id);
@@ -72,8 +72,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const mergedCart = Array.from(mergedCartMap.values());
         
         if (mergedCart.length > 0) {
-            const cartForFirestore = mergedCart.map(({ product, ...rest }) => rest);
-            await setDoc(userRef, { cart: cartForFirestore }, { merge: true });
+            await setDoc(userRef, { cart: mergedCart }, { merge: true });
         }
         
         setCart(mapCartItems(mergedCart));
@@ -111,7 +110,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !loading) {
         try {
             const cartToStore = cart.map(({ product, ...rest}) => rest);
             localStorage.setItem('cart', JSON.stringify(cartToStore));
@@ -119,7 +118,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.error("Failed to save cart to localStorage", error);
         }
     }
-  }, [cart, user]);
+  }, [cart, user, loading]);
 
 
   const addToCart = (product: Product, size: string, color: string, quantity: number = 1) => {
@@ -145,15 +144,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const removeFromCart = (itemId: string) => {
+    const itemToRemove = cart.find(item => item.id === itemId);
     const newCart = cart.filter(item => item.id !== itemId)
     setCart(newCart);
     if (user) updateFirestoreCart(newCart);
 
-    toast({
-        title: "Article supprimé",
-        description: "L'article a été retiré de votre panier.",
-        variant: "destructive",
-      });
+    if (itemToRemove) {
+        toast({
+            title: "Article supprimé",
+            description: `${itemToRemove.product?.name} a été retiré de votre panier.`,
+            variant: "destructive",
+          });
+    }
   };
 
   const updateQuantity = (itemId: string, quantity: number) => {

@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import { ProductCard } from '@/components/product/product-card';
 import { PRODUCTS } from '@/lib/data';
 import type { Product } from '@/lib/types';
@@ -44,7 +44,7 @@ export default function CategoriesPage() {
           {Object.keys(categories).map((category) => (
             <Link key={category} href={`/category/${slugify(category)}`} passHref>
                <div className="group relative aspect-square overflow-hidden rounded-lg">
-                <CldImage
+                <Image
                   src={categories[category].image}
                   alt={category}
                   fill
