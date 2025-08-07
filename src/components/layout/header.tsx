@@ -5,12 +5,21 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Search, ShoppingCart, User, Loader2 } from 'lucide-react';
+import { Heart, Search, ShoppingCart, User, Loader2, Plus, List } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 
 export function Header() {
   const { totalItems, loading: cartLoading } = useCart();
@@ -23,7 +32,6 @@ export function Header() {
     { href: '/', label: 'Accueil' },
     { href: '/categories', label: 'Catégories' },
     { href: '/promotions', label: 'Promotions' },
-    { href: '/admin/upload', label: 'Admin' },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -46,6 +54,27 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Admin</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Gestion du site</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link href="/admin/upload">
+                        <Plus className="mr-2 h-4 w-4" />
+                        <span>Ajouter un produit</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/admin/products">
+                        <List className="mr-2 h-4 w-4" />
+                        <span>Gérer les produits</span>
+                    </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
         </nav>
         <div className="flex flex-1 items-center justify-end gap-4">
           <form onSubmit={handleSearch} className="relative w-full max-w-sm">
