@@ -22,8 +22,8 @@ const categories = [
   'Accessoires'
 ];
 
-const CLOUDINARY_CLOUD_NAME = "dhjcx6ckx"; 
-const CLOUDINARY_UPLOAD_PRESET = "ml_default";
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!; 
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
 
 export default function AdminUploadPage() {
   const [productName, setProductName] = useState('');
@@ -38,6 +38,11 @@ export default function AdminUploadPage() {
   const handleUploadClick = () => {
     if (!category) {
       toast({ title: "Catégorie requise", description: "Veuillez d'abord sélectionner une catégorie.", variant: 'destructive' });
+      return;
+    }
+     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées.", variant: 'destructive' });
+      console.error("Cloudinary cloud name or upload preset is not configured in .env.local");
       return;
     }
 
@@ -62,7 +67,7 @@ export default function AdminUploadPage() {
       }
       if (error) {
         console.error("Erreur de téléversement Cloudinary:", error);
-        toast({ title: "Erreur de téléversement", description: "L'image n'a pas pu être téléversée.", variant: 'destructive' });
+        toast({ title: "Erreur de téléversement", description: "L'image n'a pas pu être téléversée. Vérifiez votre configuration Cloudinary.", variant: 'destructive' });
       }
       // La fenêtre se ferme, que ce soit un succès ou non
       if (result.event === 'close') {
@@ -177,10 +182,4 @@ export default function AdminUploadPage() {
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     2. Enregistrer le produit
                 </Button>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
-    </>
-  );
-}
+            </
