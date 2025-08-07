@@ -41,7 +41,7 @@ export default function AdminUploadPage() {
       return;
     }
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées dans next.config.ts.", variant: 'destructive' });
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées. Vérifiez next.config.ts", variant: 'destructive' });
       console.error("Cloudinary cloud name or upload preset is not configured.");
       return;
     }
