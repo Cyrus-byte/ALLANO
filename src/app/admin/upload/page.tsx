@@ -41,8 +41,8 @@ export default function AdminUploadPage() {
       return;
     }
      if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées dans le fichier .env", variant: 'destructive' });
-      console.error("Cloudinary cloud name or upload preset is not configured in .env");
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées.", variant: 'destructive' });
+      console.error("Cloudinary cloud name or upload preset is not configured.");
       return;
     }
 
