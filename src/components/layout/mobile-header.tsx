@@ -21,11 +21,12 @@ export function MobileHeader() {
 
   return (
     <header className="md:hidden sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center gap-4">
+      <div className="container flex h-16 items-center justify-between gap-4">
         <Link href="/" className="flex items-center space-x-2">
           <Logo className="h-6 w-6" />
+           <span className="font-bold">Allano</span>
         </Link>
-        <div className="flex-1">
+        <div className="flex-1 max-w-xs">
           <form onSubmit={handleSearch} className="relative w-full">
             <Input
               type="search"
