@@ -55,7 +55,7 @@ export default function Home() {
   const newArrivals = products.filter(p => p.isNew).slice(0, 8);
 
   const HeroSectionContent = () => (
-     <div className="relative z-10 flex flex-col items-center justify-center h-full text-center p-4">
+     <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
         La Mode, Réinventée.
         </h1>
@@ -72,13 +72,12 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] md:h-[70vh] text-white flex items-center justify-center">
+       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center">
         {heroLoading ? (
           <Skeleton className="w-full h-full" />
         ) : (
-          <div className="w-full h-full">
+          <>
             {heroImageUrls.length > 0 ? (
-              <>
                 <Carousel 
                   className="w-full h-full"
                   plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
@@ -86,7 +85,7 @@ export default function Home() {
                 >
                   <CarouselContent>
                     {heroImageUrls.map((url, index) => (
-                      <CarouselItem key={index}>
+                      <CarouselItem key={index} className="relative w-full h-full">
                         <Image
                           src={url}
                           alt={`Hero background ${index + 1}`}
@@ -105,17 +104,13 @@ export default function Home() {
                     </>
                   )}
                 </Carousel>
-                <div className="absolute inset-0 bg-black/60" />
-                <div className="absolute inset-0">
-                  <HeroSectionContent />
-                </div>
-              </>
             ) : (
-              <div className="w-full h-full bg-secondary text-foreground">
-                <HeroSectionContent />
-              </div>
+              <div className="w-full h-full bg-secondary" />
             )}
-          </div>
+            
+            <div className="absolute inset-0 bg-black/60" />
+            <HeroSectionContent />
+          </>
         )}
       </section>
 
