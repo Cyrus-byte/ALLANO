@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,21 +11,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { createProduct } from '@/lib/product-service';
+import { getCategories } from '@/lib/category-service';
 import { Loader2, X, PlusCircle, Link as LinkIcon, AlertCircle } from 'lucide-react';
-import type { Product } from '@/lib/types';
+import type { Product, Category } from '@/lib/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Image from 'next/image';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-const categories = [
-  'Vêtements',
-  'Chaussures',
-  'Sacs',
-  'Bijoux',
-  'Chapeaux',
-  'Accessoires'
-];
 
 const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -42,7 +34,21 @@ export default function AdminUploadPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [onSale, setOnSale] = useState(false);
   const [salePrice, setSalePrice] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+        try {
+            const fetchedCategories = await getCategories();
+            setCategories(fetchedCategories);
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Erreur", description: "Impossible de charger les catégories.", variant: "destructive" });
+        }
+    }
+    fetchCategories();
+  }, [toast]);
 
   const handleUploadClick = () => {
     if (!category) {
@@ -273,7 +279,7 @@ export default function AdminUploadPage() {
                         </SelectTrigger>
                         <SelectContent>
                         {categories.map(cat => (
-                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                         ))}
                         </SelectContent>
                     </Select>

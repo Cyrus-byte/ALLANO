@@ -57,3 +57,9 @@ export type Review = {
   comment: string;
   createdAt: any; // Firestore timestamp
 };
+
+export type Category = {
+    id: string;
+    name: string;
+    createdAt: any;
+}

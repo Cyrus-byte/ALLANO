@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Search, ShoppingCart, User, Loader2, Plus, List } from 'lucide-react';
+import { Heart, Search, ShoppingCart, User, Loader2, Plus, List, LayoutGrid } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
@@ -71,6 +71,12 @@ export function Header() {
                     <Link href="/admin/products">
                         <List className="mr-2 h-4 w-4" />
                         <span>Gérer les produits</span>
+                    </Link>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <Link href="/admin/categories">
+                        <LayoutGrid className="mr-2 h-4 w-4" />
+                        <span>Gérer les catégories</span>
                     </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

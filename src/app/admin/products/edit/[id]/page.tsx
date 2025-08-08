@@ -12,22 +12,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getProductById, updateProduct } from '@/lib/product-service';
+import { getCategories } from '@/lib/category-service';
 import { Loader2, X, PlusCircle, Link as LinkIcon, AlertCircle } from 'lucide-react';
-import type { Product } from '@/lib/types';
+import type { Product, Category } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Image from 'next/image';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-const categories = [
-  'Vêtements',
-  'Chaussures',
-  'Sacs',
-  'Bijoux',
-  'Chapeaux',
-  'Accessoires'
-];
 
 const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -50,37 +42,42 @@ export default function AdminEditProductPage() {
   const [loading, setLoading] = useState(true);
   const [onSale, setOnSale] = useState(false);
   const [salePrice, setSalePrice] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!productId) return;
-    const fetchProduct = async () => {
-      setLoading(true);
-      try {
-        const fetchedProduct = await getProductById(productId);
-        if (fetchedProduct) {
-          setProduct(fetchedProduct);
-          setProductName(fetchedProduct.name);
-          setDescription(fetchedProduct.description);
-          setPrice(fetchedProduct.price.toString());
-          setCategory(fetchedProduct.category);
-          setSizes(fetchedProduct.sizes.join(', '));
-          setColors(fetchedProduct.colors || [{ name: '', hex: '#ffffff' }]);
-          setUploadedImageUrls(fetchedProduct.images);
-          setOnSale(fetchedProduct.onSale || false);
-          setSalePrice(fetchedProduct.salePrice?.toString() || '');
-        } else {
-          notFound();
+    const fetchInitialData = async () => {
+        setLoading(true);
+        try {
+            const fetchedCategories = await getCategories();
+            setCategories(fetchedCategories);
+
+            if (productId) {
+                const fetchedProduct = await getProductById(productId);
+                if (fetchedProduct) {
+                    setProduct(fetchedProduct);
+                    setProductName(fetchedProduct.name);
+                    setDescription(fetchedProduct.description);
+                    setPrice(fetchedProduct.price.toString());
+                    setCategory(fetchedProduct.category);
+                    setSizes(fetchedProduct.sizes.join(', '));
+                    setColors(fetchedProduct.colors || [{ name: '', hex: '#ffffff' }]);
+                    setUploadedImageUrls(fetchedProduct.images);
+                    setOnSale(fetchedProduct.onSale || false);
+                    setSalePrice(fetchedProduct.salePrice?.toString() || '');
+                } else {
+                    notFound();
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch data:", error);
+            toast({ title: "Erreur", description: "Impossible de charger les données.", variant: "destructive" });
+            if (productId) notFound();
+        } finally {
+            setLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to fetch product:", error);
-        toast({ title: "Erreur", description: "Impossible de charger le produit.", variant: "destructive" });
-        notFound();
-      } finally {
-        setLoading(false);
-      }
     };
-    fetchProduct();
+    fetchInitialData();
   }, [productId, toast]);
 
 
@@ -325,7 +322,7 @@ export default function AdminEditProductPage() {
                         </SelectTrigger>
                         <SelectContent>
                         {categories.map(cat => (
-                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                         ))}
                         </SelectContent>
                     </Select>
