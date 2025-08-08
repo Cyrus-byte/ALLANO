@@ -76,21 +76,21 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary text-white">
+      <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary text-primary-foreground">
         {heroLoading ? (
             <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
             <>
                 {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 ? (
                     <Carousel 
-                        className="w-full h-full"
+                        className="absolute inset-0 w-full h-full"
                         plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
                         opts={{ loop: true }}
                     >
                         <CarouselContent>
                             {heroSettings.heroImageUrls.map((url, index) => (
                                 <CarouselItem key={index}>
-                                    <div className="relative w-full h-[60vh] md:h-[70vh]">
+                                    <div className="relative w-full h-full">
                                         <Image
                                             src={url}
                                             alt={`Hero background ${index + 1}`}
@@ -103,15 +103,9 @@ export default function Home() {
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        {heroSettings.heroImageUrls.length > 1 && (
-                            <>
-                                <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
-                                <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
-                            </>
-                        )}
                     </Carousel>
                 ) : (
-                     <div className="w-full h-full bg-secondary" />
+                     <div className="absolute inset-0 w-full h-full bg-secondary" />
                 )}
                  <div className="absolute inset-0 bg-black/60" />
                  <div className="absolute inset-0 flex items-center justify-center">
