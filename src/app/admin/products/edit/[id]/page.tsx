@@ -33,8 +33,9 @@ export default function AdminEditProductPage() {
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState<Category | null>(null);
   const [sizes, setSizes] = useState('');
+  const [shoeSizes, setShoeSizes] = useState('');
   const [colors, setColors] = useState<{ name: string; hex: string; imageUrl?: string }[]>([{ name: '', hex: '#ffffff' }]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -59,8 +60,10 @@ export default function AdminEditProductPage() {
                     setProductName(fetchedProduct.name);
                     setDescription(fetchedProduct.description);
                     setPrice(fetchedProduct.price.toString());
-                    setCategory(fetchedProduct.category);
+                    const currentCategory = fetchedCategories.find(c => c.name === fetchedProduct.category);
+                    setCategory(currentCategory || null);
                     setSizes(fetchedProduct.sizes.join(', '));
+                    setShoeSizes(fetchedProduct.shoeSizes?.join(', ') || '');
                     setColors(fetchedProduct.colors || [{ name: '', hex: '#ffffff' }]);
                     setUploadedImageUrls(fetchedProduct.images);
                     setOnSale(fetchedProduct.onSale || false);
@@ -97,7 +100,7 @@ export default function AdminEditProductPage() {
     const myWidget = window.cloudinary.createUploadWidget({
       cloudName: CLOUDINARY_CLOUD_NAME,
       uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-      folder: category.toLowerCase(),
+      folder: category.name.toLowerCase(),
       language: 'fr',
       multiple: true,
       buttonCaption: "Téléverser des images",
@@ -149,8 +152,12 @@ export default function AdminEditProductPage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productName || !price || !category || uploadedImageUrls.length === 0 || !sizes || colors.some(c => !c.name)) {
-      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs (nom, prix, catégorie, tailles, couleurs) et téléverser au moins une image.", variant: "destructive" });
+    let requiredFieldsMissing = !productName || !price || !category || uploadedImageUrls.length === 0 || colors.some(c => !c.name);
+    if (category?.attributes?.sizes && !sizes) requiredFieldsMissing = true;
+    if (category?.attributes?.shoeSizes && !shoeSizes) requiredFieldsMissing = true;
+
+    if (requiredFieldsMissing) {
+      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs pertinents pour la catégorie choisie et téléverser au moins une image.", variant: "destructive" });
       return;
     }
      if (onSale && !salePrice) {
@@ -164,9 +171,10 @@ export default function AdminEditProductPage() {
         name: productName,
         description,
         price: parseFloat(price),
-        category,
+        category: category!.name,
         images: uploadedImageUrls,
-        sizes: sizes.split(',').map(s => s.trim()),
+        sizes: sizes ? sizes.split(',').map(s => s.trim()) : [],
+        shoeSizes: shoeSizes ? shoeSizes.split(',').map(s => s.trim()) : [],
         colors: colors,
         onSale: onSale,
         salePrice: onSale ? parseFloat(salePrice) : undefined,
@@ -181,6 +189,8 @@ export default function AdminEditProductPage() {
       setIsSubmitting(false);
     }
   };
+  
+  const selectedCategoryAttributes = category?.attributes;
 
   if (loading) {
       return (
@@ -256,10 +266,20 @@ export default function AdminEditProductPage() {
                     <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Décrivez le produit..." />
                 </div>
                 
-                 <div className="space-y-2">
-                    <Label htmlFor="sizes">Tailles disponibles</Label>
-                     <Input id="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL (séparées par une virgule)" required />
-                </div>
+                 {selectedCategoryAttributes?.sizes && (
+                  <div className="space-y-2">
+                      <Label htmlFor="sizes">Tailles disponibles (vêtements)</Label>
+                      <Input id="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL (séparées par une virgule)" required />
+                  </div>
+                 )}
+
+                 {selectedCategoryAttributes?.shoeSizes && (
+                  <div className="space-y-2">
+                      <Label htmlFor="shoeSizes">Pointures disponibles (chaussures)</Label>
+                      <Input id="shoeSizes" value={shoeSizes} onChange={(e) => setShoeSizes(e.target.value)} placeholder="39, 40, 41 (séparées par une virgule)" required />
+                  </div>
+                 )}
+
 
                  <div className="space-y-4">
                     <Label>Couleurs disponibles</Label>
@@ -316,7 +336,7 @@ export default function AdminEditProductPage() {
               <div className="grid sm:grid-cols-2 gap-4 items-end pt-4 border-t">
                 <div className="space-y-2">
                     <Label htmlFor="category">Catégorie</Label>
-                    <Select onValueChange={setCategory} value={category}>
+                    <Select onValueChange={(value) => setCategory(categories.find(c => c.name === value) || null)} value={category?.name}>
                         <SelectTrigger id="category">
                         <SelectValue placeholder="Sélectionner une catégorie..." />
                         </SelectTrigger>

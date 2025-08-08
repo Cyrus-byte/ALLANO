@@ -8,12 +8,13 @@ import type { Category } from './types';
  * @param name The name for the new category.
  * @returns The ID of the newly created category.
  */
-export const createCategory = async (name: string) => {
+export const createCategory = async (name: string, attributes: Category['attributes']) => {
   if (!name) {
     throw new Error("Le nom de la catégorie est requis.");
   }
   const categoryWithDefaults = {
     name: name,
+    attributes: attributes || {},
     createdAt: serverTimestamp(),
   };
 
@@ -47,13 +48,13 @@ export const getCategories = async (): Promise<Category[]> => {
  * @param categoryId The ID of the category to update.
  * @param name The new name for the category.
  */
-export const updateCategory = async (categoryId: string, name: string) => {
+export const updateCategory = async (categoryId: string, name: string, attributes: Category['attributes']) => {
   if (!categoryId || !name) {
     throw new Error("L'ID et le nom de la catégorie sont requis pour la mise à jour.");
   }
   try {
     const categoryRef = doc(db, 'categories', categoryId);
-    await updateDoc(categoryRef, { name });
+    await updateDoc(categoryRef, { name, attributes });
   } catch (error) {
     console.error(`Erreur lors de la mise à jour de la catégorie ${categoryId}:`, error);
     throw new Error("La mise à jour de la catégorie a échoué.");

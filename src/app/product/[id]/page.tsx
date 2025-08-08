@@ -217,15 +217,16 @@ export default function ProductPage() {
   const isProductInWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
-    if (selectedSize && selectedColor) {
-      addToCart(product, selectedSize, selectedColor, quantity);
-    } else {
+    const hasSizes = (product.sizes && product.sizes.length > 0) || (product.shoeSizes && product.shoeSizes.length > 0);
+    if ((hasSizes && !selectedSize) || !selectedColor) {
         toast({
             title: "Sélection requise",
             description: "Veuillez sélectionner une taille et une couleur.",
             variant: "destructive"
         })
+        return;
     }
+    addToCart(product, selectedSize || 'unique', selectedColor, quantity);
   };
   
   const handleColorSelect = (color: Product['colors'][0]) => {
@@ -234,6 +235,8 @@ export default function ProductPage() {
         setMainImage(color.imageUrl);
     }
   }
+  
+  const allSizes = [...(product.sizes || []), ...(product.shoeSizes || [])];
 
   const currentPrice = (product.onSale && product.salePrice) ? product.salePrice : product.price;
 
@@ -319,21 +322,24 @@ export default function ProductPage() {
           </div>
 
           {/* Size Options */}
-          <div className="mt-6">
-            <h3 className="text-sm font-medium">Taille:</h3>
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              {product.sizes.map(size => (
-                <Button
-                  key={size}
-                  variant={selectedSize === size ? 'default' : 'outline'}
-                  onClick={() => setSelectedSize(size)}
-                  className="w-16"
-                >
-                  {size}
-                </Button>
-              ))}
+          {allSizes.length > 0 && (
+            <div className="mt-6">
+                <h3 className="text-sm font-medium">Taille:</h3>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                {allSizes.map(size => (
+                    <Button
+                    key={size}
+                    variant={selectedSize === size ? 'default' : 'outline'}
+                    onClick={() => setSelectedSize(size)}
+                    className="w-16"
+                    >
+                    {size}
+                    </Button>
+                ))}
+                </div>
             </div>
-          </div>
+          )}
+
 
           {/* Actions */}
           <div className="mt-8 flex items-center gap-4">
@@ -346,7 +352,7 @@ export default function ProductPage() {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedSize || !selectedColor}>
+            <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedColor || (allSizes.length > 0 && !selectedSize)}>
               <ShoppingCart className="mr-2 h-5 w-5" /> Ajouter au panier
             </Button>
             <Button variant="outline" size="icon" aria-label="Ajouter aux favoris" onClick={() => toggleWishlist(product)}>

@@ -11,6 +11,7 @@ export type Product = {
   rating: number;
   reviews: number;
   sizes: string[];
+  shoeSizes?: string[];
   colors: { name: string; hex: string; imageUrl?: string }[];
   isNew?: boolean;
   onSale?: boolean;
@@ -62,4 +63,8 @@ export type Category = {
     id: string;
     name: string;
     createdAt: any;
+    attributes?: {
+        sizes?: boolean; // For clothes (S, M, L)
+        shoeSizes?: boolean; // For shoes (39, 40, 41)
+    }
 }

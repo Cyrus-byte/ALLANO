@@ -22,13 +22,19 @@ import type { Category } from '@/lib/types';
 import { Loader2, Pencil, Trash2, PlusCircle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryAttributes, setNewCategoryAttributes] = useState({ sizes: false, shoeSizes: false });
+
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editingCategoryName, setEditingCategoryName] = useState('');
+  const [editingCategoryAttributes, setEditingCategoryAttributes] = useState({ sizes: false, shoeSizes: false });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
@@ -58,9 +64,10 @@ export default function AdminCategoriesPage() {
     }
     setIsSubmitting(true);
     try {
-      await createCategory(newCategoryName);
+      await createCategory(newCategoryName, newCategoryAttributes);
       toast({ title: "Succès", description: `La catégorie "${newCategoryName}" a été ajoutée.` });
       setNewCategoryName('');
+      setNewCategoryAttributes({ sizes: false, shoeSizes: false });
       fetchCategories(); // Refresh list
     } catch (error) {
       console.error("Failed to create category:", error);
@@ -73,6 +80,7 @@ export default function AdminCategoriesPage() {
   const handleEditClick = (category: Category) => {
     setEditingCategory(category);
     setEditingCategoryName(category.name);
+    setEditingCategoryAttributes(category.attributes || { sizes: false, shoeSizes: false });
     setIsEditModalOpen(true);
   };
   
@@ -80,7 +88,7 @@ export default function AdminCategoriesPage() {
     if (!editingCategory || !editingCategoryName.trim()) return;
     setIsSubmitting(true);
     try {
-      await updateCategory(editingCategory.id, editingCategoryName);
+      await updateCategory(editingCategory.id, editingCategoryName, editingCategoryAttributes);
       toast({ title: "Succès", description: "Catégorie mise à jour." });
       fetchCategories();
       setIsEditModalOpen(false);
@@ -112,7 +120,7 @@ export default function AdminCategoriesPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Ajouter une catégorie</CardTitle>
-                    <CardDescription>Créez une nouvelle catégorie de produits.</CardDescription>
+                    <CardDescription>Créez une nouvelle catégorie et définissez ses attributs.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleAddCategory} className="space-y-4">
@@ -125,6 +133,18 @@ export default function AdminCategoriesPage() {
                             placeholder="Ex: Vêtements"
                             />
                         </div>
+                        <div className="space-y-2">
+                            <Label>Attributs de la catégorie</Label>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="new-sizes" checked={newCategoryAttributes.sizes} onCheckedChange={(checked) => setNewCategoryAttributes(prev => ({...prev, sizes: !!checked}))} />
+                                <Label htmlFor="new-sizes" className="font-normal">A des tailles (S, M, L...)</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="new-shoeSizes" checked={newCategoryAttributes.shoeSizes} onCheckedChange={(checked) => setNewCategoryAttributes(prev => ({...prev, shoeSizes: !!checked}))}/>
+                                <Label htmlFor="new-shoeSizes" className="font-normal">A des pointures (39, 40...)</Label>
+                            </div>
+                        </div>
+
                         <Button type="submit" className="w-full" disabled={isSubmitting}>
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             <PlusCircle className="mr-2 h-4 w-4" />
@@ -142,6 +162,7 @@ export default function AdminCategoriesPage() {
                         <TableHeader>
                         <TableRow>
                             <TableHead>Nom</TableHead>
+                            <TableHead>Attributs</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                         </TableHeader>
@@ -150,6 +171,7 @@ export default function AdminCategoriesPage() {
                             Array.from({length: 4}).map((_, i) => (
                                 <TableRow key={i}>
                                     <TableCell><Skeleton className="h-6 w-3/4" /></TableCell>
+                                    <TableCell><Skeleton className="h-6 w-1/2" /></TableCell>
                                     <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
                                 </TableRow>
                             ))
@@ -157,6 +179,10 @@ export default function AdminCategoriesPage() {
                             categories.map((category) => (
                                 <TableRow key={category.id}>
                                 <TableCell className="font-medium">{category.name}</TableCell>
+                                <TableCell className="text-sm text-muted-foreground">
+                                    {category.attributes?.sizes && "Tailles "}
+                                    {category.attributes?.shoeSizes && "Pointures "}
+                                </TableCell>
                                 <TableCell className="text-right space-x-2">
                                      <Dialog open={isEditModalOpen && editingCategory?.id === category.id} onOpenChange={(isOpen) => { if(!isOpen) setEditingCategory(null); setIsEditModalOpen(isOpen); }}>
                                         <DialogTrigger asChild>
@@ -168,15 +194,26 @@ export default function AdminCategoriesPage() {
                                             <DialogHeader>
                                                 <DialogTitle>Modifier la catégorie</DialogTitle>
                                                 <DialogDescription>
-                                                   Renommez la catégorie ci-dessous.
+                                                   Renommez la catégorie et ajustez ses attributs.
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <div className="grid gap-4 py-4">
                                                 <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="name" className="text-right">
-                                                    Nom
-                                                </Label>
-                                                <Input id="name" value={editingCategoryName} onChange={(e) => setEditingCategoryName(e.target.value)} className="col-span-3" />
+                                                  <Label htmlFor="name" className="text-right">Nom</Label>
+                                                  <Input id="name" value={editingCategoryName} onChange={(e) => setEditingCategoryName(e.target.value)} className="col-span-3" />
+                                                </div>
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                  <Label className="text-right">Attributs</Label>
+                                                  <div className="col-span-3 space-y-2">
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox id="edit-sizes" checked={editingCategoryAttributes.sizes} onCheckedChange={(checked) => setEditingCategoryAttributes(prev => ({...prev, sizes: !!checked}))} />
+                                                        <Label htmlFor="edit-sizes" className="font-normal">A des tailles (S, M, L...)</Label>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox id="edit-shoeSizes" checked={editingCategoryAttributes.shoeSizes} onCheckedChange={(checked) => setEditingCategoryAttributes(prev => ({...prev, shoeSizes: !!checked}))}/>
+                                                        <Label htmlFor="edit-shoeSizes" className="font-normal">A des pointures (39, 40...)</Label>
+                                                    </div>
+                                                  </div>
                                                 </div>
                                             </div>
                                              <DialogFooter>
@@ -214,7 +251,7 @@ export default function AdminCategoriesPage() {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={2} className="h-24 text-center">Aucune catégorie trouvée.</TableCell>
+                                <TableCell colSpan={3} className="h-24 text-center">Aucune catégorie trouvée.</TableCell>
                             </TableRow>
                         )}
                         </TableBody>
