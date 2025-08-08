@@ -1,56 +1,61 @@
-
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-  
-    // Helper functions
+    
+    // Helper function to check for admin role
+    function isAdmin() {
+      // IMPORTANT: Replace the placeholder with your actual Firebase User ID (UID)
+      // To find your UID, go to the Firebase Console -> Authentication -> Users
+      return request.auth.uid == 'REMPLACEZ_CECI_PAR_VOTRE_UID_FIREBASE';
+    }
+
+    // Helper function to check if the user is signed in
     function isSignedIn() {
       return request.auth != null;
     }
-    
+
+    // Helper function to check if the user is the owner of the document
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
-    
-    function isAdmin() {
-      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.admin == true;
-    }
-    
-    // USERS: Can only read/write their own document
+
+    // Users can only read/write their own data
     match /users/{userId} {
       allow read, update, delete: if isOwner(userId);
       allow create: if isSignedIn();
     }
-    
-    // PRODUCTS: Public can read, Admins can write
+
+    // Products can be read by anyone, but only managed by admins
     match /products/{productId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
       
-      // REVIEWS: Signed in users can create, everyone can read
+      // Reviews can be read by anyone, but only created by signed-in users
       match /reviews/{reviewId} {
         allow read: if true;
         allow create: if isSignedIn();
-        allow update, delete: if false; // Or check ownership/admin status
+        allow update, delete: if false; // Reviews are immutable for now
       }
     }
     
-    // ORDERS: Users can only read their own orders
-    match /orders/{orderId} {
-      allow read, create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false; // Orders should generally be immutable
-    }
-
-    // CATEGORIES: Public can read, Admins can write
+    // Categories can be read by anyone, but only managed by admins
     match /categories/{categoryId} {
         allow read: if true;
         allow create, update, delete: if isAdmin();
     }
 
-    // SETTINGS: Public can read, Admins can write
-    match /settings/{settingId} {
+    // Orders can only be read by the user who created them, and created by signed-in users
+    match /orders/{orderId} {
+        allow read: if isOwner(resource.data.userId);
+        allow create: if isSignedIn();
+        allow update, delete: if false; // Orders are immutable once created
+    }
+
+    // Settings can be read by anyone, but only managed by admins
+    match /settings/{docId} {
         allow read: if true;
-        allow create, update, delete: if isAdmin();
+        allow write: if isAdmin();
     }
   }
 }
