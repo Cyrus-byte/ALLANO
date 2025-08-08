@@ -39,6 +39,12 @@ export const getReviewsByProductId = async (productId: string): Promise<Review[]
 export const addReview = async (productId: string, userId: string, userName: string, rating: number, comment: string): Promise<Review> => {
     const productRef = doc(db, 'products', productId);
     const reviewsColRef = collection(productRef, 'reviews');
+    
+    // Check if product exists before adding a review to its subcollection
+    const productDoc = await getDoc(productRef);
+    if (!productDoc.exists()) {
+        throw "Le produit n'existe pas !";
+    }
 
     const newReviewData = {
         userId,
@@ -48,37 +54,12 @@ export const addReview = async (productId: string, userId: string, userName: str
         createdAt: serverTimestamp()
     };
     
-    let createdReview: Review;
-
-    await runTransaction(db, async (transaction) => {
-        const productDoc = await transaction.get(productRef);
-        if (!productDoc.exists()) {
-            throw "Le produit n'existe pas !";
-        }
-
-        // Add the new review
-        const newReviewRef = doc(reviewsColRef);
-        transaction.set(newReviewRef, newReviewData);
-        
-        // Calculate new average rating
-        const productData = productDoc.data();
-        const oldRatingTotal = (productData.rating || 0) * (productData.reviews || 0);
-        const newReviewsCount = (productData.reviews || 0) + 1;
-        const newAverageRating = (oldRatingTotal + rating) / newReviewsCount;
-
-        // Update product with new rating and reviews count
-        transaction.update(productRef, {
-            reviews: newReviewsCount,
-            rating: newAverageRating
-        });
-        
-        createdReview = {
-            id: newReviewRef.id,
-            ...newReviewData,
-            createdAt: new Date().toISOString() // Approximate client-side date
-        }
-    });
-
-    // @ts-ignore
-    return createdReview;
+    const newReviewRef = await addDoc(reviewsColRef, newReviewData);
+    
+    return {
+        id: newReviewRef.id,
+        ...newReviewData,
+        createdAt: new Date().toISOString() // Approximate client-side date
+    } as Review;
 };
+
