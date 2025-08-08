@@ -9,6 +9,10 @@ import { CartProvider } from '@/contexts/cart-context';
 import { WishlistProvider } from '@/contexts/wishlist-context';
 import { AuthProvider } from '@/contexts/auth-context';
 import Script from 'next/script';
+import { Inter, Cinzel } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel' });
 
 export const metadata: Metadata = {
   title: 'Allano',
@@ -22,12 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet"></link>
-      </head>
-      <body className="font-body antialiased bg-background text-foreground">
+      <body className={`${inter.variable} ${cinzel.variable} font-body antialiased bg-background text-foreground`}>
         <AuthProvider>
             <WishlistProvider>
               <CartProvider>
