@@ -16,8 +16,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
 
@@ -29,27 +27,33 @@ const defaultSettings: HomepageSettings = {
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setProductsLoading] = useState(true);
   const [heroSettings, setHeroSettings] = useState<HomepageSettings>(defaultSettings);
   const [heroLoading, setHeroLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      setLoading(true);
+      setProductsLoading(true);
       try {
         const fetchedProducts = await getProducts();
         setProducts(fetchedProducts);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       } finally {
-        setLoading(false);
+        setProductsLoading(false);
       }
     };
     const fetchHeroSettings = async () => {
       setHeroLoading(true);
-      const settings = await getHomepageSettings();
-      setHeroSettings(settings || defaultSettings);
-      setHeroLoading(false);
+      try {
+          const settings = await getHomepageSettings();
+          setHeroSettings(settings || defaultSettings);
+      } catch (error) {
+        console.error("Failed to fetch hero settings:", error);
+        setHeroSettings(defaultSettings);
+      } finally {
+        setHeroLoading(false);
+      }
     }
 
     fetchHeroSettings();
@@ -72,7 +76,7 @@ export default function Home() {
         </Link>
         </Button>
     </div>
-  )
+  );
 
   return (
     <div className="flex flex-col">
@@ -80,41 +84,38 @@ export default function Home() {
         {heroLoading ? (
             <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
-            <>
-                {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 ? (
-                    <Carousel 
-                        className="absolute inset-0 w-full h-full"
-                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
-                        opts={{ loop: true }}
-                    >
-                        <CarouselContent>
-                            {heroSettings.heroImageUrls.map((url, index) => (
-                                <CarouselItem key={index}>
-                                    <div className="relative w-full h-full">
-                                        <Image
-                                            src={url}
-                                            alt={`Hero background ${index + 1}`}
-                                            fill
-                                            className="object-cover"
-                                            data-ai-hint="fashion model"
-                                            priority={index === 0}
-                                        />
-                                    </div>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                    </Carousel>
-                ) : (
-                     <div className="absolute inset-0 w-full h-full bg-secondary" />
-                )}
-                 <div className="absolute inset-0 bg-black/60" />
-                 <div className="absolute inset-0 flex items-center justify-center">
-                    <HeroSectionContent />
-                 </div>
-            </>
+          <>
+            {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 && (
+              <Carousel 
+                  className="absolute inset-0 w-full h-full"
+                  plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+                  opts={{ loop: true }}
+              >
+                  <CarouselContent>
+                      {heroSettings.heroImageUrls.map((url, index) => (
+                          <CarouselItem key={index}>
+                              <div className="relative w-full h-full">
+                                  <Image
+                                      src={url}
+                                      alt={`Hero background ${index + 1}`}
+                                      fill
+                                      className="object-cover"
+                                      data-ai-hint="fashion model"
+                                      priority={index === 0}
+                                  />
+                              </div>
+                          </CarouselItem>
+                      ))}
+                  </CarouselContent>
+              </Carousel>
+            )}
+            <div className="absolute inset-0 bg-black/60" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <HeroSectionContent />
+            </div>
+          </>
         )}
       </section>
-
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <ProductRecommendations />
