@@ -49,19 +49,21 @@ export default function AdminSettingsPage() {
       language: 'fr',
       multiple: true,
     }, (error: any, result: any) => { 
-      if (result.event === 'close' || result.event === 'abort') {
+      if (!error && result && result.event === "close") {
         setIsUploading(false);
+        return;
       }
       if (error) {
         console.error("Upload error:", error);
         toast({ title: "Erreur de téléversement", variant: 'destructive' });
         setIsUploading(false);
+        return;
       }
-      if (result.event === "success") { 
+      if (!error && result && result.event === "success") { 
         setHeroImageUrls(prev => [...prev, result.info.secure_url]);
         toast({ title: "Image ajoutée", description: "Cliquez sur 'Enregistrer' pour appliquer."});
       }
-       if (result.event === "queue-changed" && result.info.files.length === 0) {
+       if (!error && result && result.event === "queue-changed" && result.info.files.length === 0) {
         setIsUploading(false);
       }
     });
