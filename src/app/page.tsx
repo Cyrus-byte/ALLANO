@@ -54,55 +54,63 @@ export default function Home() {
 
   const newArrivals = products.filter(p => p.isNew).slice(0, 8);
 
+  const HeroSectionContent = () => (
+     <div className="relative z-20 flex flex-col items-center justify-center h-full text-center p-4">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
+        La Mode, Réinventée.
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
+        Découvrez les dernières tendances et exprimez votre style unique avec Allano.
+        </p>
+        <Button size="lg" className="mt-8" asChild>
+        <Link href="/categories">
+            Explorer les collections <ArrowRight className="ml-2" />
+        </Link>
+        </Button>
+    </div>
+  )
+
   return (
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
         {heroLoading ? (
             <Skeleton className="w-full h-full" />
-        ) : (
-            heroImageUrls.length > 0 && (
+        ) : heroImageUrls.length > 0 ? (
+            <>
                 <Carousel 
-                  className="w-full h-full"
-                  plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
-                  opts={{ loop: true }}
-                >
-                  <CarouselContent>
-                    {heroImageUrls.map((url, index) => (
-                      <CarouselItem key={index}>
-                         <Image
-                          src={url}
-                          alt={`Hero background ${index + 1}`}
-                          fill
-                          className="object-cover"
-                          data-ai-hint="fashion model"
-                          priority={index === 0}
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  {heroImageUrls.length > 1 && (
-                    <>
-                        <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
-                        <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
-                    </>
-                  )}
+                    className="w-full h-full"
+                    plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+                    opts={{ loop: true }}
+                    >
+                    <CarouselContent>
+                        {heroImageUrls.map((url, index) => (
+                        <CarouselItem key={index}>
+                            <Image
+                            src={url}
+                            alt={`Hero background ${index + 1}`}
+                            fill
+                            className="object-cover"
+                            data-ai-hint="fashion model"
+                            priority={index === 0}
+                            />
+                        </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    {heroImageUrls.length > 1 && (
+                        <>
+                            <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
+                            <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
+                        </>
+                    )}
                 </Carousel>
-            )
+                <div className="absolute inset-0 bg-black/60 z-10" />
+                <HeroSectionContent />
+            </>
+        ) : (
+            <div className="w-full h-full bg-secondary">
+                 <HeroSectionContent />
+            </div>
         )}
-        <div className="absolute inset-0 bg-black/60 z-10" />
-        <div className="relative z-20 flex flex-col items-center justify-center h-full text-center p-4">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
-            La Mode, Réinventée.
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
-            Découvrez les dernières tendances et exprimez votre style unique avec Allano.
-          </p>
-          <Button size="lg" className="mt-8" asChild>
-            <Link href="/categories">
-              Explorer les collections <ArrowRight className="ml-2" />
-            </Link>
-          </Button>
-        </div>
       </section>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -139,4 +147,3 @@ export default function Home() {
     </div>
   );
 }
-
