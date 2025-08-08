@@ -3,61 +3,51 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // =============================================================
-    // FONCTION D'ADMINISTRATION
-    // =============================================================
+
+    // Helper function to check if a user is an administrator
     function isAdmin() {
-      // Pour devenir administrateur, remplacez la ligne ci-dessous :
-      // 1. TROUVEZ votre UID dans la console Firebase (Authentication -> Users).
-      // 2. REMPLACEZ 'REMPLACEZ_CECI_PAR_VOTRE_UID_FIREBASE' par votre UID.
-      // Exemple : return request.auth.uid == 'AbcDeF1gH2iJkL3mN4oP5qR6sT7uV8w';
-      return request.auth.uid == 'REMPLACEZ_CECI_PAR_VOTRE_UID_FIREBASE';
+      // IMPORTANT: Replace the placeholder with your actual Firebase User UID.
+      // To find your UID, go to the Firebase Console -> Authentication -> Users tab.
+      let adminUIDs = [
+        // TODO: REMPLACEZ_CECI_PAR_VOTRE_UID_FIREBASE
+        'lsVXL4iLaEWydMn8jWWs3V0tncL2'
+      ];
+      return request.auth != null && request.auth.uid in adminUIDs;
     }
 
-    function isSignedIn() {
-      return request.auth != null;
+    // Default deny all reads and writes
+    match /{document=**} {
+      allow read, write: if false;
     }
 
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-
-    // =============================================================
-    // RÈGLES DES COLLECTIONS
-    // =============================================================
-
-    // Users: Can only read/write their own data
+    // Users: Can read/write their own data
     match /users/{userId} {
-      allow read, update, delete: if isOwner(userId);
-      allow create: if isSignedIn();
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
     // Products: Read-only for everyone, write access for admins
     match /products/{productId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
-
-      // Reviews Subcollection: Read-only for all, write for signed-in users
-      match /reviews/{reviewId} {
-        allow read: if true;
-        allow create: if isSignedIn();
-        allow update, delete: if isOwner(request.resource.data.userId);
-      }
+      allow write: if isAdmin();
     }
     
+    // Reviews: Read-only for everyone, write for authenticated users
+    match /products/{productId}/reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+    }
+
     // Categories: Read-only for everyone, write access for admins
     match /categories/{categoryId} {
         allow read: if true;
-        allow create, update, delete: if isAdmin();
+        allow write: if isAdmin();
     }
 
     // Orders: Users can only access their own orders
     match /orders/{orderId} {
-        allow read, update: if isOwner(resource.data.userId);
-        allow create: if isSignedIn();
+        allow read, create: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
-
+    
     // Settings: Read-only for everyone, write access for admins
     match /settings/{docId} {
         allow read: if true;
