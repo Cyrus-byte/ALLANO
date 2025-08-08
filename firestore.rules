@@ -1,36 +1,46 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Products can be read by anyone, but only created/updated/deleted by a logged-in user.
+    // Les utilisateurs ne peuvent lire et écrire que leurs propres documents.
+    match /users/{userId} {
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+
+    // Les produits sont lisibles par tous, mais l'écriture est restreinte.
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      // Seuls les utilisateurs authentifiés peuvent créer, mettre à jour ou supprimer des produits.
+      // Pour une meilleure sécurité, vous devriez ajouter un rôle admin ici.
+      allow create, update, delete: if request.auth != null;
 
-      // Reviews can be read by anyone, but only created by a logged-in user.
-      // No one can update or delete a review from the client.
+      // Les avis sont lisibles par tous, mais ne peuvent être créés que par des utilisateurs authentifiés.
       match /reviews/{reviewId} {
         allow read: if true;
         allow create: if request.auth != null;
-        allow update, delete: if false;
       }
     }
 
-    // Categories can be read by anyone, but only written by a logged-in user.
+    // Les catégories sont lisibles par tous, mais l'écriture est restreinte.
     match /categories/{categoryId} {
-        allow read: if true;
-        allow write: if request.auth != null;
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
     }
 
-    // Users can only read/write their own data (cart, wishlist, orders).
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Orders can be created by a logged in user, but only read by that same user.
+    // Les utilisateurs ne peuvent lire que leurs propres commandes.
     match /orders/{orderId} {
-       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Empêche la mise à jour ou la suppression des commandes depuis le client.
+      allow update, delete: if false;
+    }
+
+    // Les paramètres sont lisibles par tous, mais modifiables uniquement par des utilisateurs authentifiés.
+    match /settings/{settingId} {
+        allow read: if true;
+        allow write: if request.auth != null;
     }
   }
 }
