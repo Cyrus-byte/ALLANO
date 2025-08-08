@@ -46,7 +46,6 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Logo className="h-6 w-auto" />
-           <span className="font-bold">Allano</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm">
           {navLinks.map(link => (
