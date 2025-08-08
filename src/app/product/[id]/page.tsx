@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { getProductById } from '@/lib/product-service';
-import type { Product } from '@/lib/types';
+import type { Product, Review } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Star, Minus, Plus, Heart, ShoppingCart } from 'lucide-react';
@@ -14,12 +14,129 @@ import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/auth-context';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { getReviewsByProductId, addReview } from '@/lib/review-service';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
+function ProductReviews({ productId }: { productId: string }) {
+    const { user } = useAuth();
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [newRating, setNewRating] = useState(0);
+    const [newComment, setNewComment] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            setLoading(true);
+            try {
+                const fetchedReviews = await getReviewsByProductId(productId);
+                setReviews(fetchedReviews);
+            } catch (error) {
+                console.error("Failed to fetch reviews:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchReviews();
+    }, [productId]);
+
+    const handleReviewSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) {
+            toast({ title: "Connexion requise", description: "Vous devez être connecté pour laisser un avis.", variant: "destructive" });
+            return;
+        }
+        if (newRating === 0 || !newComment) {
+            toast({ title: "Champs requis", description: "Veuillez donner une note et un commentaire.", variant: "destructive" });
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            const newReview = await addReview(productId, user.uid, user.displayName || 'Anonyme', newRating, newComment);
+            setReviews([newReview, ...reviews]);
+            setNewComment('');
+            setNewRating(0);
+            toast({ title: "Avis ajouté", description: "Merci pour votre contribution !" });
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Erreur", description: "Impossible d'ajouter l'avis.", variant: "destructive" });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    
+    return (
+        <div className="mt-12">
+            <h2 className="text-2xl font-bold mb-6">Avis des clients</h2>
+            {user && (
+                 <form onSubmit={handleReviewSubmit} className="mb-8 p-6 border rounded-lg">
+                    <h3 className="font-semibold mb-4">Laissez votre avis</h3>
+                    <div className="mb-4">
+                        <Label>Note</Label>
+                        <div className="flex items-center gap-1 mt-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                    key={star}
+                                    className={cn("h-6 w-6 cursor-pointer", newRating >= star ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')}
+                                    onClick={() => setNewRating(star)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                     <div className="mb-4">
+                        <Label htmlFor="comment">Commentaire</Label>
+                        <Textarea id="comment" value={newComment} onChange={(e) => setNewComment(e.target.value)} required className="mt-2" />
+                    </div>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Publication...' : 'Publier mon avis'}
+                    </Button>
+                </form>
+            )}
+
+            <div className="space-y-6">
+                {loading ? (
+                    <p>Chargement des avis...</p>
+                ) : reviews.length > 0 ? (
+                    reviews.map(review => (
+                        <div key={review.id} className="flex gap-4">
+                            <Avatar>
+                                <AvatarFallback>{review.userName.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                    <p className="font-semibold">{review.userName}</p>
+                                    <span className="text-sm text-muted-foreground">{format(new Date(review.createdAt), 'd MMMM yyyy', { locale: fr })}</span>
+                                </div>
+                                <div className="flex items-center gap-1 my-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star key={i} className={cn("h-4 w-4", i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
+                                    ))}
+                                </div>
+                                <p className="text-muted-foreground">{review.comment}</p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-muted-foreground">Aucun avis pour ce produit pour le moment.</p>
+                )}
+            </div>
+        </div>
+    );
+}
+
 
 export default function ProductPage() {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const params = useParams();
   const { toast } = useToast();
+  const productId = params.id as string;
   
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,13 +149,12 @@ export default function ProductPage() {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const fetchedProduct = await getProductById(params.id as string);
+        const fetchedProduct = await getProductById(productId);
         if (fetchedProduct) {
           setProduct(fetchedProduct);
           setMainImage(fetchedProduct.images[0] || '');
           if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
             setSelectedColor(fetchedProduct.colors[0].name);
-            // If the first color has an associated image, set it as the main image
             if (fetchedProduct.colors[0].imageUrl) {
               setMainImage(fetchedProduct.colors[0].imageUrl);
             }
@@ -53,10 +169,10 @@ export default function ProductPage() {
         setLoading(false);
       }
     };
-    if(params.id) {
+    if(productId) {
         fetchProduct();
     }
-  }, [params.id]);
+  }, [productId]);
 
 
   if (loading || !product) {
@@ -218,6 +334,10 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+
+       <Separator className="my-10" />
+
+       <ProductReviews productId={productId} />
     </div>
   );
 }

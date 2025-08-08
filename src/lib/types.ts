@@ -48,3 +48,12 @@ export type Order = {
   createdAt: any; // Firestore timestamp, will be Date object on client
   paymentDetails?: any;
 };
+
+export type Review = {
+  id: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: any; // Firestore timestamp
+};
