@@ -4,43 +4,60 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Les utilisateurs ne peuvent lire et écrire que leurs propres documents.
-    match /users/{userId} {
-      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null;
+    // =================================
+    // Helper Functions
+    // =================================
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // Les produits sont lisibles par tous, mais l'écriture est restreinte.
+    // IMPORTANT: Replace the placeholder UID with your actual Firebase User ID.
+    // You can find your UID in the Firebase Console under Authentication > Users.
+    function isAdmin() {
+      return request.auth.uid in ['REPLACE_WITH_YOUR_ADMIN_UID'];
+    }
+
+    // =================================
+    // Collection Rules
+    // =================================
+
+    // Users: Can only read/write their own data.
+    match /users/{userId} {
+      allow read, update, delete: if request.auth.uid == userId;
+      allow create: if isSignedIn();
+    }
+
+    // Products: Publicly readable, only admins can write.
     match /products/{productId} {
       allow read: if true;
-      // Seuls les utilisateurs authentifiés peuvent créer, mettre à jour ou supprimer des produits.
-      // Pour une meilleure sécurité, vous devriez ajouter un rôle admin ici.
-      allow create, update, delete: if request.auth != null;
+      allow create, update, delete: if isAdmin();
 
-      // Les avis sont lisibles par tous, mais ne peuvent être créés que par des utilisateurs authentifiés.
+      // Reviews subcollection: Anyone signed in can create a review.
       match /reviews/{reviewId} {
         allow read: if true;
-        allow create: if request.auth != null;
+        allow create: if isSignedIn();
+        allow update, delete: if false; // Future: allow user to edit their own review
       }
     }
 
-    // Les catégories sont lisibles par tous, mais l'écriture est restreinte.
-    match /categories/{categoryId} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null;
-    }
-
-    // Les utilisateurs ne peuvent lire que leurs propres commandes.
+    // Orders: Users can only read/create their own orders. Admins can view all.
     match /orders/{orderId} {
-      allow read, create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      // Empêche la mise à jour ou la suppression des commandes depuis le client.
-      allow update, delete: if false;
+        allow read: if request.resource.data.userId == request.auth.uid || isAdmin();
+        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+        allow update: if isAdmin();
+        allow list: if isAdmin();
+    }
+    
+    // Categories: Publicly readable, only admins can write.
+    match /categories/{categoryId} {
+        allow read: if true;
+        allow create, update, delete: if isAdmin();
     }
 
-    // Les paramètres sont lisibles par tous, mais modifiables uniquement par des utilisateurs authentifiés.
+    // Settings: Publicly readable, only admins can write.
     match /settings/{settingId} {
         allow read: if true;
-        allow write: if request.auth != null;
+        allow create, update, delete: if isAdmin();
     }
   }
 }
