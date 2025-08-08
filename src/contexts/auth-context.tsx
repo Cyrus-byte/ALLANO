@@ -8,6 +8,9 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 
+// Hardcoded Admin UID. In a real-world scenario, this might come from a secure config.
+const ADMIN_UID = 'Lh1t3W3YqWg2S6uWdBsY05tSgT23';
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -33,18 +36,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-  const createUserDocument = async (user: User) => {
+  const createUserDocument = async (user: User, additionalData = {}) => {
     if (!user) return;
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists()) {
-        await setDoc(userRef, {
+        const userData = {
             email: user.email,
             displayName: user.displayName,
             createdAt: new Date(),
             cart: [],
             wishlist: [],
-        });
+            ...additionalData
+        };
+
+        if (user.uid === ADMIN_UID) {
+            // @ts-ignore
+            userData.roles = { admin: true };
+        }
+
+        await setDoc(userRef, userData);
     }
   }
 
