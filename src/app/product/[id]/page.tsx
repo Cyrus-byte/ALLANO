@@ -22,7 +22,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-function ProductReviews({ productId }: { productId: string }) {
+function ProductReviews({ 
+    productId, 
+    onReviewsLoaded 
+}: { 
+    productId: string,
+    onReviewsLoaded: (reviews: Review[]) => void
+}) {
     const { user } = useAuth();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,6 +43,7 @@ function ProductReviews({ productId }: { productId: string }) {
             try {
                 const fetchedReviews = await getReviewsByProductId(productId);
                 setReviews(fetchedReviews);
+                onReviewsLoaded(fetchedReviews);
             } catch (error) {
                 console.error("Failed to fetch reviews:", error);
             } finally {
@@ -44,7 +51,7 @@ function ProductReviews({ productId }: { productId: string }) {
             }
         };
         fetchReviews();
-    }, [productId]);
+    }, [productId, onReviewsLoaded]);
 
     const handleReviewSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,7 +66,9 @@ function ProductReviews({ productId }: { productId: string }) {
         setIsSubmitting(true);
         try {
             const newReview = await addReview(productId, user.uid, user.displayName || 'Anonyme', newRating, newComment);
-            setReviews([newReview, ...reviews]);
+            const updatedReviews = [newReview, ...reviews];
+            setReviews(updatedReviews);
+            onReviewsLoaded(updatedReviews);
             setNewComment('');
             setNewRating(0);
             toast({ title: "Avis ajouté", description: "Merci pour votre contribution !" });
@@ -144,6 +153,7 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [mainImage, setMainImage] = useState<string>('');
+  const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -173,6 +183,11 @@ export default function ProductPage() {
         fetchProduct();
     }
   }, [productId]);
+  
+  const ratingAverage = reviews.length > 0
+    ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+    : 0;
+  const reviewCount = reviews.length;
 
 
   if (loading || !product) {
@@ -256,12 +271,18 @@ export default function ProductPage() {
         <div>
           <h1 className="text-3xl md:text-4xl font-bold font-headline">{product.name}</h1>
           <div className="flex items-center gap-4 mt-4">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className={cn("h-5 w-5", i < Math.round(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
-              ))}
-            </div>
-            <span className="text-muted-foreground text-sm">{product.reviews} avis</span>
+             {reviewCount > 0 ? (
+                <>
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={cn("h-5 w-5", i < Math.round(ratingAverage) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
+                    ))}
+                  </div>
+                  <span className="text-muted-foreground text-sm">{reviewCount} avis</span>
+                </>
+              ) : (
+                 <span className="text-muted-foreground text-sm">Aucun avis pour le moment</span>
+              )}
           </div>
           
           <div className="flex items-baseline gap-4 mt-4">
@@ -337,7 +358,7 @@ export default function ProductPage() {
 
        <Separator className="my-10" />
 
-       <ProductReviews productId={productId} />
+       <ProductReviews productId={productId} onReviewsLoaded={setReviews} />
     </div>
   );
 }

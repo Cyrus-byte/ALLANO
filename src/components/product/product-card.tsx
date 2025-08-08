@@ -72,11 +72,12 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
           )}
         </div>
-        <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
+        {/* Commenting out static rating display. This will be calculated on the product page */}
+        {/* <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
           <span>{product.rating}</span>
           <span>({product.reviews})</span>
-        </div>
+        </div> */}
       </CardFooter>
     </Card>
   );
