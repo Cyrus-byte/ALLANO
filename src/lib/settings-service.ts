@@ -5,30 +5,30 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 const settingsDocRef = doc(db, 'settings', 'homepage');
 
 /**
- * Updates the homepage hero image URL in Firestore.
- * @param imageUrl The new URL for the hero image.
+ * Updates the homepage hero image URLs in Firestore.
+ * @param imageUrls The new array of URLs for the hero images.
  */
-export const updateHomepageHeroUrl = async (imageUrl: string) => {
+export const updateHomepageHeroUrls = async (imageUrls: string[]) => {
   try {
     await setDoc(settingsDocRef, { 
-        heroImageUrl: imageUrl,
+        heroImageUrls: imageUrls,
         updatedAt: serverTimestamp()
     }, { merge: true });
   } catch (error) {
-    console.error("Error updating homepage hero URL:", error);
+    console.error("Error updating homepage hero URLs:", error);
     throw new Error("Failed to update homepage settings.");
   }
 };
 
 /**
- * Fetches the homepage hero image URL from Firestore.
- * @returns A promise that resolves to the hero image URL, or null if not found.
+ * Fetches the homepage hero image URLs from Firestore.
+ * @returns A promise that resolves to an array of hero image URLs, or null if not found.
  */
-export const getHomepageHeroUrl = async (): Promise<string | null> => {
+export const getHomepageHeroUrls = async (): Promise<string[] | null> => {
     try {
         const docSnap = await getDoc(settingsDocRef);
         if (docSnap.exists()) {
-            return docSnap.data().heroImageUrl || null;
+            return docSnap.data().heroImageUrls || null;
         } else {
             return null;
         }

@@ -11,15 +11,27 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getHomepageHeroUrl } from '@/lib/settings-service';
+import { getHomepageHeroUrls } from '@/lib/settings-service';
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import Autoplay from "embla-carousel-autoplay"
+
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [heroImageUrl, setHeroImageUrl] = useState("https://placehold.co/1600x900.png");
+  const [heroImageUrls, setHeroImageUrls] = useState<string[]>([]);
+  const [heroLoading, setHeroLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
         const fetchedProducts = await getProducts();
         setProducts(fetchedProducts);
@@ -29,12 +41,14 @@ export default function Home() {
         setLoading(false);
       }
     };
-    const fetchHeroImage = async () => {
-      const url = await getHomepageHeroUrl();
-      if(url) setHeroImageUrl(url);
+    const fetchHeroImages = async () => {
+      setHeroLoading(true);
+      const urls = await getHomepageHeroUrls();
+      setHeroImageUrls(urls || []);
+      setHeroLoading(false);
     }
 
-    fetchHeroImage();
+    fetchHeroImages();
     fetchProducts();
   }, []);
 
@@ -43,14 +57,32 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
-        <Image
-          src={heroImageUrl}
-          alt="Hero background"
-          fill
-          className="object-cover"
-          data-ai-hint="fashion model"
-          priority
-        />
+        {heroLoading ? (
+            <Skeleton className="w-full h-full" />
+        ) : (
+            <Carousel 
+              className="w-full h-full"
+              plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+              opts={{ loop: true }}
+            >
+              <CarouselContent>
+                {heroImageUrls.map((url, index) => (
+                  <CarouselItem key={index}>
+                     <Image
+                      src={url}
+                      alt={`Hero background ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      data-ai-hint="fashion model"
+                      priority={index === 0}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
+              <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
+            </Carousel>
+        )}
         <div className="absolute inset-0 bg-black/60 z-10" />
         <div className="relative z-20 flex flex-col items-center justify-center h-full text-center p-4">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
@@ -60,8 +92,8 @@ export default function Home() {
             Découvrez les dernières tendances et exprimez votre style unique avec Allano.
           </p>
           <Button size="lg" className="mt-8" asChild>
-            <Link href="/promotions">
-              Nouvelle Collection <ArrowRight className="ml-2" />
+            <Link href="/categories">
+              Explorer les collections <ArrowRight className="ml-2" />
             </Link>
           </Button>
         </div>
@@ -74,7 +106,7 @@ export default function Home() {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline">Nouveautés</h2>
             <Button variant="link" asChild className="text-primary">
-              <Link href="/promotions">
+              <Link href="/categories">
                 Voir tout <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
