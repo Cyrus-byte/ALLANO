@@ -19,18 +19,28 @@ interface ProductFiltersProps {
 export function ProductFilters({ products, onFilterChange }: ProductFiltersProps) {
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedShoeSizes, setSelectedShoeSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState('newest');
 
-  const availableSizes = useMemo(() => {
-    const allSizes = products.flatMap(p => p.sizes);
-    return [...new Set(allSizes)].sort();
+  const { availableSizes, availableShoeSizes, availableColors } = useMemo(() => {
+    const allSizes = new Set<string>();
+    const allShoeSizes = new Set<string>();
+    const allColors = new Set<string>();
+
+    products.forEach(p => {
+        p.sizes?.forEach(s => allSizes.add(s));
+        p.shoeSizes?.forEach(s => allShoeSizes.add(s));
+        p.colors?.forEach(c => allColors.add(c.name));
+    });
+
+    return {
+        availableSizes: Array.from(allSizes).sort(),
+        availableShoeSizes: Array.from(allShoeSizes).sort((a,b) => Number(a) - Number(b)),
+        availableColors: Array.from(allColors).sort()
+    };
   }, [products]);
 
-  const availableColors = useMemo(() => {
-    const allColors = products.flatMap(p => p.colors.map(c => c.name));
-    return [...new Set(allColors)].sort();
-  }, [products]);
 
   useEffect(() => {
     const filterAndSort = () => {
@@ -44,7 +54,12 @@ export function ProductFilters({ products, onFilterChange }: ProductFiltersProps
 
       // Size filter
       if (selectedSizes.length > 0) {
-        filtered = filtered.filter(p => p.sizes.some(size => selectedSizes.includes(size)));
+        filtered = filtered.filter(p => p.sizes?.some(size => selectedSizes.includes(size)));
+      }
+      
+      // Shoe Size filter
+      if (selectedShoeSizes.length > 0) {
+        filtered = filtered.filter(p => p.shoeSizes?.some(size => selectedShoeSizes.includes(size)));
       }
 
       // Color filter
@@ -69,11 +84,17 @@ export function ProductFilters({ products, onFilterChange }: ProductFiltersProps
     };
 
     filterAndSort();
-  }, [priceRange, selectedSizes, selectedColors, sortOrder, products, onFilterChange]);
+  }, [priceRange, selectedSizes, selectedShoeSizes, selectedColors, sortOrder, products, onFilterChange]);
 
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes(prev =>
+      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+    );
+  };
+  
+  const handleShoeSizeChange = (size: string) => {
+    setSelectedShoeSizes(prev =>
       prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
     );
   };
@@ -87,6 +108,7 @@ export function ProductFilters({ products, onFilterChange }: ProductFiltersProps
   const resetFilters = () => {
     setPriceRange([0, 100000]);
     setSelectedSizes([]);
+    setSelectedShoeSizes([]);
     setSelectedColors([]);
     setSortOrder('newest');
   }
@@ -132,7 +154,7 @@ export function ProductFilters({ products, onFilterChange }: ProductFiltersProps
 
         {availableSizes.length > 0 && (
           <div>
-            <Label className="font-semibold">Taille</Label>
+            <Label className="font-semibold">Taille (vêtements)</Label>
             <div className="space-y-2 mt-2">
               {availableSizes.map(size => (
                 <div key={size} className="flex items-center">
@@ -143,6 +165,21 @@ export function ProductFilters({ products, onFilterChange }: ProductFiltersProps
             </div>
           </div>
         )}
+        
+         {availableShoeSizes.length > 0 && (
+          <div>
+            <Label className="font-semibold">Pointure (chaussures)</Label>
+            <div className="space-y-2 mt-2">
+              {availableShoeSizes.map(size => (
+                <div key={size} className="flex items-center">
+                  <Checkbox id={`shoe-size-${size}`} checked={selectedShoeSizes.includes(size)} onCheckedChange={() => handleShoeSizeChange(size)} />
+                  <Label htmlFor={`shoe-size-${size}`} className="ml-2 font-normal">{size}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
 
         {availableColors.length > 0 && (
           <div>
