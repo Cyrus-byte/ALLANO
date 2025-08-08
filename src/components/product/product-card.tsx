@@ -59,7 +59,6 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex-col items-start p-4">
-        {product.brand && <p className="text-xs text-muted-foreground">{product.brand}</p>}
         <Link href={`/product/${product.id}`}>
           <h3 className="font-semibold text-sm truncate w-full">{product.name}</h3>
         </Link>

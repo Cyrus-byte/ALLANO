@@ -17,7 +17,6 @@ export const createProduct = async (productData: Partial<ProductInput>) => {
     price: productData.price || 0,
     images: productData.images || [],
     category: productData.category || 'Non classé',
-    brand: productData.brand || '',
     sizes: productData.sizes || [],
     colors: productData.colors || [],
     rating: 0,

@@ -33,7 +33,6 @@ export default function AdminEditProductPage() {
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [brand, setBrand] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
   const [sizes, setSizes] = useState('');
   const [shoeSizes, setShoeSizes] = useState('');
@@ -61,7 +60,6 @@ export default function AdminEditProductPage() {
                     setProductName(fetchedProduct.name);
                     setDescription(fetchedProduct.description);
                     setPrice(fetchedProduct.price.toString());
-                    setBrand(fetchedProduct.brand || '');
                     const currentCategory = fetchedCategories.find(c => c.name === fetchedProduct.category);
                     setCategory(currentCategory || null);
                     setSizes(fetchedProduct.sizes.join(', '));
@@ -173,7 +171,6 @@ export default function AdminEditProductPage() {
         name: productName,
         description,
         price: parseFloat(price),
-        brand,
         category: category!.name,
         images: uploadedImageUrls,
         sizes: sizes ? sizes.split(',').map(s => s.trim()) : [],
@@ -233,15 +230,9 @@ export default function AdminEditProductPage() {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="productName">Nom du produit</Label>
-                        <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="brand">Marque (optionnel)</Label>
-                        <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Ex: Nike, Allano..." />
-                    </div>
+                <div className="space-y-2">
+                    <Label htmlFor="productName">Nom du produit</Label>
+                    <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
