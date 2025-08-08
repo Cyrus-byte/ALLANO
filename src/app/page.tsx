@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,7 +6,7 @@ import { ProductCard } from '@/components/product/product-card';
 import { ProductRecommendations } from '@/components/product/product-recommendations';
 import { getProducts } from '@/lib/product-service';
 import type { Product } from '@/lib/types';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,11 +24,70 @@ const defaultSettings: HomepageSettings = {
     heroSubheadline: 'Découvrez les dernières tendances et exprimez votre style unique avec Allano.'
 }
 
+const HeroSection = ({ settings, loading }: { settings: HomepageSettings, loading: boolean }) => {
+  const HeroSectionContent = () => (
+     <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
+          {settings.heroHeadline}
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
+          {settings.heroSubheadline}
+        </p>
+        <Button size="lg" className="mt-8" asChild>
+        <Link href="/categories">
+            Explorer les collections <ArrowRight className="ml-2" />
+        </Link>
+        </Button>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary text-primary-foreground">
+        <Skeleton className="absolute inset-0 w-full h-full" />
+      </section>
+    );
+  }
+
+  return (
+      <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary text-primary-foreground">
+          {settings.heroImageUrls && settings.heroImageUrls.length > 0 && (
+            <Carousel 
+                className="absolute inset-0 w-full h-full"
+                plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+                opts={{ loop: true }}
+            >
+                <CarouselContent>
+                    {settings.heroImageUrls.map((url, index) => (
+                        <CarouselItem key={index}>
+                            <div className="relative w-full h-full">
+                                <Image
+                                    src={url}
+                                    alt={`Hero background ${index + 1}`}
+                                    fill
+                                    className="object-cover"
+                                    data-ai-hint="fashion model"
+                                    priority={index === 0}
+                                />
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+            </Carousel>
+          )}
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <HeroSectionContent />
+          </div>
+      </section>
+  )
+}
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setProductsLoading] = useState(true);
+  const [loadingProducts, setProductsLoading] = useState(true);
   const [heroSettings, setHeroSettings] = useState<HomepageSettings>(defaultSettings);
-  const [heroLoading, setHeroLoading] = useState(true);
+  const [loadingHero, setHeroLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -62,60 +120,9 @@ export default function Home() {
 
   const newArrivals = products.filter(p => p.isNew).slice(0, 8);
 
-  const HeroSectionContent = () => (
-     <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
-          {heroSettings.heroHeadline}
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
-          {heroSettings.heroSubheadline}
-        </p>
-        <Button size="lg" className="mt-8" asChild>
-        <Link href="/categories">
-            Explorer les collections <ArrowRight className="ml-2" />
-        </Link>
-        </Button>
-    </div>
-  );
-
   return (
     <div className="flex flex-col">
-      <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary text-primary-foreground">
-        {heroLoading ? (
-            <Skeleton className="absolute inset-0 w-full h-full" />
-        ) : (
-          <>
-            {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 && (
-              <Carousel 
-                  className="absolute inset-0 w-full h-full"
-                  plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
-                  opts={{ loop: true }}
-              >
-                  <CarouselContent>
-                      {heroSettings.heroImageUrls.map((url, index) => (
-                          <CarouselItem key={index}>
-                              <div className="relative w-full h-full">
-                                  <Image
-                                      src={url}
-                                      alt={`Hero background ${index + 1}`}
-                                      fill
-                                      className="object-cover"
-                                      data-ai-hint="fashion model"
-                                      priority={index === 0}
-                                  />
-                              </div>
-                          </CarouselItem>
-                      ))}
-                  </CarouselContent>
-              </Carousel>
-            )}
-            <div className="absolute inset-0 bg-black/60" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <HeroSectionContent />
-            </div>
-          </>
-        )}
-      </section>
+      <HeroSection settings={heroSettings} loading={loadingHero} />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <ProductRecommendations />
@@ -129,7 +136,7 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          {loading ? (
+          {loadingProducts ? (
              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
                 {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i}>
