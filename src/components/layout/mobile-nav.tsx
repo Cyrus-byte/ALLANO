@@ -32,7 +32,7 @@ export function MobileNav() {
             <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
               <div className="relative">
                 {item.loading ? <Loader2 className={cn("h-6 w-6 animate-spin", isActive ? "text-primary" : "text-muted-foreground")} /> : <item.icon className={cn("h-6 w-6", isActive ? "text-primary" : "text-muted-foreground")} />}
-                {!item.loading && item.count && item.count > 0 && (
+                {!item.loading && typeof item.count !== 'undefined' && item.count > 0 && (
                   <Badge variant="destructive" className="absolute -top-2 -right-3 h-5 w-5 justify-center rounded-full p-0">
                     {item.count}
                   </Badge>
