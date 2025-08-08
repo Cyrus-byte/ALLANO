@@ -1,63 +1,74 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // =================================
-    // Helper Functions
-    // =================================
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    // IMPORTANT: Replace the placeholder UID with your actual Firebase User ID.
-    // You can find your UID in the Firebase Console under Authentication > Users.
+  
+    // =============================================================
+    // FONCTION D'AIDE :
+    // Vérifie si l'utilisateur connecté est un administrateur.
+    // =============================================================
     function isAdmin() {
-      return request.auth.uid in ['REPLACE_WITH_YOUR_ADMIN_UID'];
-    }
-
-    // =================================
-    // Collection Rules
-    // =================================
-
-    // Users: Can only read/write their own data.
-    match /users/{userId} {
-      allow read, update, delete: if request.auth.uid == userId;
-      allow create: if isSignedIn();
-    }
-
-    // Products: Publicly readable, only admins can write.
-    match /products/{productId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin();
-
-      // Reviews subcollection: Anyone signed in can create a review.
-      match /reviews/{reviewId} {
-        allow read: if true;
-        allow create: if isSignedIn();
-        allow update, delete: if false; // Future: allow user to edit their own review
-      }
-    }
-
-    // Orders: Users can only read/create their own orders. Admins can view all.
-    match /orders/{orderId} {
-        allow read: if request.resource.data.userId == request.auth.uid || isAdmin();
-        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-        allow update: if isAdmin();
-        allow list: if isAdmin();
+      // Pour que cela fonctionne, remplacez la ligne ci-dessous
+      // par votre propre UID Firebase que vous trouverez dans la
+      // section "Authentication" de la console Firebase.
+      //
+      // Exemple : return request.auth.uid == 'AbcdeF1G2hI3jK4lM5n6oP7qR8sT9';
+      //
+      let adminUIDs = [
+        'REMPLACEZ_CECI_PAR_VOTRE_UID_FIREBASE'
+      ];
+      return request.auth.uid in adminUIDs;
     }
     
-    // Categories: Publicly readable, only admins can write.
+    // =============================================================
+    // COLLECTIONS PUBLIQUES
+    // Tout le monde peut lire ces données.
+    // Seuls les administrateurs peuvent les modifier.
+    // =============================================================
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
     match /categories/{categoryId} {
-        allow read: if true;
-        allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // =============================================================
+    // SOUS-COLLECTION D'AVIS
+    // Tout le monde peut lire les avis.
+    // Seuls les utilisateurs connectés peuvent en créer.
+    // =============================================================
+    match /products/{productId}/reviews/{reviewId} {
+       allow read: if true;
+       allow create: if request.auth != null;
+       allow update, delete: if false; // Personne ne peut modifier/supprimer les avis
     }
 
-    // Settings: Publicly readable, only admins can write.
-    match /settings/{settingId} {
-        allow read: if true;
-        allow create, update, delete: if isAdmin();
+    // =============================================================
+    // DONNÉES UTILISATEUR
+    // Les utilisateurs ne peuvent accéder qu'à leurs propres documents.
+    // =============================================================
+    match /users/{userId} {
+      allow read, update: if request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+    
+    // =============================================================
+    // COMMANDES
+    // Les utilisateurs ne peuvent lire que leurs propres commandes.
+    // La création est gérée par le backend sécurisé (fonctions).
+    // =============================================================
+    match /orders/{orderId} {
+        allow read: if request.auth.uid == resource.data.userId;
+        allow create: if request.auth != null; // La création est limitée au backend
+        allow update, delete: if false;
     }
   }
 }
