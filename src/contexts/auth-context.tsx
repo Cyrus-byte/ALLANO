@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, getDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore"; 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 
@@ -29,7 +29,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Check for and assign admin role on every auth state change for the logged-in admin
+        if (user.uid === ADMIN_UID) {
+            const userRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userRef);
+            if(userDoc.exists() && !userDoc.data().roles?.admin) {
+                await updateDoc(userRef, { 'roles.admin': true });
+            }
+        }
+      }
       setUser(user);
       setLoading(false);
     });
@@ -40,6 +50,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
+    
+    // Only create document if it doesn't exist
     if (!userDoc.exists()) {
         const userData = {
             email: user.email,
@@ -50,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...additionalData
         };
 
+        // Assign admin role on creation
         if (user.uid === ADMIN_UID) {
             // @ts-ignore
             userData.roles = { admin: true };
@@ -68,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userWithProfile = { ...userCredential.user, displayName };
       await createUserDocument(userWithProfile);
 
-      setUser(userCredential.user);
+      // No need to set user here, onAuthStateChanged will handle it.
       router.push('/');
       toast({ title: "Compte créé", description: "Bienvenue sur Allano !" });
     } catch (error: any) {
@@ -80,6 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logIn = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      // onAuthStateChanged will handle user state and role check.
       router.push('/account');
       toast({ title: "Connexion réussie", description: "Heureux de vous revoir !" });
     } catch (error: any) {
@@ -93,6 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       await createUserDocument(result.user);
+      // onAuthStateChanged will handle user state and role check.
       router.push('/account');
       toast({ title: "Connexion réussie", description: "Heureux de vous revoir !" });
     } catch (error: any) {
