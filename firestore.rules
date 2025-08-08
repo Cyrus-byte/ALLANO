@@ -1,32 +1,37 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Products can be read by anyone, but only modified by an admin (future feature)
+    // Products can be read by anyone. Only admins should write.
+    // We allow updates only on rating and reviews fields for review transactions.
     match /products/{productId} {
       allow read: if true;
-      allow write: if false; // For now, only allow creation/update/deletion from server-side/admin SDK
-
+      allow create, delete: if false; // Should be handled by admin SDK
+      allow update: if request.auth != null 
+                    && request.resource.data.keys().hasOnly(['rating', 'reviews'])
+                    && request.resource.data.rating is number
+                    && request.resource.data.reviews is number;
+      
       // Reviews can be read by anyone
       match /reviews/{reviewId} {
         allow read: if true;
-        // Only authenticated users can create reviews
-        allow create: if request.auth != null;
-        allow update, delete: if false; // Prevent editing/deleting for now
+        // Only authenticated users can create their own reviews
+        allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+        // Users can't update or delete reviews for now to keep it simple
+        allow update, delete: if false;
       }
     }
 
-    // Users can only read and write their own document
+    // Users can only read and write their own documents (e.g., cart, wishlist).
     match /users/{userId} {
-      allow read, update: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null;
+      allow read, write, create: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // Orders can only be read by the user who created them
+
+    // Orders can be created by authenticated users for themselves.
+    // Reading/updating status should be handled by a backend/admin role.
     match /orders/{orderId} {
-      allow read, create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
+        allow read, update: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true || resource.data.userId == request.auth.uid;
+        allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
   }
 }
