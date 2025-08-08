@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Search, ShoppingCart, User, Loader2, Plus, List, LayoutGrid } from 'lucide-react';
+import { Heart, Search, ShoppingCart, User, Loader2, Plus, List, LayoutGrid, Settings } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
@@ -45,8 +45,8 @@ export function Header() {
     <header className="sticky top-0 z-40 hidden w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:block">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Logo className="h-6 w-6" />
-          <span className="font-bold">Allano</span>
+          <Logo className="h-6 w-auto" />
+           <span className="font-bold">Allano</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm">
           {navLinks.map(link => (
@@ -77,6 +77,12 @@ export function Header() {
                     <Link href="/admin/categories">
                         <LayoutGrid className="mr-2 h-4 w-4" />
                         <span>Gérer les catégories</span>
+                    </Link>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <Link href="/admin/settings">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Personnalisation</span>
                     </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

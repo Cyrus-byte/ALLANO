@@ -11,10 +11,12 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getHomepageHeroUrl } from '@/lib/settings-service';
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroImageUrl, setHeroImageUrl] = useState("https://placehold.co/1600x900.png");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -27,6 +29,12 @@ export default function Home() {
         setLoading(false);
       }
     };
+    const fetchHeroImage = async () => {
+      const url = await getHomepageHeroUrl();
+      if(url) setHeroImageUrl(url);
+    }
+
+    fetchHeroImage();
     fetchProducts();
   }, []);
 
@@ -36,7 +44,7 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
         <Image
-          src="https://placehold.co/1600x900.png"
+          src={heroImageUrl}
           alt="Hero background"
           fill
           className="object-cover"
