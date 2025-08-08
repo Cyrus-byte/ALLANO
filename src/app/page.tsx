@@ -60,28 +60,34 @@ export default function Home() {
         {heroLoading ? (
             <Skeleton className="w-full h-full" />
         ) : (
-            <Carousel 
-              className="w-full h-full"
-              plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
-              opts={{ loop: true }}
-            >
-              <CarouselContent>
-                {heroImageUrls.map((url, index) => (
-                  <CarouselItem key={index}>
-                     <Image
-                      src={url}
-                      alt={`Hero background ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      data-ai-hint="fashion model"
-                      priority={index === 0}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
-              <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
-            </Carousel>
+            heroImageUrls.length > 0 && (
+                <Carousel 
+                  className="w-full h-full"
+                  plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+                  opts={{ loop: true }}
+                >
+                  <CarouselContent>
+                    {heroImageUrls.map((url, index) => (
+                      <CarouselItem key={index}>
+                         <Image
+                          src={url}
+                          alt={`Hero background ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          data-ai-hint="fashion model"
+                          priority={index === 0}
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  {heroImageUrls.length > 1 && (
+                    <>
+                        <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
+                        <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
+                    </>
+                  )}
+                </Carousel>
+            )
         )}
         <div className="absolute inset-0 bg-black/60 z-10" />
         <div className="relative z-20 flex flex-col items-center justify-center h-full text-center p-4">
@@ -133,3 +139,4 @@ export default function Home() {
     </div>
   );
 }
+
