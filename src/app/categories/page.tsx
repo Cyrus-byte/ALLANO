@@ -6,7 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ProductCard } from '@/components/product/product-card';
 import { getProducts } from '@/lib/product-service';
-import type { Product } from '@/lib/types';
+import { getCategories } from '@/lib/category-service';
+import type { Product, Category } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,46 +25,47 @@ const slugify = (text: string) =>
     .replace(/--+/g, '-');
 
 export default function CategoriesPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchAllData = async () => {
       setLoading(true);
       try {
-        const fetchedProducts = await getProducts();
-        // Sort products to have new ones first, then by creation date (if available)
-        fetchedProducts.sort((a, b) => {
-            if (a.isNew && !b.isNew) return -1;
-            if (!a.isNew && b.isNew) return 1;
-            // Add secondary sort criteria if needed, e.g., by name
-            return a.name.localeCompare(b.name);
+        const [fetchedCategories, allProducts] = await Promise.all([
+          getCategories(),
+          getProducts()
+        ]);
+        
+        // Sort products into a map for easy lookup
+        const productMap: Record<string, Product[]> = {};
+        allProducts.forEach(product => {
+            if (!productMap[product.category]) {
+                productMap[product.category] = [];
+            }
+            productMap[product.category].push(product);
         });
-        setProducts(fetchedProducts);
+        
+        setCategories(fetchedCategories);
+        setProductsByCategory(productMap);
+
       } catch (error) {
-        console.error("Failed to fetch products:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchProducts();
+    fetchAllData();
   }, []);
 
-  const categories = products.reduce((acc, product) => {
-    const category = product.category;
-    if (!acc[category]) {
-      // Find a new product for the category image if one exists
-      const newProductInCategory = products.find(p => p.category === category && p.isNew);
-      acc[category] = { 
-        products: [], 
-        // Use the new product's image, or fallback to the current product's image
-        image: newProductInCategory ? newProductInCategory.images[0] : product.images[0] 
-      };
-    }
-    acc[category].products.push(product);
-    return acc;
-  }, {} as Record<string, { products: Product[], image: string }>);
-
+  const getCategoryImage = (categoryName: string) => {
+    const products = productsByCategory[categoryName] || [];
+    const newProduct = products.find(p => p.isNew);
+    if (newProduct) return newProduct.images[0];
+    if (products.length > 0) return products[0].images[0];
+    return "https://placehold.co/400x400.png"; // Fallback image
+  }
 
   if (loading) {
      return (
@@ -108,17 +110,17 @@ export default function CategoriesPage() {
 
       <section className="mb-16">
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
-          {Object.keys(categories).sort().map((category) => (
-            <Link key={category} href={`/category/${slugify(category)}`} passHref>
+          {categories.map((category) => (
+            <Link key={category.id} href={`/category/${slugify(category.name)}`} passHref>
                <div className="group relative aspect-square overflow-hidden rounded-lg">
                 <Image
-                  src={categories[category].image}
-                  alt={category}
+                  src={getCategoryImage(category.name)}
+                  alt={category.name}
                   fill
                   className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h2 className="text-sm font-bold text-white text-center p-1">{category}</h2>
+                  <h2 className="text-sm font-bold text-white text-center p-1">{category.name}</h2>
                 </div>
               </div>
             </Link>
@@ -127,23 +129,28 @@ export default function CategoriesPage() {
       </section>
 
       <div className="space-y-16">
-        {Object.entries(categories).sort(([a], [b]) => a.localeCompare(b)).map(([category, { products }]) => (
-          <section key={category} id={`${slugify(category)}`} className="scroll-mt-24">
-             <div className="flex justify-between items-end mb-8 border-b pb-4">
-                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">{category}</h2>
-                 <Button asChild variant="link" className="text-primary pr-0">
-                    <Link href={`/category/${slugify(category)}`}>
-                        Voir tout <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                 </Button>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-              {products.slice(0,4).map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </section>
-        ))}
+        {categories.map((category) => {
+          const products = productsByCategory[category.name] || [];
+          if(products.length === 0) return null;
+          
+          return (
+            <section key={category.id} id={`${slugify(category.name)}`} className="scroll-mt-24">
+               <div className="flex justify-between items-end mb-8 border-b pb-4">
+                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">{category.name}</h2>
+                   <Button asChild variant="link" className="text-primary pr-0">
+                      <Link href={`/category/${slugify(category.name)}`}>
+                          Voir tout <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                   </Button>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                {products.slice(0, 4).map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </section>
+          )
+        })}
       </div>
     </div>
   );
