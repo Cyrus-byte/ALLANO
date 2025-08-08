@@ -1,69 +1,56 @@
 
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper Functions
+  
+    // Helper functions
     function isSignedIn() {
       return request.auth != null;
     }
-
+    
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
-
-    function getRole(role) {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles[role] == true;
-    }
-
+    
     function isAdmin() {
-      return isSignedIn() && getRole('admin');
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.admin == true;
     }
-
-    // USERS
-    // - A user can only access their own document.
-    // - Anyone can create a user document (on signup).
+    
+    // USERS: Can only read/write their own document
     match /users/{userId} {
-      allow read, update: if isSignedIn() && isOwner(userId);
+      allow read, update, delete: if isOwner(userId);
       allow create: if isSignedIn();
     }
-
-    // PRODUCTS & REVIEWS
-    // - Anyone can read products and reviews.
-    // - Only admins can write to products.
-    // - Only signed-in users can write reviews.
+    
+    // PRODUCTS: Public can read, Admins can write
     match /products/{productId} {
       allow read: if true;
-      allow write: if isAdmin();
-
+      allow create, update, delete: if isAdmin();
+      
+      // REVIEWS: Signed in users can create, everyone can read
       match /reviews/{reviewId} {
         allow read: if true;
         allow create: if isSignedIn();
-        // Allow no updates/deletes for now for simplicity
-        allow update, delete: if false;
+        allow update, delete: if false; // Or check ownership/admin status
       }
     }
-
-    // CATEGORIES & SETTINGS
-    // - Anyone can read categories and settings.
-    // - Only admins can write to them.
-    match /categories/{categoryId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    match /settings/{settingId} {
-       allow read: if true;
-       allow write: if isAdmin();
-    }
-
-    // ORDERS
-    // - A user can only access their own orders.
-    // - Orders are created through a backend function implicitly.
+    
+    // ORDERS: Users can only read their own orders
     match /orders/{orderId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create, update, delete: if isAdmin(); // Only admins can manage orders post-creation
+      allow read, create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false; // Orders should generally be immutable
+    }
+
+    // CATEGORIES: Public can read, Admins can write
+    match /categories/{categoryId} {
+        allow read: if true;
+        allow create, update, delete: if isAdmin();
+    }
+
+    // SETTINGS: Public can read, Admins can write
+    match /settings/{settingId} {
+        allow read: if true;
+        allow create, update, delete: if isAdmin();
     }
   }
 }
