@@ -11,8 +11,7 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getHomepageHeroUrls } from '@/lib/settings-service';
-import { Card, CardContent } from "@/components/ui/card"
+import { getHomepageSettings, type HomepageSettings } from '@/lib/settings-service';
 import {
   Carousel,
   CarouselContent,
@@ -22,11 +21,16 @@ import {
 } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
 
+const defaultSettings: HomepageSettings = {
+    heroImageUrls: [],
+    heroHeadline: 'La Mode, Réinventée.',
+    heroSubheadline: 'Découvrez les dernières tendances et exprimez votre style unique avec Allano.'
+}
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [heroImageUrls, setHeroImageUrls] = useState<string[]>([]);
+  const [heroSettings, setHeroSettings] = useState<HomepageSettings>(defaultSettings);
   const [heroLoading, setHeroLoading] = useState(true);
 
   useEffect(() => {
@@ -41,14 +45,14 @@ export default function Home() {
         setLoading(false);
       }
     };
-    const fetchHeroImages = async () => {
+    const fetchHeroSettings = async () => {
       setHeroLoading(true);
-      const urls = await getHomepageHeroUrls();
-      setHeroImageUrls(urls || []);
+      const settings = await getHomepageSettings();
+      setHeroSettings(settings || defaultSettings);
       setHeroLoading(false);
     }
 
-    fetchHeroImages();
+    fetchHeroSettings();
     fetchProducts();
   }, []);
 
@@ -57,10 +61,10 @@ export default function Home() {
   const HeroSectionContent = () => (
      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
-        La Mode, Réinventée.
+          {heroSettings.heroHeadline}
         </h1>
         <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
-        Découvrez les dernières tendances et exprimez votre style unique avec Allano.
+          {heroSettings.heroSubheadline}
         </p>
         <Button size="lg" className="mt-8" asChild>
         <Link href="/categories">
@@ -72,19 +76,19 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white">
+       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white bg-secondary">
         {heroLoading ? (
             <Skeleton className="w-full h-full" />
         ) : (
             <>
-                {heroImageUrls.length > 0 ? (
+                {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 ? (
                     <Carousel 
                         className="w-full h-full"
                         plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
                         opts={{ loop: true }}
                     >
                         <CarouselContent>
-                            {heroImageUrls.map((url, index) => (
+                            {heroSettings.heroImageUrls.map((url, index) => (
                                 <CarouselItem key={index}>
                                     <div className="relative w-full h-[60vh] md:h-[70vh]">
                                         <Image
@@ -99,7 +103,7 @@ export default function Home() {
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        {heroImageUrls.length > 1 && (
+                        {heroSettings.heroImageUrls.length > 1 && (
                             <>
                                 <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
                                 <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none" />
@@ -110,9 +114,7 @@ export default function Home() {
                     <div className="w-full h-full bg-secondary" />
                 )}
                 <div className="absolute inset-0 bg-black/60" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <HeroSectionContent />
-                </div>
+                <HeroSectionContent />
             </>
         )}
       </section>
