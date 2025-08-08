@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/layout/header';
+import { MobileHeader } from '@/components/layout/mobile-header';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { CartProvider } from '@/contexts/cart-context';
 import { WishlistProvider } from '@/contexts/wishlist-context';
@@ -32,7 +33,8 @@ export default function RootLayout({
               <CartProvider>
                 <div className="relative flex min-h-screen flex-col">
                   <Header />
-                  <main className="flex-1">{children}</main>
+                  <MobileHeader />
+                  <main className="flex-1 pt-16 md:pt-0">{children}</main>
                   <MobileNav />
                 </div>
                 <Toaster />
