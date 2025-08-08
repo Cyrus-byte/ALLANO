@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -23,23 +24,6 @@ const defaultSettings: HomepageSettings = {
     heroHeadline: 'La Mode, Réinventée.',
     heroSubheadline: 'Découvrez les dernières tendances et exprimez votre style unique avec Allano.'
 }
-
-const HeroSectionContent = ({ settings }: { settings: HomepageSettings }) => (
-     <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
-          {settings.heroHeadline}
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
-          {settings.heroSubheadline}
-        </p>
-        <Button size="lg" className="mt-8" asChild>
-        <Link href="/categories">
-            Explorer les collections <ArrowRight className="ml-2" />
-        </Link>
-        </Button>
-    </div>
-);
-
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -86,12 +70,12 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary text-primary-foreground flex items-center justify-center">
+       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary flex items-center justify-center">
           {loadingHero ? (
               <Skeleton className="absolute inset-0 w-full h-full" />
           ) : (
             <>
-              {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 && (
+              {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 ? (
                 <Carousel 
                     className="absolute inset-0 w-full h-full"
                     plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
@@ -113,9 +97,25 @@ export default function Home() {
                         ))}
                     </CarouselContent>
                 </Carousel>
+              ) : (
+                <div className="absolute inset-0 bg-slate-700"></div>
               )}
+              
               <div className="absolute inset-0 bg-black/60" />
-              <HeroSectionContent settings={heroSettings} />
+
+              <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
+                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
+                  {heroSettings.heroHeadline}
+                </h1>
+                <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
+                  {heroSettings.heroSubheadline}
+                </p>
+                <Button size="lg" className="mt-8" asChild>
+                <Link href="/categories">
+                    Explorer les collections <ArrowRight className="ml-2" />
+                </Link>
+                </Button>
+              </div>
             </>
           )}
       </section>
