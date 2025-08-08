@@ -83,11 +83,11 @@ export function Header() {
             </DropdownMenu>
         </nav>
         <div className="flex flex-1 items-center justify-end gap-4">
-          <form onSubmit={handleSearch} className="relative w-full max-w-sm">
+          <form onSubmit={handleSearch} className="relative w-full max-w-xs">
             <Input
               type="search"
               placeholder="Rechercher un produit..."
-              className="pl-10"
+              className="pl-10 rounded-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

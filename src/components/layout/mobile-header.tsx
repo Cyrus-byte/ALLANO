@@ -30,7 +30,7 @@ export function MobileHeader() {
             <Input
               type="search"
               placeholder="Rechercher..."
-              className="pl-10 h-10"
+              className="pl-10 h-10 rounded-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
