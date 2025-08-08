@@ -1,0 +1,32 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Products can be read by anyone, but only modified by an admin (future feature)
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if false; // For now, only allow creation/update/deletion from server-side/admin SDK
+
+      // Reviews can be read by anyone
+      match /reviews/{reviewId} {
+        allow read: if true;
+        // Only authenticated users can create reviews
+        allow create: if request.auth != null;
+        allow update, delete: if false; // Prevent editing/deleting for now
+      }
+    }
+
+    // Users can only read and write their own document
+    match /users/{userId} {
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+    
+    // Orders can only be read by the user who created them
+    match /orders/{orderId} {
+      allow read, create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}
