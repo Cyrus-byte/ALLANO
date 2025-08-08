@@ -26,6 +26,7 @@ export default function AdminUploadPage() {
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [brand, setBrand] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
   const [sizes, setSizes] = useState('');
   const [shoeSizes, setShoeSizes] = useState('');
@@ -139,6 +140,7 @@ export default function AdminUploadPage() {
         name: productName,
         description,
         price: parseFloat(price),
+        brand,
         category: category!.name,
         images: uploadedImageUrls,
         sizes: sizes ? sizes.split(',').map(s => s.trim()) : [],
@@ -153,6 +155,7 @@ export default function AdminUploadPage() {
       setProductName('');
       setDescription('');
       setPrice('');
+      setBrand('');
       setCategory(null);
       setSizes('');
       setShoeSizes('');
@@ -187,9 +190,15 @@ export default function AdminUploadPage() {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
-                <div className="space-y-2">
-                    <Label htmlFor="productName">Nom du produit</Label>
-                    <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
+                <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="productName">Nom du produit</Label>
+                        <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="brand">Marque (optionnel)</Label>
+                        <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Ex: Nike, Allano..." />
+                    </div>
                 </div>
                  
                 <div className="grid sm:grid-cols-2 gap-4">

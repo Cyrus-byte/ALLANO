@@ -272,7 +272,8 @@ export default function ProductPage() {
 
         {/* Product Details */}
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold font-headline">{product.name}</h1>
+          {product.brand && <p className="text-sm font-semibold text-muted-foreground">{product.brand}</p>}
+          <h1 className="text-3xl md:text-4xl font-bold font-headline mt-1">{product.name}</h1>
           <div className="flex items-center gap-4 mt-4">
              {reviewCount > 0 ? (
                 <>

@@ -59,6 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex-col items-start p-4">
+        {product.brand && <p className="text-xs text-muted-foreground">{product.brand}</p>}
         <Link href={`/product/${product.id}`}>
           <h3 className="font-semibold text-sm truncate w-full">{product.name}</h3>
         </Link>
@@ -72,12 +73,6 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
           )}
         </div>
-        {/* Commenting out static rating display. This will be calculated on the product page */}
-        {/* <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-          <span>{product.rating}</span>
-          <span>({product.reviews})</span>
-        </div> */}
       </CardFooter>
     </Card>
   );
