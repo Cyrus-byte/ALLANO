@@ -36,7 +36,13 @@ export default function AdminSettingsPage() {
     const fetchSettings = async () => {
       setLoading(true);
       const fetchedSettings = await getHomepageSettings();
-      const currentSettings = fetchedSettings || defaultSettings;
+      // Ensure headline/subheadline are strings to avoid controlled/uncontrolled error
+      const currentSettings = {
+          ...defaultSettings,
+          ...(fetchedSettings || {}),
+          heroHeadline: (fetchedSettings?.heroHeadline) || defaultSettings.heroHeadline,
+          heroSubheadline: (fetchedSettings?.heroSubheadline) || defaultSettings.heroSubheadline,
+      };
       setSettings(currentSettings);
       setInitialSettings(currentSettings);
       setLoading(false);
@@ -59,19 +65,19 @@ export default function AdminSettingsPage() {
       language: 'fr',
       multiple: true,
     }, (error: any, result: any) => { 
-      if (result.event === 'close' || result.event === 'abort') {
+        if (result.event === 'close' || result.event === 'abort') {
           setIsUploading(false);
-      }
-      if (error) {
-        console.error("Upload error:", error);
-        toast({ title: "Erreur de téléversement", variant: 'destructive' });
-        setIsUploading(false);
-        return;
-      }
-      if (result.event === "success") { 
-        setSettings(prev => ({...prev, heroImageUrls: [...prev.heroImageUrls, result.info.secure_url]}));
-        toast({ title: "Image ajoutée", description: "Cliquez sur 'Enregistrer' pour appliquer."});
-      }
+        }
+        if (error) {
+            console.error("Upload error:", error);
+            toast({ title: "Erreur de téléversement", variant: 'destructive' });
+            setIsUploading(false);
+            return;
+        }
+        if (result.event === "success") { 
+            setSettings(prev => ({...prev, heroImageUrls: [...prev.heroImageUrls, result.info.secure_url]}));
+            toast({ title: "Image ajoutée", description: "Cliquez sur 'Enregistrer' pour appliquer."});
+        }
     });
     myWidget.open();
   };
@@ -143,11 +149,11 @@ export default function AdminSettingsPage() {
                 <div className="space-y-4 border-b pb-6">
                     <div className="space-y-2">
                         <Label htmlFor="heroHeadline">Titre principal</Label>
-                        <Input id="heroHeadline" value={settings.heroHeadline} onChange={handleInputChange} />
+                        <Input id="heroHeadline" value={settings.heroHeadline || ''} onChange={handleInputChange} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="heroSubheadline">Sous-titre</Label>
-                        <Textarea id="heroSubheadline" value={settings.heroSubheadline} onChange={handleInputChange} />
+                        <Textarea id="heroSubheadline" value={settings.heroSubheadline || ''} onChange={handleInputChange} />
                     </div>
                 </div>
 
