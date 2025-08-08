@@ -76,9 +76,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white bg-secondary">
+       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary text-white">
         {heroLoading ? (
-            <Skeleton className="w-full h-full" />
+            <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
             <>
                 {heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0 ? (
@@ -111,10 +111,12 @@ export default function Home() {
                         )}
                     </Carousel>
                 ) : (
-                    <div className="w-full h-full bg-secondary" />
+                     <div className="w-full h-full bg-secondary" />
                 )}
-                <div className="absolute inset-0 bg-black/60" />
-                <HeroSectionContent />
+                 <div className="absolute inset-0 bg-black/60" />
+                 <div className="absolute inset-0 flex items-center justify-center">
+                    <HeroSectionContent />
+                 </div>
             </>
         )}
       </section>
