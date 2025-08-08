@@ -43,7 +43,7 @@ export default function Home() {
           data-ai-hint="fashion model"
           priority
         />
-        <div className="absolute inset-0 bg-black/50 z-10" />
+        <div className="absolute inset-0 bg-black/60 z-10" />
         <div className="relative z-20 flex flex-col items-center justify-center h-full text-center p-4">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
             La Mode, Réinventée.
@@ -51,8 +51,10 @@ export default function Home() {
           <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
             Découvrez les dernières tendances et exprimez votre style unique avec Allano.
           </p>
-          <Button size="lg" className="mt-8">
-            Nouvelle Collection <ArrowRight className="ml-2" />
+          <Button size="lg" className="mt-8" asChild>
+            <Link href="/promotions">
+              Nouvelle Collection <ArrowRight className="ml-2" />
+            </Link>
           </Button>
         </div>
       </section>
