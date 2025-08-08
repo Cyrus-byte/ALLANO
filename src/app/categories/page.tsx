@@ -32,6 +32,13 @@ export default function CategoriesPage() {
       setLoading(true);
       try {
         const fetchedProducts = await getProducts();
+        // Sort products to have new ones first, then by creation date (if available)
+        fetchedProducts.sort((a, b) => {
+            if (a.isNew && !b.isNew) return -1;
+            if (!a.isNew && b.isNew) return 1;
+            // Add secondary sort criteria if needed, e.g., by name
+            return a.name.localeCompare(b.name);
+        });
         setProducts(fetchedProducts);
       } catch (error) {
         console.error("Failed to fetch products:", error);
@@ -45,11 +52,18 @@ export default function CategoriesPage() {
   const categories = products.reduce((acc, product) => {
     const category = product.category;
     if (!acc[category]) {
-      acc[category] = { products: [], image: product.images[0] };
+      // Find a new product for the category image if one exists
+      const newProductInCategory = products.find(p => p.category === category && p.isNew);
+      acc[category] = { 
+        products: [], 
+        // Use the new product's image, or fallback to the current product's image
+        image: newProductInCategory ? newProductInCategory.images[0] : product.images[0] 
+      };
     }
     acc[category].products.push(product);
     return acc;
   }, {} as Record<string, { products: Product[], image: string }>);
+
 
   if (loading) {
      return (
@@ -94,7 +108,7 @@ export default function CategoriesPage() {
 
       <section className="mb-16">
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
-          {Object.keys(categories).map((category) => (
+          {Object.keys(categories).sort().map((category) => (
             <Link key={category} href={`/category/${slugify(category)}`} passHref>
                <div className="group relative aspect-square overflow-hidden rounded-lg">
                 <Image
@@ -113,7 +127,7 @@ export default function CategoriesPage() {
       </section>
 
       <div className="space-y-16">
-        {Object.entries(categories).map(([category, { products }]) => (
+        {Object.entries(categories).sort(([a], [b]) => a.localeCompare(b)).map(([category, { products }]) => (
           <section key={category} id={`${slugify(category)}`} className="scroll-mt-24">
              <div className="flex justify-between items-end mb-8 border-b pb-4">
                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">{category}</h2>
