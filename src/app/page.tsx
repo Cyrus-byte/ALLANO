@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
 import { ProductRecommendations } from '@/components/product/product-recommendations';
@@ -27,6 +27,11 @@ export default function Home() {
   const [loadingProducts, setProductsLoading] = useState(true);
   const [heroSettings, setHeroSettings] = useState<HomepageSettings>(defaultSettings);
   const [loadingHero, setHeroLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -66,10 +71,12 @@ export default function Home() {
     fetchProducts();
   }, []);
 
+  const isLoading = loadingHero || !isMounted;
+
   return (
     <div>
        <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary group">
-        {loadingHero ? (
+        {isLoading ? (
           <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
           <>
