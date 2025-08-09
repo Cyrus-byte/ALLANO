@@ -30,8 +30,11 @@ export default function Home() {
   const [loadingProducts, setProductsLoading] = useState(true);
   const [heroSettings, setHeroSettings] = useState<HomepageSettings>(defaultSettings);
   const [loadingHero, setHeroLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    
     const fetchProducts = async () => {
       setProductsLoading(true);
       try {
@@ -43,6 +46,7 @@ export default function Home() {
         setProductsLoading(false);
       }
     };
+    
     const fetchHeroSettings = async () => {
       setHeroLoading(true);
       try {
@@ -70,32 +74,35 @@ export default function Home() {
 
   const newArrivals = products.filter(p => p.isNew).slice(0, 8);
   const hasImages = heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0;
+  const isLoading = loadingHero || !isClient;
 
   return (
     <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary flex items-center justify-center">
-        {loadingHero && <Skeleton className="absolute inset-0 w-full h-full" />}
-
-        {!loadingHero && hasImages && (
+       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary">
+        {isLoading ? (
+          <Skeleton className="absolute inset-0 w-full h-full" />
+        ) : (
+          hasImages && (
             <Carousel
-            className="w-full h-full"
-            plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
-            opts={{ loop: true }}
+              className="w-full h-full"
+              plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
+              opts={{ loop: true }}
             >
-            <CarouselContent>
+              <CarouselContent>
                 {heroSettings.heroImageUrls.map((url, index) => (
-                <CarouselItem key={index}>
+                  <CarouselItem key={index}>
                     <Image
-                    src={url}
-                    alt={`Hero image ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    priority={index === 0}
+                      src={url}
+                      alt={`Hero image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      priority={index === 0}
                     />
-                </CarouselItem>
+                  </CarouselItem>
                 ))}
-            </CarouselContent>
+              </CarouselContent>
             </Carousel>
+          )
         )}
         
         <div className="absolute inset-0 bg-black/60" />
