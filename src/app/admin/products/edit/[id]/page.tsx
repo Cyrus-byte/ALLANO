@@ -99,7 +99,7 @@ export default function AdminEditProductPage() {
       return;
     }
      if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées. Vérifiez votre fichier .env", variant: 'destructive' });
+      toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées. Vérifiez votre fichier .env.local", variant: 'destructive' });
       console.error("Cloudinary cloud name or upload preset is not configured.");
       return;
     }
@@ -397,5 +397,3 @@ export default function AdminEditProductPage() {
     </>
   );
 }
-
-    
