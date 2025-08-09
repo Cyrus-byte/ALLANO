@@ -70,7 +70,6 @@ export default function Home() {
 
   const newArrivals = products.filter(p => p.isNew).slice(0, 8);
   const hasImages = heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0;
-  const firstImage = hasImages ? heroSettings.heroImageUrls[0] : null;
 
   return (
     <div className="flex flex-col">
@@ -79,14 +78,26 @@ export default function Home() {
           <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
           <>
-            {hasImages && firstImage ? (
-                <Image
-                    src={firstImage}
-                    alt="Hero background"
-                    fill
-                    className="object-cover"
-                    priority
-                />
+            {hasImages ? (
+               <Carousel
+                className="w-full h-full"
+                plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
+                opts={{ loop: true }}
+              >
+                <CarouselContent>
+                  {heroSettings.heroImageUrls.map((url, index) => (
+                    <CarouselItem key={index}>
+                      <Image
+                        src={url}
+                        alt={`Hero image ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        priority={index === 0}
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             ) : (
                 <div className="absolute inset-0 bg-slate-700"></div>
             )}
