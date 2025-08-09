@@ -86,17 +86,17 @@ export default function Home() {
 
   return (
     <div>
-       <section className="w-full py-12 md:py-20">
-        <div className="container mx-auto">
+       <section className="w-full relative">
+        <div className="container mx-auto py-12 md:py-20">
            {heroSettings.heroImageUrls.length > 0 ? (
-                <>
+                <div className="relative aspect-video w-full rounded-lg overflow-hidden">
                     <Carousel
                         opts={{
                             align: "center",
                             loop: true,
                         }}
                         plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
-                        className="w-full"
+                        className="w-full h-full"
                     >
                         <CarouselContent>
                             {heroSettings.heroImageUrls.map((url, index) => (
@@ -106,7 +106,7 @@ export default function Home() {
                                     src={url}
                                     alt={`Hero image ${index + 1}`}
                                     fill
-                                    className="object-cover rounded-lg"
+                                    className="object-cover"
                                     priority={index === 0}
                                 />
                                 </div>
@@ -114,11 +114,11 @@ export default function Home() {
                             ))}
                         </CarouselContent>
                     </Carousel>
-                    <div className="text-center mt-8">
-                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-white">
                             {heroSettings.heroHeadline}
                         </h1>
-                        <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+                        <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-foreground/90">
                             {heroSettings.heroSubheadline}
                         </p>
                         <Button size="lg" className="mt-8" asChild>
@@ -127,7 +127,7 @@ export default function Home() {
                             </Link>
                         </Button>
                     </div>
-                </>
+                </div>
             ) : (
                  <div className="text-center py-16">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
