@@ -12,7 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getHomepageSettings, type HomepageSettings } from '@/lib/settings-service';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
 
 
@@ -113,8 +113,6 @@ export default function Home() {
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
                     </Carousel>
                     <div className="text-center mt-8">
                         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
