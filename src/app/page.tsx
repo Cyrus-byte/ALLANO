@@ -114,7 +114,7 @@ export default function Home() {
                     </CarouselContent>
                 </Carousel>
                 <div className="text-center mt-8">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
+                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground whitespace-nowrap">
                         {heroSettings.heroHeadline}
                     </h1>
                     <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
@@ -129,7 +129,7 @@ export default function Home() {
               </div>
             ) : (
                  <div className="text-center py-16">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
+                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground whitespace-nowrap">
                         {heroSettings.heroHeadline}
                     </h1>
                     <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
