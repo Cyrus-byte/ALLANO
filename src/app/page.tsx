@@ -95,12 +95,12 @@ export default function Home() {
                             align: "center",
                             loop: true,
                         }}
-                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
                         className="w-full"
                     >
                         <CarouselContent>
                             {heroSettings.heroImageUrls.map((url, index) => (
-                            <CarouselItem key={index} className="md:basis-4/5">
+                            <CarouselItem key={index}>
                                 <div className="relative aspect-video w-full">
                                 <Image
                                     src={url}
