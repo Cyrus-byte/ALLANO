@@ -14,6 +14,7 @@ export function ProductRecommendations() {
   const { user, loading: authLoading } = useAuth();
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchRecommendations() {
@@ -32,8 +33,9 @@ export function ProductRecommendations() {
         const allProducts = await getProducts();
         const recommendedProducts = allProducts.filter(p => result.recommendations.includes(p.name));
         setRecommendations(recommendedProducts);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des recommandations:", error);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des recommandations:", err);
+        setError("Impossible de charger les recommandations pour le moment.");
         setRecommendations([]);
       } finally {
         setLoading(false);
@@ -45,8 +47,8 @@ export function ProductRecommendations() {
     }
   }, [user, authLoading]);
 
-  if (authLoading || loading) {
-    return !authLoading && !user ? null : (
+  if (authLoading) {
+    return (
       <section className="py-12 md:py-16">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline mb-8 flex items-center gap-2">
             <Wand2 className="text-primary" /> Pour vous
@@ -64,7 +66,7 @@ export function ProductRecommendations() {
     );
   }
 
-  if (!user || recommendations.length === 0) {
+  if (!user || loading || error || recommendations.length === 0) {
     return null;
   }
 
