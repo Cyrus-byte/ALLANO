@@ -75,55 +75,65 @@ export default function Home() {
 
   return (
     <div>
-       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary">
-        {isLoading ? (
-          <Skeleton className="w-full h-full" />
-        ) : (
-          <>
-            <Carousel
-              className="w-full h-full"
-              plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-            >
-              <CarouselContent className="h-full">
-                {heroSettings.heroImageUrls.length > 0 ? (
-                  heroSettings.heroImageUrls.map((url, index) => (
-                    <CarouselItem key={index} className="h-full">
-                       <Image
-                          src={url}
-                          alt={`Hero image ${index + 1}`}
-                          fill
-                          className="object-cover"
-                          priority={index === 0}
-                        />
-                    </CarouselItem>
-                  ))
-                ) : (
-                  <CarouselItem className="h-full w-full bg-secondary" />
-                )}
-              </CarouselContent>
-              <CarouselPrevious className="absolute left-4 text-white bg-black/30 hover:bg-black/50 hover:text-white border-none" />
-              <CarouselNext className="absolute right-4 text-white bg-black/30 hover:bg-black/50 hover:text-white border-none" />
-            </Carousel>
-            <div className="absolute inset-0 bg-black/60" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
+       <section className="w-full py-12 md:py-20 bg-gradient-to-b from-secondary/40 via-background to-background">
+        <div className="container text-center">
+            {isLoading ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-12 w-2/3 mx-auto" />
+                    <Skeleton className="h-6 w-1/2 mx-auto" />
+                    <Skeleton className="w-full aspect-video max-w-4xl mx-auto rounded-lg" />
+                    <Skeleton className="h-10 w-48 mx-auto" />
+                </div>
+            ) : (
+             <>
                 <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
-                {heroSettings.heroHeadline}
+                    {heroSettings.heroHeadline}
                 </h1>
-                <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
-                {heroSettings.heroSubheadline}
+                <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground">
+                    {heroSettings.heroSubheadline}
                 </p>
-                <Button size="lg" className="mt-8" asChild>
-                <Link href="/categories">
-                    Explorer les collections <ArrowRight className="ml-2" />
-                </Link>
+                 <div className="mt-8">
+                     <Carousel
+                        className="w-full max-w-4xl mx-auto"
+                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+                        opts={{
+                            align: "start",
+                            loop: true,
+                        }}
+                        >
+                        <CarouselContent>
+                            {heroSettings.heroImageUrls.length > 0 ? (
+                            heroSettings.heroImageUrls.map((url, index) => (
+                                <CarouselItem key={index}>
+                                    <div className="aspect-video relative overflow-hidden rounded-lg shadow-lg">
+                                        <Image
+                                            src={url}
+                                            alt={`Hero image ${index + 1}`}
+                                            fill
+                                            className="object-cover"
+                                            priority={index === 0}
+                                        />
+                                    </div>
+                                </CarouselItem>
+                            ))
+                            ) : (
+                                <CarouselItem>
+                                    <div className="aspect-video relative overflow-hidden rounded-lg bg-secondary" />
+                                </CarouselItem>
+                            )}
+                        </CarouselContent>
+                        <CarouselPrevious className="left-[-50px]" />
+                        <CarouselNext className="right-[-50px]" />
+                    </Carousel>
+                 </div>
+                <Button size="lg" className="mt-10" asChild>
+                    <Link href="/categories">
+                        Explorer les collections <ArrowRight className="ml-2" />
+                    </Link>
                 </Button>
-            </div>
-          </>
-        )}
+            </>
+            )}
+        </div>
       </section>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
