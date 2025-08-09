@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
 import { ProductRecommendations } from '@/components/product/product-recommendations';
@@ -45,9 +45,9 @@ export default function Home() {
       setHeroLoading(true);
       try {
           const settings = await getHomepageSettings();
-          if (settings) {
+          if (settings && settings.heroImageUrls && settings.heroImageUrls.length > 0) {
             setHeroSettings({
-              heroImageUrls: settings.heroImageUrls || [],
+              heroImageUrls: settings.heroImageUrls,
               heroHeadline: settings.heroHeadline || defaultSettings.heroHeadline,
               heroSubheadline: settings.heroSubheadline || defaultSettings.heroSubheadline
             });
@@ -67,22 +67,33 @@ export default function Home() {
   }, []);
 
 
+  const isLoading = loadingHero || loadingProducts;
+
+  if (isLoading) {
+    return (
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="w-full py-12 md:py-20">
+                <Skeleton className="w-full aspect-[16/9] md:aspect-video rounded-lg" />
+                 <div className="text-center mt-8">
+                    <Skeleton className="h-12 w-2/3 mx-auto" />
+                    <Skeleton className="h-6 w-1/2 mx-auto mt-4" />
+                    <Skeleton className="h-12 w-48 mx-auto mt-8" />
+                </div>
+            </section>
+        </div>
+    )
+  }
+
   return (
     <div>
        <section className="w-full py-12 md:py-20">
         <div className="container mx-auto">
-            {loadingHero ? (
-                <div className="space-y-4">
-                    <Skeleton className="w-full h-[60vh] rounded-lg" />
-                    <Skeleton className="h-10 w-2/3 mx-auto" />
-                    <Skeleton className="h-6 w-1/2 mx-auto" />
-                </div>
-            ) : (
+           {heroSettings.heroImageUrls.length > 0 ? (
                 <>
-                   <Carousel
+                    <Carousel
                         opts={{
                             align: "center",
-                            loop: false,
+                            loop: true,
                         }}
                         plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
                         className="w-full"
@@ -102,8 +113,8 @@ export default function Home() {
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="ml-16" />
-                        <CarouselNext className="mr-16"/>
+                        <CarouselPrevious />
+                        <CarouselNext />
                     </Carousel>
                     <div className="text-center mt-8">
                         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
@@ -119,6 +130,20 @@ export default function Home() {
                         </Button>
                     </div>
                 </>
+            ) : (
+                 <div className="text-center py-16">
+                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
+                        {heroSettings.heroHeadline}
+                    </h1>
+                    <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+                        {heroSettings.heroSubheadline}
+                    </p>
+                    <Button size="lg" className="mt-8" asChild>
+                        <Link href="/categories">
+                            Explorer les collections <ArrowRight className="ml-2" />
+                        </Link>
+                    </Button>
+                </div>
             )}
         </div>
       </section>
