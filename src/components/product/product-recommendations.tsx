@@ -33,8 +33,12 @@ export function ProductRecommendations() {
         const allProducts = await getProducts();
         const recommendedProducts = allProducts.filter(p => result.recommendations.includes(p.name));
         setRecommendations(recommendedProducts);
-      } catch (err) {
-        console.error("Erreur lors de la récupération des recommandations:", err);
+      } catch (err: any) {
+        if (err.message?.includes('429')) {
+          // Quota exceeded, fail silently.
+        } else {
+          console.error("Erreur lors de la récupération des recommandations:", err);
+        }
         setError("Impossible de charger les recommandations pour le moment.");
         setRecommendations([]);
       } finally {
