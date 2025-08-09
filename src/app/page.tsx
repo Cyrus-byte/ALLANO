@@ -27,11 +27,6 @@ export default function Home() {
   const [loadingProducts, setProductsLoading] = useState(true);
   const [heroSettings, setHeroSettings] = useState<HomepageSettings>(defaultSettings);
   const [loadingHero, setHeroLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -71,62 +66,61 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  const isLoading = loadingHero || !isMounted;
 
   return (
     <div>
-       <section className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center text-white bg-black">
-        {isLoading ? (
-            <Skeleton className="absolute inset-0" />
-        ) : (
-             <>
-                <Carousel
-                    className="absolute inset-0 w-full h-full"
-                    plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
-                    opts={{ align: "start", loop: true }}
-                >
-                    <CarouselContent>
-                        {heroSettings.heroImageUrls.length > 0 ? (
-                        heroSettings.heroImageUrls.map((url, index) => (
-                            <CarouselItem key={index}>
-                                <div className="relative w-full h-full">
-                                    <Image
-                                        src={url}
-                                        alt={`Hero image ${index + 1}`}
-                                        fill
-                                        className="object-cover"
-                                        priority={index === 0}
-                                    />
+       <section className="w-full py-12 md:py-20">
+        <div className="container mx-auto">
+            {loadingHero ? (
+                <div className="space-y-4">
+                    <Skeleton className="w-full h-[60vh] rounded-lg" />
+                    <Skeleton className="h-10 w-2/3 mx-auto" />
+                    <Skeleton className="h-6 w-1/2 mx-auto" />
+                </div>
+            ) : (
+                <>
+                   <Carousel
+                        opts={{
+                            align: "center",
+                            loop: false,
+                        }}
+                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+                        className="w-full"
+                    >
+                        <CarouselContent>
+                            {heroSettings.heroImageUrls.map((url, index) => (
+                            <CarouselItem key={index} className="md:basis-4/5">
+                                <div className="relative aspect-video w-full">
+                                <Image
+                                    src={url}
+                                    alt={`Hero image ${index + 1}`}
+                                    fill
+                                    className="object-cover rounded-lg"
+                                    priority={index === 0}
+                                />
                                 </div>
                             </CarouselItem>
-                        ))
-                        ) : (
-                            <CarouselItem>
-                                <Skeleton className="w-full h-full" />
-                            </CarouselItem>
-                        )}
-                    </CarouselContent>
-                    <CarouselPrevious className="left-4" />
-                    <CarouselNext className="right-4" />
-                </Carousel>
-                
-                <div className="absolute inset-0 bg-black/50" />
-                
-                <div className="relative z-10 text-center px-4">
-                    <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
-                        {heroSettings.heroHeadline}
-                    </h1>
-                    <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-white/90">
-                        {heroSettings.heroSubheadline}
-                    </p>
-                    <Button size="lg" className="mt-8" asChild>
-                        <Link href="/categories">
-                            Explorer les collections <ArrowRight className="ml-2" />
-                        </Link>
-                    </Button>
-                </div>
-            </>
-        )}
+                            ))}
+                        </CarouselContent>
+                        <CarouselPrevious className="ml-16" />
+                        <CarouselNext className="mr-16"/>
+                    </Carousel>
+                    <div className="text-center mt-8">
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-foreground">
+                            {heroSettings.heroHeadline}
+                        </h1>
+                        <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+                            {heroSettings.heroSubheadline}
+                        </p>
+                        <Button size="lg" className="mt-8" asChild>
+                            <Link href="/categories">
+                                Explorer les collections <ArrowRight className="ml-2" />
+                            </Link>
+                        </Button>
+                    </div>
+                </>
+            )}
+        </div>
       </section>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
