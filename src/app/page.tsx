@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
 import { ProductRecommendations } from '@/components/product/product-recommendations';
@@ -12,6 +12,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getHomepageSettings, type HomepageSettings } from '@/lib/settings-service';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import Autoplay from "embla-carousel-autoplay";
+
 
 const defaultSettings: HomepageSettings = {
     heroImageUrls: [],
@@ -63,40 +66,55 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  const hasImages = heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0;
-
   return (
     <div>
-      <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary">
+       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary group">
         {loadingHero ? (
           <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
-          hasImages && (
-            <Image
-              src={heroSettings.heroImageUrls[0]}
-              alt="Hero image"
-              fill
-              className="object-cover"
-              priority
-            />
-          )
+          <>
+            <Carousel
+              className="w-full h-full"
+              plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+            >
+              <CarouselContent className="h-full">
+                {heroSettings.heroImageUrls.length > 0 ? (
+                  heroSettings.heroImageUrls.map((url, index) => (
+                    <CarouselItem key={index} className="h-full">
+                       <Image
+                          src={url}
+                          alt={`Hero image ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          priority={index === 0}
+                        />
+                    </CarouselItem>
+                  ))
+                ) : (
+                  <CarouselItem className="h-full w-full bg-secondary" />
+                )}
+              </CarouselContent>
+            </Carousel>
+            <div className="absolute inset-0 bg-black/60" />
+            <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
+                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
+                {heroSettings.heroHeadline}
+                </h1>
+                <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
+                {heroSettings.heroSubheadline}
+                </p>
+                <Button size="lg" className="mt-8" asChild>
+                <Link href="/categories">
+                    Explorer les collections <ArrowRight className="ml-2" />
+                </Link>
+                </Button>
+            </div>
+          </>
         )}
-        
-        <div className="absolute inset-0 bg-black/60" />
-
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
-            {heroSettings.heroHeadline}
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
-            {heroSettings.heroSubheadline}
-            </p>
-            <Button size="lg" className="mt-8" asChild>
-            <Link href="/categories">
-                Explorer les collections <ArrowRight className="ml-2" />
-            </Link>
-            </Button>
-        </div>
       </section>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -133,3 +151,4 @@ export default function Home() {
     </div>
   );
 }
+
