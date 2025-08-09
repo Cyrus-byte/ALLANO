@@ -75,9 +75,9 @@ export default function Home() {
 
   return (
     <div>
-       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary group">
+       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary">
         {isLoading ? (
-          <Skeleton className="absolute inset-0 w-full h-full" />
+          <Skeleton className="w-full h-full" />
         ) : (
           <>
             <Carousel
@@ -109,7 +109,7 @@ export default function Home() {
               <CarouselNext className="absolute right-4 text-white bg-black/30 hover:bg-black/50 hover:text-white border-none" />
             </Carousel>
             <div className="absolute inset-0 bg-black/60" />
-            <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
                 <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-headline">
                 {heroSettings.heroHeadline}
                 </h1>
