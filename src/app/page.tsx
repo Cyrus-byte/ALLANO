@@ -12,12 +12,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getHomepageSettings, type HomepageSettings } from '@/lib/settings-service';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel"
-import Autoplay from "embla-carousel-autoplay"
 
 const defaultSettings: HomepageSettings = {
     heroImageUrls: [],
@@ -30,12 +24,8 @@ export default function Home() {
   const [loadingProducts, setProductsLoading] = useState(true);
   const [heroSettings, setHeroSettings] = useState<HomepageSettings>(defaultSettings);
   const [loadingHero, setHeroLoading] = useState(true);
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This ensures the component only renders on the client, preventing hydration errors.
-    setIsClient(true);
-    
     const fetchProducts = async () => {
       setProductsLoading(true);
       try {
@@ -74,34 +64,21 @@ export default function Home() {
   }, []);
 
   const hasImages = heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0;
-  const isLoading = loadingHero || !isClient;
 
   return (
     <div>
       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary">
-        {isLoading ? (
+        {loadingHero ? (
           <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
-          isClient && hasImages && (
-            <Carousel
-              className="w-full h-full"
-              plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
-              opts={{ loop: true }}
-            >
-              <CarouselContent>
-                {heroSettings.heroImageUrls.map((url, index) => (
-                  <CarouselItem key={index}>
-                    <Image
-                      src={url}
-                      alt={`Hero image ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      priority={index === 0}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
+          hasImages && (
+            <Image
+              src={heroSettings.heroImageUrls[0]}
+              alt="Hero image"
+              fill
+              className="object-cover"
+              priority
+            />
           )
         )}
         
