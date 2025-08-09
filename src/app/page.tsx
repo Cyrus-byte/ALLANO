@@ -33,6 +33,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // This ensures the component only renders on the client, preventing hydration errors.
     setIsClient(true);
     
     const fetchProducts = async () => {
@@ -72,17 +73,16 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  const newArrivals = products.filter(p => p.isNew).slice(0, 8);
   const hasImages = heroSettings.heroImageUrls && heroSettings.heroImageUrls.length > 0;
   const isLoading = loadingHero || !isClient;
 
   return (
-    <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary">
+    <div>
+      <section className="relative w-full h-[60vh] md:h-[70vh] bg-secondary">
         {isLoading ? (
           <Skeleton className="absolute inset-0 w-full h-full" />
         ) : (
-          hasImages && (
+          isClient && hasImages && (
             <Carousel
               className="w-full h-full"
               plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
@@ -146,7 +146,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-              {newArrivals.map(product => (
+              {products.filter(p => p.isNew).slice(0, 8).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
