@@ -12,7 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getHomepageSettings, type HomepageSettings } from '@/lib/settings-service';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
 
 
@@ -75,7 +75,7 @@ export default function Home() {
           <>
             <Carousel
               className="w-full h-full"
-              plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
+              plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
               opts={{
                 align: "start",
                 loop: true,
@@ -98,6 +98,8 @@ export default function Home() {
                   <CarouselItem className="h-full w-full bg-secondary" />
                 )}
               </CarouselContent>
+              <CarouselPrevious className="absolute left-4 text-white bg-black/30 hover:bg-black/50 hover:text-white border-none" />
+              <CarouselNext className="absolute right-4 text-white bg-black/30 hover:bg-black/50 hover:text-white border-none" />
             </Carousel>
             <div className="absolute inset-0 bg-black/60" />
             <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
@@ -151,4 +153,3 @@ export default function Home() {
     </div>
   );
 }
-
