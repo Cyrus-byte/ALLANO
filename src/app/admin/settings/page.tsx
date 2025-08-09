@@ -51,6 +51,15 @@ export default function AdminSettingsPage() {
   }, []);
 
   const handleUploadClick = () => {
+    // @ts-ignore
+    if (!window.cloudinary) {
+        toast({
+            title: "Le service de téléversement n'est pas prêt",
+            description: "Veuillez patienter quelques instants et réessayer.",
+            variant: "destructive"
+        });
+        return;
+    }
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
       toast({ title: "Configuration manquante", description: "Les informations Cloudinary ne sont pas configurées.", variant: 'destructive' });
       return;
@@ -202,3 +211,5 @@ export default function AdminSettingsPage() {
     </>
   );
 }
+
+    

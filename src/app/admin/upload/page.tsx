@@ -52,6 +52,15 @@ export default function AdminUploadPage() {
   }, [toast]);
 
   const handleUploadClick = () => {
+    // @ts-ignore
+    if (!window.cloudinary) {
+        toast({
+            title: "Le service de téléversement n'est pas prêt",
+            description: "Veuillez patienter quelques instants et réessayer.",
+            variant: "destructive"
+        });
+        return;
+    }
     if (!category) {
       toast({ title: "Catégorie requise", description: "Veuillez d'abord sélectionner une catégorie.", variant: 'destructive' });
       return;
@@ -345,3 +354,5 @@ export default function AdminUploadPage() {
     </>
   );
 }
+
+    
