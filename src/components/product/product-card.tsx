@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart } from 'lucide-react';
+import { Star, Heart, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import type { Product } from '@/lib/types';
@@ -26,52 +26,58 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className="overflow-hidden border-0 shadow-none bg-transparent group">
-      <CardContent className="p-0">
-        <div className="relative aspect-[3/4] overflow-hidden">
-          <Link href={`/product/${product.id}`}>
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              data-ai-hint="product image"
-            />
-          </Link>
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/70 hover:bg-background"
-            aria-label="Ajouter aux favoris"
-            onClick={handleWishlistClick}
-          >
-            <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-red-500 text-red-500" : "")} />
-          </Button>
-          {product.isNew && !product.onSale && (
-            <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
-              NOUVEAU
-            </div>
-          )}
-           {product.onSale && (
-             <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-full">
-              PROMO
-            </div>
-           )}
-        </div>
-      </CardContent>
-      <CardFooter className="flex-col items-start p-4">
-        <Link href={`/product/${product.id}`}>
-          <h3 className="font-semibold text-sm truncate w-full">{product.name}</h3>
+        <Link href={`/product/${product.id}`} aria-label={product.name}>
+            <CardContent className="p-0">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-md">
+                    <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    data-ai-hint="product image"
+                    />
+                    
+                    <Button
+                        variant="secondary"
+                        size="icon"
+                        className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/70 hover:bg-background transition-opacity opacity-0 group-hover:opacity-100"
+                        aria-label="Ajouter aux favoris"
+                        onClick={handleWishlistClick}
+                    >
+                        <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-red-500 text-red-500" : "")} />
+                    </Button>
+                    
+                     <div className="absolute bottom-2 right-2 transition-opacity opacity-0 group-hover:opacity-100">
+                        <Button size="icon" className="h-9 w-9 rounded-full bg-primary/90 hover:bg-primary" aria-label="Ajouter au panier">
+                           <ShoppingCart className="h-4 w-4" />
+                        </Button>
+                    </div>
+
+                    {product.isNew && !product.onSale && (
+                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
+                        NOUVEAU
+                    </div>
+                    )}
+                    {product.onSale && (
+                    <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-full">
+                        PROMO
+                    </div>
+                    )}
+                </div>
+            </CardContent>
         </Link>
-        <div className="flex items-center gap-2 mt-1">
-          <p className={cn("font-bold", product.onSale && "text-destructive")}>
-            {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
-          </p>
-          {product.onSale && (
-            <p className="text-sm text-muted-foreground line-through">
-              {product.price.toLocaleString('fr-FR')} FCFA
+        <CardFooter className="flex-col items-start p-2 pt-3">
+            <h3 className="font-semibold text-sm truncate w-full">{product.name}</h3>
+            <div className="flex items-center gap-2 mt-1">
+            <p className={cn("font-bold", product.onSale && "text-destructive")}>
+                {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
             </p>
-          )}
-        </div>
+            {product.onSale && (
+                <p className="text-sm text-muted-foreground line-through">
+                {product.price.toLocaleString('fr-FR')} FCFA
+                </p>
+            )}
+            </div>
       </CardFooter>
     </Card>
   );
