@@ -37,8 +37,7 @@ export const getReviewsByProductId = async (productId: string): Promise<Review[]
 
 
 export const addReview = async (productId: string, userId: string, userName: string, rating: number, comment: string): Promise<Review> => {
-    const productRef = doc(db, 'products', productId);
-    const reviewsColRef = collection(productRef, 'reviews');
+    const reviewsColRef = collection(db, 'products', productId, 'reviews');
     
     const newReviewData = {
         userId,
@@ -48,36 +47,10 @@ export const addReview = async (productId: string, userId: string, userName: str
         createdAt: serverTimestamp()
     };
     
-    // Add the new review and update the product's average rating in a transaction
-    await runTransaction(db, async (transaction) => {
-        const productDoc = await transaction.get(productRef);
-        if (!productDoc.exists()) {
-            throw new Error("Le produit n'existe pas ou la connexion à la base de données a échoué.");
-        }
+    const docRef = await addDoc(reviewsColRef, newReviewData);
 
-        // Add the new review document
-        const newReviewRef = doc(reviewsColRef); // Create a new ref in the subcollection
-        transaction.set(newReviewRef, newReviewData);
-        
-        // Update the aggregate rating on the product
-        const currentData = productDoc.data();
-        const currentRating = currentData.rating || 0;
-        const currentReviewsCount = currentData.reviews || 0;
-
-        const newReviewsCount = currentReviewsCount + 1;
-        const newTotalRating = (currentRating * currentReviewsCount) + rating;
-        const newAverageRating = newTotalRating / newReviewsCount;
-
-        transaction.update(productRef, { 
-            rating: newAverageRating, 
-            reviews: newReviewsCount 
-        });
-    });
-
-    // The review is created within the transaction, we need to return something sensible
-    // For simplicity, we'll return the input data as the created review, as fetching it again is complex post-transaction
      return {
-        id: 'temp-id', // The actual ID is generated in the transaction
+        id: docRef.id,
         userId,
         userName,
         rating,
