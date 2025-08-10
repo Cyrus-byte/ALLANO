@@ -95,6 +95,12 @@ export function MobileNav() {
                             </Link>
                         </Button>
                         <Button variant="ghost" className="justify-start" asChild>
+                            <Link href="/admin/promo-codes">
+                                <Tag className="mr-2 h-4 w-4" />
+                                <span>Codes Promo</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" className="justify-start" asChild>
                             <Link href="/admin/settings">
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Personnalisation</span>

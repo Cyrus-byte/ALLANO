@@ -3,7 +3,7 @@
 
 import { useCart } from '@/contexts/cart-context';
 import { useAuth } from '@/contexts/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const { cart, totalPrice, totalItems, loading: cartLoading, clearCart } = useCart();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
 
   const [firstName, setFirstName] = useState('');
@@ -37,6 +38,10 @@ export default function CheckoutPage() {
   const [city, setCity] = useState('Ouagadougou');
   const [phone, setPhone] = useState('');
   const [paymentLoading, setPaymentLoading] = useState(false);
+
+  // Get promo code info from URL
+  const promoCode = searchParams.get('promoCode');
+  const discount = Number(searchParams.get('discount')) || 0;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -51,6 +56,10 @@ export default function CheckoutPage() {
         setLastName(nameParts.slice(1).join(' ') || '');
     }
   }, [user]);
+  
+  const shippingCost = totalItems > 0 ? 2000 : 0;
+  const grandTotal = totalPrice - discount + shippingCost;
+
 
   const handlePayment = async () => {
     if(!firstName || !lastName || !address || !phone) {
@@ -69,8 +78,6 @@ export default function CheckoutPage() {
     setPaymentLoading(true);
 
     const transactionId = `ALLANO-${Date.now()}`;
-    const shippingCost = totalItems > 0 ? 2000 : 0;
-    const grandTotal = totalPrice + shippingCost;
     
     try {
         window.CinetPay.setConfig({
@@ -109,6 +116,7 @@ export default function CheckoutPage() {
                         totalAmount: grandTotal,
                         status: 'Payée',
                         paymentDetails: data,
+                        ...(promoCode && { promoCode: { code: promoCode, discount } })
                     };
 
                     await createOrder(orderData);
@@ -139,8 +147,6 @@ export default function CheckoutPage() {
   }
 
   const isLoading = cartLoading || authLoading;
-  const shippingCost = totalItems > 0 ? 2000 : 0;
-  const grandTotal = totalPrice + shippingCost;
 
   if (isLoading) {
     return (
@@ -231,6 +237,12 @@ export default function CheckoutPage() {
                         <span>Sous-total</span>
                         <span>{totalPrice.toLocaleString('fr-FR')} FCFA</span>
                     </div>
+                     {discount > 0 && (
+                        <div className="flex justify-between text-sm text-destructive">
+                            <span>Réduction</span>
+                            <span>- {discount.toLocaleString('fr-FR')} FCFA</span>
+                        </div>
+                     )}
                      <div className="flex justify-between text-sm">
                         <span>Livraison</span>
                         <span>{shippingCost.toLocaleString('fr-FR')} FCFA</span>

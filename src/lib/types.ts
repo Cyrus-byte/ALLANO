@@ -1,4 +1,5 @@
 
+
 export type Product = {
   id: string;
   name: string;
@@ -49,6 +50,10 @@ export type Order = {
   status: 'Payée' | 'Expédiée' | 'Livrée' | 'Annulée';
   createdAt: any; // Firestore timestamp, will be Date object on client
   paymentDetails?: any;
+  promoCode?: {
+    code: string;
+    discount: number;
+  };
 };
 
 export type Review = {
@@ -68,4 +73,12 @@ export type Category = {
         sizes?: boolean; // For clothes (S, M, L)
         shoeSizes?: boolean; // For shoes (39, 40, 41)
     }
+}
+
+export type PromoCode = {
+    id: string; // The code itself
+    type: 'percentage' | 'fixed';
+    value: number;
+    expiresAt?: any; // Firestore timestamp
+    createdAt: any;
 }

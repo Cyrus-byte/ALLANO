@@ -8,14 +8,52 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Minus, Plus, Trash2, ShoppingCart, Loader2 } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart, Loader2, Tag, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { applyPromoCode } from '@/lib/promo-code-service';
+import type { PromoCode } from '@/lib/types';
+
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, totalPrice, totalItems, loading } = useCart();
+  const [promoCode, setPromoCode] = useState('');
+  const [promoCodeLoading, setPromoCodeLoading] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [discount, setDiscount] = useState(0);
+  const { toast } = useToast();
+
+  const handleApplyPromoCode = async () => {
+    if (!promoCode.trim()) {
+        toast({ title: "Code invalide", description: "Veuillez entrer un code promo.", variant: "destructive" });
+        return;
+    }
+    setPromoCodeLoading(true);
+    try {
+        const result = await applyPromoCode(promoCode.trim(), totalPrice);
+        setAppliedPromo(result.promoCode);
+        setDiscount(result.discount);
+        toast({ title: "Code appliqué", description: "La réduction a été appliquée à votre commande." });
+    } catch (error: any) {
+        setAppliedPromo(null);
+        setDiscount(0);
+        toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } finally {
+        setPromoCodeLoading(false);
+    }
+  }
+  
+  const removePromoCode = () => {
+    setPromoCode('');
+    setAppliedPromo(null);
+    setDiscount(0);
+    toast({ title: "Code retiré", description: "La réduction a été retirée." });
+  }
 
   const shippingCost = totalItems > 0 ? 2000 : 0;
-  const grandTotal = totalPrice + shippingCost;
+  const grandTotal = totalPrice - discount + shippingCost;
+
 
   if (loading) {
       return (
@@ -92,10 +130,37 @@ export default function CartPage() {
               <CardTitle>Résumé de la commande</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
+               <div className="flex gap-2">
+                 <Input 
+                    placeholder="Code promo" 
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    disabled={!!appliedPromo}
+                 />
+                 <Button onClick={handleApplyPromoCode} disabled={promoCodeLoading || !!appliedPromo}>
+                    {promoCodeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Appliquer
+                </Button>
+               </div>
+
+
               <div className="flex justify-between">
                 <span>Sous-total ({totalItems} articles)</span>
                 <span className="font-semibold">{totalPrice.toLocaleString('fr-FR')} FCFA</span>
               </div>
+              
+              {appliedPromo && (
+                <div className="flex justify-between text-destructive">
+                    <div className='flex items-center gap-2'>
+                        <span>Réduction ({appliedPromo.id})</span>
+                         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removePromoCode}>
+                            <X className="h-4 w-4"/>
+                        </Button>
+                    </div>
+                    <span className="font-semibold">- {discount.toLocaleString('fr-FR')} FCFA</span>
+                </div>
+              )}
+
               <div className="flex justify-between">
                 <span>Livraison</span>
                 <span className="font-semibold">{shippingCost.toLocaleString('fr-FR')} FCFA</span>
@@ -108,7 +173,7 @@ export default function CartPage() {
             </CardContent>
             <CardFooter className="flex-col gap-2">
               <Button asChild size="lg" className="w-full">
-                <Link href="/checkout">Passer au paiement</Link>
+                <Link href={`/checkout?promoCode=${appliedPromo?.id || ''}&discount=${discount}`}>Passer au paiement</Link>
               </Button>
                <p className="text-xs text-muted-foreground text-center">Paiements sécurisés par CinetPay</p>
             </CardFooter>
