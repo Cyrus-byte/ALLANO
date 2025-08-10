@@ -86,63 +86,59 @@ export default function Home() {
 
   return (
     <div>
-       <section className="w-full">
-        <div className="container mx-auto py-12 md:py-20">
-           {heroSettings.heroImageUrls.length > 0 ? (
-              <div>
-                <Carousel
-                    opts={{
-                        align: "center",
-                    }}
-                    plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
-                    className="w-full rounded-lg overflow-hidden"
-                >
-                    <CarouselContent>
-                        {heroSettings.heroImageUrls.map((url, index) => (
-                        <CarouselItem key={index}>
-                            <div className="relative aspect-video w-full">
-                            <Image
-                                src={url}
-                                alt={`Hero image ${index + 1}`}
-                                fill
-                                className="object-cover"
-                                priority={index === 0}
-                            />
-                            </div>
-                        </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                </Carousel>
-                <div className="text-center mt-8">
-                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-foreground">
-                        {heroSettings.heroHeadline}
-                    </h1>
-                    <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-                        {heroSettings.heroSubheadline}
-                    </p>
-                    <Button size="lg" className="mt-8" asChild>
-                        <Link href="/categories">
-                            Explorer les collections <ArrowRight className="ml-2" />
-                        </Link>
-                    </Button>
-                </div>
-              </div>
-            ) : (
-                 <div className="text-center py-16">
-                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-foreground">
-                        {heroSettings.heroHeadline}
-                    </h1>
-                    <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-                        {heroSettings.heroSubheadline}
-                    </p>
-                    <Button size="lg" className="mt-8" asChild>
-                        <Link href="/categories">
-                            Explorer les collections <ArrowRight className="ml-2" />
-                        </Link>
-                    </Button>
-                </div>
-            )}
-        </div>
+       <section className="w-full relative">
+        {heroSettings.heroImageUrls.length > 0 ? (
+          <div className="relative aspect-video w-full">
+            <Carousel
+              opts={{ align: "center", loop: true }}
+              plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
+              className="w-full h-full"
+            >
+              <CarouselContent>
+                {heroSettings.heroImageUrls.map((url, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative aspect-video w-full h-full">
+                      <Image
+                        src={url}
+                        alt={`Hero image ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        priority={index === 0}
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-white whitespace-nowrap">
+                {heroSettings.heroHeadline}
+              </h1>
+              <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
+                {heroSettings.heroSubheadline}
+              </p>
+              <Button size="lg" className="mt-8" asChild>
+                <Link href="/categories">
+                  Explorer les collections <ArrowRight className="ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="container mx-auto text-center py-16">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-foreground">
+              {heroSettings.heroHeadline}
+            </h1>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+              {heroSettings.heroSubheadline}
+            </p>
+            <Button size="lg" className="mt-8" asChild>
+              <Link href="/categories">
+                Explorer les collections <ArrowRight className="ml-2" />
+              </Link>
+            </Button>
+          </div>
+        )}
       </section>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
