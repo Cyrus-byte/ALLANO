@@ -28,6 +28,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdminPromoCodesPage() {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
