@@ -40,18 +40,12 @@ export function ProductCard({ product }: ProductCardProps) {
                     <Button
                         variant="secondary"
                         size="icon"
-                        className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/70 hover:bg-background transition-opacity opacity-0 group-hover:opacity-100"
+                        className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/70 hover:bg-background"
                         aria-label="Ajouter aux favoris"
                         onClick={handleWishlistClick}
                     >
                         <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-red-500 text-red-500" : "")} />
                     </Button>
-                    
-                     <div className="absolute bottom-2 right-2 transition-opacity opacity-0 group-hover:opacity-100">
-                        <Button size="icon" className="h-9 w-9 rounded-full bg-primary/90 hover:bg-primary" aria-label="Ajouter au panier">
-                           <ShoppingCart className="h-4 w-4" />
-                        </Button>
-                    </div>
 
                     {product.isNew && !product.onSale && (
                     <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
@@ -68,15 +62,20 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
         <CardFooter className="flex-col items-start p-2 pt-3">
             <h3 className="font-semibold text-sm truncate w-full">{product.name}</h3>
-            <div className="flex items-center gap-2 mt-1">
-            <p className={cn("font-bold", product.onSale && "text-destructive")}>
-                {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
-            </p>
-            {product.onSale && (
-                <p className="text-sm text-muted-foreground line-through">
-                {product.price.toLocaleString('fr-FR')} FCFA
-                </p>
-            )}
+            <div className="flex justify-between items-center w-full mt-1">
+                <div className="flex flex-col items-start">
+                    <p className={cn("font-bold", product.onSale && "text-destructive")}>
+                        {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
+                    </p>
+                    {product.onSale && (
+                        <p className="text-sm text-muted-foreground line-through">
+                        {product.price.toLocaleString('fr-FR')} FCFA
+                        </p>
+                    )}
+                </div>
+                 <Button size="icon" className="h-9 w-9 shrink-0" aria-label="Ajouter au panier">
+                    <ShoppingCart className="h-4 w-4" />
+                </Button>
             </div>
       </CardFooter>
     </Card>
