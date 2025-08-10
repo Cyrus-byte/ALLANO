@@ -19,7 +19,8 @@ import Autoplay from "embla-carousel-autoplay";
 const defaultSettings: HomepageSettings = {
     heroImageUrls: [],
     heroHeadline: 'La Mode, Réinventée.',
-    heroSubheadline: 'Découvrez les dernières tendances et exprimez votre style unique avec Allano.'
+    heroSubheadline: 'Découvrez les dernières tendances et exprimez votre style unique avec Allano.',
+    heroButtonText: 'Explorer les collections'
 }
 
 export default function Home() {
@@ -48,8 +49,9 @@ export default function Home() {
           if (settings) {
             setHeroSettings({
               heroImageUrls: settings.heroImageUrls || [],
-              heroHeadline: settings.heroHeadline ?? defaultSettings.heroHeadline,
-              heroSubheadline: settings.heroSubheadline ?? defaultSettings.heroSubheadline
+              heroHeadline: settings.heroHeadline,
+              heroSubheadline: settings.heroSubheadline,
+              heroButtonText: settings.heroButtonText
             });
           } else {
              setHeroSettings(defaultSettings);
@@ -121,11 +123,13 @@ export default function Home() {
                   {heroSettings.heroSubheadline}
                 </p>
               )}
-              <Button size="lg" className="mt-8" asChild>
-                <Link href="/categories">
-                  Explorer les collections <ArrowRight className="ml-2" />
-                </Link>
-              </Button>
+              {heroSettings.heroButtonText && (
+                <Button size="lg" className="mt-8" asChild>
+                    <Link href="/categories">
+                    {heroSettings.heroButtonText} <ArrowRight className="ml-2" />
+                    </Link>
+                </Button>
+              )}
             </div>
           </div>
         ) : (
@@ -140,11 +144,13 @@ export default function Home() {
                 {heroSettings.heroSubheadline}
               </p>
             )}
-            <Button size="lg" className="mt-8" asChild>
-              <Link href="/categories">
-                Explorer les collections <ArrowRight className="ml-2" />
-              </Link>
-            </Button>
+            {heroSettings.heroButtonText && (
+                <Button size="lg" className="mt-8" asChild>
+                <Link href="/categories">
+                    {heroSettings.heroButtonText} <ArrowRight className="ml-2" />
+                </Link>
+                </Button>
+            )}
           </div>
         )}
       </section>

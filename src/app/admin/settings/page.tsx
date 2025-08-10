@@ -20,7 +20,8 @@ const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESE
 const defaultSettings: HomepageSettings = {
     heroImageUrls: [],
     heroHeadline: 'La Mode, Réinventée.',
-    heroSubheadline: 'Découvrez les dernières tendances et exprimez votre style unique avec Allano.'
+    heroSubheadline: 'Découvrez les dernières tendances et exprimez votre style unique avec Allano.',
+    heroButtonText: 'Explorer les collections'
 }
 
 export default function AdminSettingsPage() {
@@ -41,6 +42,7 @@ export default function AdminSettingsPage() {
           heroImageUrls: fetchedSettings?.heroImageUrls || defaultSettings.heroImageUrls,
           heroHeadline: fetchedSettings?.heroHeadline ?? defaultSettings.heroHeadline,
           heroSubheadline: fetchedSettings?.heroSubheadline ?? defaultSettings.heroSubheadline,
+          heroButtonText: fetchedSettings?.heroButtonText ?? defaultSettings.heroButtonText,
       };
       setSettings(currentSettings);
       setInitialSettings(currentSettings);
@@ -158,11 +160,15 @@ export default function AdminSettingsPage() {
                 <div className="space-y-4 border-b pb-6">
                     <div className="space-y-2">
                         <Label htmlFor="heroHeadline">Titre principal</Label>
-                        <Input id="heroHeadline" value={settings.heroHeadline || ''} onChange={handleInputChange} />
+                        <Input id="heroHeadline" value={settings.heroHeadline || ''} onChange={handleInputChange} placeholder="Laisser vide pour cacher le titre" />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="heroSubheadline">Sous-titre</Label>
                         <Textarea id="heroSubheadline" value={settings.heroSubheadline || ''} onChange={handleInputChange} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="heroButtonText">Texte du bouton</Label>
+                        <Input id="heroButtonText" value={settings.heroButtonText || ''} onChange={handleInputChange} placeholder="Laisser vide pour cacher le bouton" />
                     </div>
                 </div>
 

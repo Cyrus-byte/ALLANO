@@ -8,6 +8,7 @@ export interface HomepageSettings {
     heroImageUrls: string[];
     heroHeadline?: string;
     heroSubheadline?: string;
+    heroButtonText?: string;
 }
 
 /**
