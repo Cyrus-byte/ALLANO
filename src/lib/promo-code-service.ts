@@ -4,7 +4,7 @@ import { collection, addDoc, getDocs, doc, deleteDoc, serverTimestamp, updateDoc
 import type { PromoCode } from './types';
 
 
-export const createPromoCode = async (data: Omit<PromoCode, 'id' | 'createdAt'>) => {
+export const createPromoCode = async (data: Omit<PromoCode, 'createdAt'> & {id: string}) => {
   const promoCodeRef = doc(db, 'promoCodes', data.id);
   const promoCodeSnap = await getDoc(promoCodeRef);
 
@@ -84,5 +84,5 @@ export const applyPromoCode = async (code: string, cartTotal: number): Promise<{
          throw new Error("Le montant de la commande est inférieur à la réduction.");
     }
 
-    return { promoCode, discount };
+    return { promoCode: {...promoCode, id: promoCodeSnap.id }, discount };
 }

@@ -31,7 +31,7 @@ export default function CartPage() {
     }
     setPromoCodeLoading(true);
     try {
-        const result = await applyPromoCode(promoCode.trim(), totalPrice);
+        const result = await applyPromoCode(promoCode.trim().toUpperCase(), totalPrice);
         setAppliedPromo(result.promoCode);
         setDiscount(result.discount);
         toast({ title: "Code appliqué", description: "La réduction a été appliquée à votre commande." });

@@ -116,7 +116,7 @@ export default function CheckoutPage() {
                         totalAmount: grandTotal,
                         status: 'Payée',
                         paymentDetails: data,
-                        ...(promoCode && { promoCode: { code: promoCode, discount } })
+                        ...(promoCode && discount > 0 && { promoCode: { code: promoCode, discount } })
                     };
 
                     await createOrder(orderData);
@@ -239,7 +239,7 @@ export default function CheckoutPage() {
                     </div>
                      {discount > 0 && (
                         <div className="flex justify-between text-sm text-destructive">
-                            <span>Réduction</span>
+                            <span>Réduction ({promoCode})</span>
                             <span>- {discount.toLocaleString('fr-FR')} FCFA</span>
                         </div>
                      )}
