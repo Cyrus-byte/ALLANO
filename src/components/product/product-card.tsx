@@ -9,8 +9,8 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { useState } from 'react';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { useEffect, useState } from 'react';
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +21,17 @@ export function ProductCard({ product }: ProductCardProps) {
   const isProductInWishlist = isInWishlist(product.id);
   const [api, setApi] = useState<any>();
   const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return
+    }
+    setCurrent(api.selectedScrollSnap())
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap())
+    })
+  }, [api])
+
 
    const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -70,8 +81,6 @@ export function ProductCard({ product }: ProductCardProps) {
               PROMO
             </div>
           )}
-          <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                 {product.images.map((_, index) => (
                     <button
