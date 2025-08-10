@@ -78,8 +78,8 @@ export default function CategoriesPage() {
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-x-2 gap-y-6 md:gap-x-4">
                     {Array.from({length: 6}).map((_, i) => 
                         <div key={i} className="flex flex-col items-center gap-2">
-                           <Skeleton key={i} className="w-20 h-20 rounded-full" />
-                           <Skeleton key={i} className="h-4 w-16" />
+                           <Skeleton className="w-20 h-20 rounded-full" />
+                           <Skeleton className="h-4 w-16" />
                         </div>
                     )}
                 </div>
