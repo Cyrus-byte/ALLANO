@@ -42,7 +42,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 hidden w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:block">
+    <header className="absolute top-0 z-40 hidden w-full border-b border-transparent bg-transparent text-white md:block">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center">
@@ -50,13 +50,13 @@ export function Header() {
           </Link>
           <nav className="flex items-center gap-6 text-sm">
             {navLinks.map(link => (
-              <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">
+              <Link key={link.href} href={link.href} className="transition-colors hover:text-white/80 text-white/80">
                 {link.label}
               </Link>
             ))}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Admin</Button>
+                  <Button variant="ghost" className="transition-colors hover:text-white/80 text-white/80 px-0 hover:bg-white/10">Admin</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuLabel>Gestion du site</DropdownMenuLabel>
@@ -95,18 +95,18 @@ export function Header() {
             <Input
               type="search"
               placeholder="Rechercher un produit..."
-              className="pl-10 rounded-full h-9"
+              className="pl-10 rounded-full h-9 bg-white/20 placeholder:text-white/70 border-white/30 text-white"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                <button type="submit" className="p-0 m-0 h-full bg-transparent border-none">
-                <Search className="h-5 w-5 text-muted-foreground" />
+                <Search className="h-5 w-5 text-white/70" />
                </button>
             </div>
           </form>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits">
+            <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits" className="hover:bg-white/10">
               <Link href="/wishlist">
                 <div className="relative">
                   {wishlistLoading ? <Loader2 className="animate-spin"/> : <Heart />}
@@ -118,7 +118,7 @@ export function Header() {
                 </div>
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" asChild aria-label="Panier">
+            <Button variant="ghost" size="icon" asChild aria-label="Panier" className="hover:bg-white/10">
               <Link href="/cart">
                 <div className="relative">
                   {cartLoading ? <Loader2 className="animate-spin"/> : <ShoppingCart />}
@@ -130,7 +130,7 @@ export function Header() {
                 </div>
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" asChild aria-label="Compte utilisateur">
+            <Button variant="ghost" size="icon" asChild aria-label="Compte utilisateur" className="hover:bg-white/10">
               <Link href="/account">
                 <User />
               </Link>
