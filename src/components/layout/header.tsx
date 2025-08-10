@@ -45,51 +45,50 @@ export function Header() {
     <header className="sticky top-0 z-40 hidden w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:block">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center">
-              <Logo className="h-6 w-auto" />
-            </Link>
+          <Link href="/" className="flex items-center mr-6">
+            <Logo className="h-6 w-auto" />
+          </Link>
+          <nav className="flex items-center gap-6 text-sm">
+            {navLinks.map(link => (
+              <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">
+                {link.label}
+              </Link>
+            ))}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Admin</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Gestion du site</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                      <Link href="/admin/upload">
+                          <Plus className="mr-2 h-4 w-4" />
+                          <span>Ajouter un produit</span>
+                      </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                      <Link href="/admin/products">
+                          <List className="mr-2 h-4 w-4" />
+                          <span>Gérer les produits</span>
+                      </Link>
+                  </DropdownMenuItem>
+                   <DropdownMenuItem asChild>
+                      <Link href="/admin/categories">
+                          <LayoutGrid className="mr-2 h-4 w-4" />
+                          <span>Gérer les catégories</span>
+                      </Link>
+                  </DropdownMenuItem>
+                   <DropdownMenuItem asChild>
+                      <Link href="/admin/settings">
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Personnalisation</span>
+                      </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+          </nav>
         </div>
-
-        <nav className="flex items-center gap-6 text-sm">
-          {navLinks.map(link => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">
-              {link.label}
-            </Link>
-          ))}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Admin</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>Gestion du site</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link href="/admin/upload">
-                        <Plus className="mr-2 h-4 w-4" />
-                        <span>Ajouter un produit</span>
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href="/admin/products">
-                        <List className="mr-2 h-4 w-4" />
-                        <span>Gérer les produits</span>
-                    </Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                    <Link href="/admin/categories">
-                        <LayoutGrid className="mr-2 h-4 w-4" />
-                        <span>Gérer les catégories</span>
-                    </Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                    <Link href="/admin/settings">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Personnalisation</span>
-                    </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-        </nav>
 
         <div className="flex items-center justify-end gap-4">
           <form onSubmit={handleSearch} className="relative w-full max-w-xs">
