@@ -37,6 +37,7 @@ export const getReviewsByProductId = async (productId: string): Promise<Review[]
 
 
 export const addReview = async (productId: string, userId: string, userName: string, rating: number, comment: string): Promise<Review> => {
+    const productRef = doc(db, 'products', productId);
     const reviewsColRef = collection(db, 'products', productId, 'reviews');
     
     const newReviewData = {
@@ -47,10 +48,38 @@ export const addReview = async (productId: string, userId: string, userName: str
         createdAt: serverTimestamp()
     };
     
-    const docRef = await addDoc(reviewsColRef, newReviewData);
+    const newReviewRef = doc(reviewsColRef);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const productDoc = await transaction.get(productRef);
+            if (!productDoc.exists()) {
+                throw "Document does not exist!";
+            }
+
+            // Get current reviews data
+            const currentReviews = await getReviewsByProductId(productId);
+            const newNumberOfReviews = currentReviews.length + 1;
+            const oldRatingTotal = (productDoc.data().rating || 0) * currentReviews.length;
+            const newAverageRating = (oldRatingTotal + rating) / newNumberOfReviews;
+
+            // Update product with new average rating and review count
+            transaction.update(productRef, { 
+                rating: newAverageRating,
+                reviews: newNumberOfReviews
+            });
+
+            // Add the new review
+            transaction.set(newReviewRef, newReviewData);
+        });
+
+    } catch (e) {
+        console.error("Transaction failed: ", e);
+        throw new Error("Impossible d'ajouter l'avis.");
+    }
 
      return {
-        id: docRef.id,
+        id: newReviewRef.id,
         userId,
         userName,
         rating,
