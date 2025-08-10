@@ -48,9 +48,9 @@ export function Header() {
 
   return (
     <header className={cn(
-        "hidden w-full md:block z-40",
+        "hidden w-full md:block z-40 transition-colors duration-300",
         isHomePage 
-            ? "absolute top-0 border-transparent bg-transparent text-white" 
+            ? "absolute top-0 border-transparent bg-gradient-to-b from-black/70 to-transparent text-white" 
             : "sticky top-0 bg-background text-foreground border-b"
     )}>
       <div className="container flex h-16 items-center justify-between">
@@ -110,7 +110,7 @@ export function Header() {
               className={cn(
                 "pl-10 rounded-full h-9", 
                 isHomePage 
-                  ? "bg-white/20 placeholder:text-white/70 border-white/30 text-white" 
+                  ? "bg-white/20 placeholder:text-white/70 border-white/30 text-white focus:bg-white/30" 
                   : "bg-muted placeholder:text-muted-foreground border-transparent"
               )}
               value={searchQuery}
@@ -123,7 +123,7 @@ export function Header() {
             </div>
           </form>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits" className={cn(isHomePage && "hover:bg-white/10")}>
+            <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits" className={cn(isHomePage && "hover:bg-white/10 text-white/80 hover:text-white/100")}>
               <Link href="/wishlist">
                 <div className="relative">
                   {wishlistLoading ? <Loader2 className="animate-spin"/> : <Heart />}
@@ -135,7 +135,7 @@ export function Header() {
                 </div>
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" asChild aria-label="Panier" className={cn(isHomePage && "hover:bg-white/10")}>
+            <Button variant="ghost" size="icon" asChild aria-label="Panier" className={cn(isHomePage && "hover:bg-white/10 text-white/80 hover:text-white/100")}>
               <Link href="/cart">
                 <div className="relative">
                   {cartLoading ? <Loader2 className="animate-spin"/> : <ShoppingCart />}
@@ -147,7 +147,7 @@ export function Header() {
                 </div>
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" asChild aria-label="Compte utilisateur" className={cn(isHomePage && "hover:bg-white/10")}>
+            <Button variant="ghost" size="icon" asChild aria-label="Compte utilisateur" className={cn(isHomePage && "hover:bg-white/10 text-white/80 hover:text-white/100")}>
               <Link href="/account">
                 <User />
               </Link>

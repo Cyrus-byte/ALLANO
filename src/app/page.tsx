@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <div className="flex-1">
-      <section className="w-full relative -mt-16 md:-mt-20">
+      <section className="w-full relative">
         {heroSettings.heroImageUrls.length > 0 ? (
           <div className="relative aspect-[9/16] md:aspect-video w-full">
             <Carousel
@@ -114,7 +114,7 @@ export default function Home() {
               <CarouselPrevious />
               <CarouselNext />
             </Carousel>
-            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
+            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-4">
               {heroSettings.heroHeadline && (
                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight font-headline text-white">
                   {heroSettings.heroHeadline}
