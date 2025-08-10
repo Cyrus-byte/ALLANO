@@ -94,6 +94,14 @@ export function ProductCard({ product }: ProductCardProps) {
       </CardContent>
       <CardFooter className="flex-col items-start p-2 pt-3">
         <h3 className="font-semibold text-sm truncate w-full">{product.name}</h3>
+        {product.reviews > 0 && (
+            <div className="flex items-center gap-1 mt-1">
+                {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={cn("h-4 w-4", i < product.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
+                ))}
+                 <span className="text-xs text-muted-foreground ml-1">({product.reviews})</span>
+            </div>
+        )}
         <div className="flex justify-between items-center w-full mt-1">
           <div className="flex flex-col items-start">
             <p className={cn("font-bold", product.onSale && "text-destructive")}>
