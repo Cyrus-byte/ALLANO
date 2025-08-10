@@ -88,9 +88,9 @@ export default function Home() {
 
   return (
     <div className="flex-1">
-      <section className="w-full relative -mt-16">
+      <section className="w-full">
         {heroSettings.heroImageUrls.length > 0 ? (
-          <div className="relative aspect-[9/16] md:aspect-[16/7] w-full">
+          <div className="relative aspect-[9/16] md:aspect-video w-full">
             <Carousel
               opts={{ align: "center", loop: true }}
               plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
@@ -99,7 +99,7 @@ export default function Home() {
               <CarouselContent>
                 {heroSettings.heroImageUrls.map((url, index) => (
                   <CarouselItem key={index}>
-                    <div className="relative w-full h-full aspect-[9/16] md:aspect-[16/7]">
+                    <div className="relative w-full h-full aspect-[9/16] md:aspect-video">
                       <Image
                         src={url}
                         alt={`Hero image ${index + 1}`}
