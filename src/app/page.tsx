@@ -75,7 +75,7 @@ export default function Home() {
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <section className="w-full py-12 md:py-20">
-                <Skeleton className="w-full aspect-[16/9] md:aspect-video rounded-lg" />
+                <Skeleton className="w-full aspect-video md:aspect-[16/7] rounded-lg" />
                  <div className="text-center mt-8">
                     <Skeleton className="h-12 w-2/3 mx-auto" />
                     <Skeleton className="h-6 w-1/2 mx-auto mt-4" />
