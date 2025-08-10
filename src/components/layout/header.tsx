@@ -10,7 +10,7 @@ import { Logo } from '@/components/icons';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,9 +25,14 @@ import { useAuth } from '@/contexts/auth-context';
 export function Header() {
   const { totalItems, loading: cartLoading } = useCart();
   const { wishlist, loading: wishlistLoading } = useWishlist();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const navLinks = [
     { href: '/', label: 'Accueil' },
@@ -55,7 +60,7 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            {isAdmin && (
+            {isClient && isAdmin && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="text-muted-foreground hover:text-foreground">Admin</Button>
@@ -112,8 +117,8 @@ export function Header() {
             <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits">
               <Link href="/wishlist">
                 <div className="relative">
-                  {wishlistLoading ? <Loader2 className="animate-spin"/> : <Heart />}
-                  {!wishlistLoading && wishlist.length > 0 && (
+                  {cartLoading ? <Loader2 className="animate-spin"/> : <Heart />}
+                  {!cartLoading && wishlist.length > 0 && (
                     <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full p-0">
                       {wishlist.length}
                     </Badge>
