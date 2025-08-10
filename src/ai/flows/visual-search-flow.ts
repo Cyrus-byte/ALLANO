@@ -47,8 +47,13 @@ export const generateProductDescriptionFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async (input) => {
-    const { output } = await descriptionPrompt(input);
-    return output?.description || '';
+    try {
+        const { output } = await descriptionPrompt(input);
+        return output?.description || '';
+    } catch (e) {
+        console.error("Error in generateProductDescriptionFlow (likely quota issue):", e);
+        return ''; // Return empty string on failure
+    }
   }
 );
 // Exported wrapper function
@@ -79,7 +84,8 @@ export async function findSimilarProducts(input: VisualSearchInput): Promise<Pro
     const searchDescription = await generateProductDescriptionFlow({ photoDataUri: input.photoDataUri });
 
     if (!searchDescription) {
-        throw new Error("Could not generate a description from the image.");
+        // This can happen if the AI description generation fails (e.g., quota)
+        console.warn("Could not generate a description from the image. Visual search may be less accurate.");
     }
     
     // 2. Fetch all products from the database
@@ -93,6 +99,7 @@ export async function findSimilarProducts(input: VisualSearchInput): Promise<Pro
     
     // 3. Use another LLM call to compare the search description with all product descriptions
     const comparisonPrompt = `Based on the search description "${searchDescription}", which of the following products are the most similar?
+    If the search description is empty, use your best visual judgement from the provided image.
     Return a ranked list of the top 5 most similar product IDs.
     
     Available products:
@@ -122,6 +129,7 @@ export async function findSimilarProducts(input: VisualSearchInput): Promise<Pro
 
   } catch (error) {
     console.error("Error in findSimilarProducts flow:", error);
+    // Re-throw the error so the client-side can catch it and display a message.
     throw error;
   }
 }

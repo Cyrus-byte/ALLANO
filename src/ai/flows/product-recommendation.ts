@@ -49,8 +49,14 @@ export const productRecommendationFlow = ai.defineFlow(
     outputSchema: ProductRecommendationOutputSchema,
   },
   async input => {
-    const {output} = await productRecommendationPrompt(input);
-    return output!;
+    try {
+        const {output} = await productRecommendationPrompt(input);
+        return output!;
+    } catch(e) {
+        console.error("Error in product recommendation flow (likely quota issue):", e);
+        // Fail gracefully by returning empty recommendations
+        return { recommendations: [] };
+    }
   }
 );
 
