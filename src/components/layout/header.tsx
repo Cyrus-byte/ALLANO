@@ -43,10 +43,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 hidden w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:block">
-      <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-8 flex items-center space-x-2">
-          <Logo className="h-6 w-auto" />
-        </Link>
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center">
+              <Logo className="h-6 w-auto" />
+            </Link>
+        </div>
+
         <nav className="flex items-center gap-6 text-sm">
           {navLinks.map(link => (
             <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">
@@ -87,12 +90,13 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
         </nav>
-        <div className="flex flex-1 items-center justify-end gap-4">
+
+        <div className="flex items-center justify-end gap-4">
           <form onSubmit={handleSearch} className="relative w-full max-w-xs">
             <Input
               type="search"
               placeholder="Rechercher un produit..."
-              className="pl-10 rounded-full"
+              className="pl-10 rounded-full h-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -102,7 +106,7 @@ export function Header() {
                </button>
             </div>
           </form>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits">
               <Link href="/wishlist">
                 <div className="relative">
