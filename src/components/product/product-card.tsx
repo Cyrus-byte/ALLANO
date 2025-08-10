@@ -3,12 +3,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, ShoppingCart } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
+import { ProductQuickView } from './product-quick-view';
 
 interface ProductCardProps {
   product: Product;
@@ -37,15 +38,27 @@ export function ProductCard({ product }: ProductCardProps) {
                     data-ai-hint="product image"
                     />
                     
-                    <Button
-                        variant="secondary"
-                        size="icon"
-                        className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/70 hover:bg-background"
-                        aria-label="Ajouter aux favoris"
-                        onClick={handleWishlistClick}
-                    >
-                        <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-red-500 text-red-500" : "")} />
-                    </Button>
+                    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                       <Button
+                            variant="secondary"
+                            size="icon"
+                            className="h-8 w-8 rounded-full bg-background/70 hover:bg-background"
+                            aria-label="Ajouter aux favoris"
+                            onClick={handleWishlistClick}
+                        >
+                            <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-orange-500 text-orange-500" : "")} />
+                        </Button>
+                        <ProductQuickView product={product}>
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="h-8 w-8 rounded-full bg-background/70 hover:bg-background"
+                                aria-label="Aperçu rapide"
+                            >
+                                <Eye className="h-4 w-4" />
+                            </Button>
+                        </ProductQuickView>
+                    </div>
 
                     {product.isNew && !product.onSale && (
                     <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
@@ -73,7 +86,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         </p>
                     )}
                 </div>
-                 <Button asChild size="icon" className="h-9 w-9 shrink-0" aria-label="Ajouter au panier">
+                 <Button asChild size="icon" className="h-9 w-9 shrink-0">
                     <Link href={`/product/${product.id}`}>
                         <ShoppingCart className="h-4 w-4" />
                     </Link>
