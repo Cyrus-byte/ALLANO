@@ -2,28 +2,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check for admin role
-    function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
     // Allow users to read and write to their own document
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      // Admins can read any user document
-      allow read: if isAdmin();
     }
 
-    // Allow users to read orders that belong to them, admins can read all
+    // Allow users to read orders that belong to them
     match /orders/{orderId} {
-      allow read: if (request.auth != null && request.auth.uid == resource.data.userId) || isAdmin();
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null;
     }
     
-    // Admins can manage all products, categories, and settings
+    // Allow anyone to read public data like products, categories, and settings
     match /products/{productId} {
       allow read: if true;
-      allow write: if isAdmin();
     }
     
     match /products/{productId}/reviews/{reviewId} {
@@ -33,16 +25,17 @@ service cloud.firestore {
 
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if isAdmin();
-    }
-    
-    match /promoCodes/{codeId} {
-      allow read, write: if isAdmin();
     }
 
     match /settings/{settingId} {
         allow read: if true;
-        allow write: if isAdmin();
+    }
+
+    match /promoCodes/{codeId} {
+      // ANYONE can read a promo code to apply it.
+      allow read: if true;
+      // ONLY admins can create, update, or delete promo codes.
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
   }
 }
