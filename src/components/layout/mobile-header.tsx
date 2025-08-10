@@ -21,21 +21,21 @@ export function MobileHeader() {
 
   return (
     <header className="md:hidden sticky top-0 z-40 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-center gap-4">
-        <Link href="/" className="flex items-center space-x-2">
+      <div className="container flex h-16 items-center justify-between gap-4">
+        <Link href="/" className="flex items-center">
           <Logo className="h-6 w-auto" />
         </Link>
-        <div className="flex-1 max-w-xs">
-          <form onSubmit={handleSearch} className="relative w-full">
+        <div className="flex-1 flex justify-end">
+          <form onSubmit={handleSearch} className="relative w-full max-w-xs">
             <Input
               type="search"
               placeholder="Rechercher..."
-              className="pl-10 h-10 rounded-full"
+              className="pl-10 h-10 rounded-full bg-muted border-transparent focus-visible:ring-primary focus-visible:ring-2"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-               <button type="submit" className="p-0 m-0 h-full bg-transparent border-none">
+               <button type="submit" className="p-0 m-0 h-full bg-transparent border-none" aria-label="Rechercher">
                 <Search className="h-5 w-5 text-muted-foreground" />
                </button>
             </div>
