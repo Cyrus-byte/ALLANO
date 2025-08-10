@@ -1,6 +1,6 @@
 
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, doc, deleteDoc, serverTimestamp, updateDoc, orderBy, query, getDoc, where, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, deleteDoc, serverTimestamp, updateDoc, orderBy, query, getDoc, where, Timestamp, setDoc } from 'firebase/firestore';
 import type { PromoCode } from './types';
 
 
