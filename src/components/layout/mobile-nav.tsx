@@ -35,7 +35,7 @@ export function MobileNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 h-20 pb-safe border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 pb-safe border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
       <nav className={cn("grid h-full", isAdmin ? "grid-cols-7" : "grid-cols-6")}>
         {navItems.map(item => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
