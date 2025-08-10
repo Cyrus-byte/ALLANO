@@ -214,7 +214,7 @@ export default function ProductPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
             <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
                  <div className="flex flex-col gap-4">
-                    <Skeleton className="aspect-[3/4] w-full rounded-lg" />
+                    <Skeleton className="aspect-square w-full rounded-lg" />
                     <div className="grid grid-cols-5 gap-2">
                         <Skeleton className="w-full aspect-square rounded-lg" />
                         <Skeleton className="w-full aspect-square rounded-lg" />
@@ -272,7 +272,7 @@ export default function ProductPage() {
                 <CarouselContent>
                 {product.images.map((img, index) => (
                     <CarouselItem key={index}>
-                         <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
+                         <div className="relative aspect-square w-full overflow-hidden rounded-lg">
                              {product.onSale && (
                                 <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-sm font-bold px-3 py-1.5 rounded-full z-10">
                                     PROMO
@@ -404,3 +404,4 @@ export default function ProductPage() {
   );
 }
 
+    
