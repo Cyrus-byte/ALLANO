@@ -75,8 +75,13 @@ export default function CategoriesPage() {
                 <Skeleton className="h-6 w-1/3 mx-auto mt-4" />
             </div>
             <section className="mb-16">
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
-                    {Array.from({length: 6}).map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-x-2 gap-y-6 md:gap-x-4">
+                    {Array.from({length: 6}).map((_, i) => 
+                        <div key={i} className="flex flex-col items-center gap-2">
+                           <Skeleton key={i} className="w-20 h-20 rounded-full" />
+                           <Skeleton key={i} className="h-4 w-16" />
+                        </div>
+                    )}
                 </div>
             </section>
             <div className="space-y-16">
@@ -109,19 +114,19 @@ export default function CategoriesPage() {
       </div>
 
       <section className="mb-16">
-        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
+        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-x-2 gap-y-6 md:gap-x-4">
           {categories.map((category) => (
             <Link key={category.id} href={`/category/${slugify(category.name)}`} passHref>
-               <div className="group relative aspect-square overflow-hidden rounded-lg">
-                <Image
-                  src={getCategoryImage(category.name)}
-                  alt={category.name}
-                  fill
-                  className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h2 className="text-sm font-bold text-white text-center p-1">{category.name}</h2>
-                </div>
+               <div className="group flex flex-col items-center gap-2 text-center">
+                 <div className="relative w-20 h-20 overflow-hidden rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105">
+                    <Image
+                      src={getCategoryImage(category.name)}
+                      alt={category.name}
+                      fill
+                      className="object-cover"
+                    />
+                 </div>
+                 <h2 className="text-sm font-medium text-foreground">{category.name}</h2>
               </div>
             </Link>
           ))}
