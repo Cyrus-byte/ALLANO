@@ -1,15 +1,13 @@
-
 "use client";
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, ShoppingCart, Eye } from 'lucide-react';
+import { Star, Heart, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
-import { ProductQuickView } from './product-quick-view';
 
 interface ProductCardProps {
   product: Product;
@@ -48,16 +46,6 @@ export function ProductCard({ product }: ProductCardProps) {
                         >
                             <Heart className={cn("h-4 w-4", isProductInWishlist ? "fill-orange-500 text-orange-500" : "")} />
                         </Button>
-                        <ProductQuickView product={product}>
-                            <Button
-                                variant="secondary"
-                                size="icon"
-                                className="h-8 w-8 rounded-full bg-background/70 hover:bg-background"
-                                aria-label="Aperçu rapide"
-                            >
-                                <Eye className="h-4 w-4" />
-                            </Button>
-                        </ProductQuickView>
                     </div>
 
                     {product.isNew && !product.onSale && (
