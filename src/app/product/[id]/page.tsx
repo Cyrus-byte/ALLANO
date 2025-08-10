@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { getProductById } from '@/lib/product-service';
@@ -21,6 +21,8 @@ import { getReviewsByProductId, addReview } from '@/lib/review-service';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
+
 
 function ProductReviews({ 
     productId, 
@@ -152,8 +154,11 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [mainImage, setMainImage] = useState<string>('');
   const [reviews, setReviews] = useState<Review[]>([]);
+
+  const [mainApi, setMainApi] = useState<CarouselApi>()
+  const [thumbApi, setThumbApi] = useState<CarouselApi>()
+  const [selectedThumb, setSelectedThumb] = useState(0)
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -162,12 +167,8 @@ export default function ProductPage() {
         const fetchedProduct = await getProductById(productId);
         if (fetchedProduct) {
           setProduct(fetchedProduct);
-          setMainImage(fetchedProduct.images[0] || '');
           if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
             setSelectedColor(fetchedProduct.colors[0].name);
-            if (fetchedProduct.colors[0].imageUrl) {
-              setMainImage(fetchedProduct.colors[0].imageUrl);
-            }
           }
         } else {
             notFound();
@@ -183,6 +184,24 @@ export default function ProductPage() {
         fetchProduct();
     }
   }, [productId]);
+
+  const onThumbClick = useCallback((index: number) => {
+    if (!mainApi || !thumbApi) return
+    mainApi.scrollTo(index)
+  }, [mainApi, thumbApi])
+
+  const onSelect = useCallback(() => {
+    if (!mainApi || !thumbApi) return
+    setSelectedThumb(mainApi.selectedScrollSnap())
+    thumbApi.scrollTo(mainApi.selectedScrollSnap())
+  }, [mainApi, thumbApi, setSelectedThumb])
+
+  useEffect(() => {
+    if (!mainApi) return
+    onSelect()
+    mainApi.on('select', onSelect)
+    mainApi.on('reInit', onSelect)
+  }, [mainApi, onSelect])
   
   const ratingAverage = reviews.length > 0
     ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
@@ -194,13 +213,13 @@ export default function ProductPage() {
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
             <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
-                <div className="flex flex-col-reverse md:flex-row gap-4">
-                    <div className="flex md:flex-col gap-2 justify-center">
-                        <Skeleton className="w-16 h-20 rounded-lg" />
-                        <Skeleton className="w-16 h-20 rounded-lg" />
-                        <Skeleton className="w-16 h-20 rounded-lg" />
-                    </div>
+                 <div className="flex flex-col gap-4">
                     <Skeleton className="aspect-[3/4] w-full rounded-lg" />
+                    <div className="grid grid-cols-5 gap-2">
+                        <Skeleton className="w-full aspect-square rounded-lg" />
+                        <Skeleton className="w-full aspect-square rounded-lg" />
+                        <Skeleton className="w-full aspect-square rounded-lg" />
+                    </div>
                 </div>
                 <div>
                     <Skeleton className="h-10 w-3/4 mb-4" />
@@ -232,7 +251,10 @@ export default function ProductPage() {
   const handleColorSelect = (color: Product['colors'][0]) => {
     setSelectedColor(color.name);
     if (color.imageUrl) {
-        setMainImage(color.imageUrl);
+        const imageIndex = product.images.findIndex(img => img === color.imageUrl);
+        if (imageIndex !== -1) {
+            onThumbClick(imageIndex);
+        }
     }
   }
   
@@ -245,29 +267,42 @@ export default function ProductPage() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
         {/* Image Gallery */}
-        <div className="flex flex-col-reverse md:flex-row gap-4">
-          <div className="flex md:flex-col gap-2 justify-center">
-            {product.images.map((img, index) => (
-              <button
-                key={index}
-                className={cn(
-                  "relative w-16 h-20 rounded-lg overflow-hidden ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring",
-                  mainImage === img && "ring-2 ring-primary"
-                )}
-                onClick={() => setMainImage(img)}
-              >
-                <Image src={img} alt={`${product.name} thumbnail ${index + 1}`} fill className="object-cover" />
-              </button>
-            ))}
-          </div>
-          <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-             {product.onSale && (
-                <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-sm font-bold px-3 py-1.5 rounded-full z-10">
-                    PROMO
-                </div>
-             )}
-            <Image src={mainImage} alt={product.name} fill className="object-cover" />
-          </div>
+        <div className="flex flex-col gap-4">
+            <Carousel setApi={setMainApi} className="w-full group">
+                <CarouselContent>
+                {product.images.map((img, index) => (
+                    <CarouselItem key={index}>
+                         <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
+                             {product.onSale && (
+                                <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-sm font-bold px-3 py-1.5 rounded-full z-10">
+                                    PROMO
+                                </div>
+                             )}
+                            <Image src={img} alt={`${product.name} image ${index + 1}`} fill className="object-cover" />
+                        </div>
+                    </CarouselItem>
+                ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-4" />
+                <CarouselNext className="right-4" />
+            </Carousel>
+            <Carousel setApi={setThumbApi} opts={{ align: "start", slidesToScroll: 1, dragFree: true, containScroll: 'keepSnaps' }} className="w-full">
+                <CarouselContent className="-ml-2">
+                    {product.images.map((img, index) => (
+                    <CarouselItem key={index} className="pl-2 basis-1/4 sm:basis-1/5 md:basis-1/6">
+                       <button
+                            onClick={() => onThumbClick(index)}
+                            className={cn(
+                            "relative aspect-square w-full rounded-lg overflow-hidden ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring",
+                            selectedThumb === index && "ring-2 ring-primary"
+                            )}
+                        >
+                            <Image src={img} alt={`${product.name} thumbnail ${index + 1}`} fill className="object-cover" />
+                        </button>
+                    </CarouselItem>
+                ))}
+                </CarouselContent>
+            </Carousel>
         </div>
 
         {/* Product Details */}
@@ -368,3 +403,4 @@ export default function ProductPage() {
     </div>
   );
 }
+
