@@ -36,12 +36,11 @@ export default function AdminSettingsPage() {
     const fetchSettings = async () => {
       setLoading(true);
       const fetchedSettings = await getHomepageSettings();
-      // Ensure headline/subheadline are strings to avoid controlled/uncontrolled error
+      // Use fetched settings or fall back to defaults, allowing empty strings
       const currentSettings = {
-          ...defaultSettings,
-          ...(fetchedSettings || {}),
-          heroHeadline: (fetchedSettings?.heroHeadline) || defaultSettings.heroHeadline,
-          heroSubheadline: (fetchedSettings?.heroSubheadline) || defaultSettings.heroSubheadline,
+          heroImageUrls: fetchedSettings?.heroImageUrls || defaultSettings.heroImageUrls,
+          heroHeadline: fetchedSettings?.heroHeadline ?? defaultSettings.heroHeadline,
+          heroSubheadline: fetchedSettings?.heroSubheadline ?? defaultSettings.heroSubheadline,
       };
       setSettings(currentSettings);
       setInitialSettings(currentSettings);

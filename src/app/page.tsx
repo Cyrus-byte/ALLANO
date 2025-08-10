@@ -45,11 +45,11 @@ export default function Home() {
       setHeroLoading(true);
       try {
           const settings = await getHomepageSettings();
-          if (settings && settings.heroImageUrls && settings.heroImageUrls.length > 0) {
+          if (settings) {
             setHeroSettings({
-              heroImageUrls: settings.heroImageUrls,
-              heroHeadline: settings.heroHeadline || defaultSettings.heroHeadline,
-              heroSubheadline: settings.heroSubheadline || defaultSettings.heroSubheadline
+              heroImageUrls: settings.heroImageUrls || [],
+              heroHeadline: settings.heroHeadline ?? defaultSettings.heroHeadline,
+              heroSubheadline: settings.heroSubheadline ?? defaultSettings.heroSubheadline
             });
           } else {
              setHeroSettings(defaultSettings);
@@ -111,12 +111,16 @@ export default function Home() {
               </CarouselContent>
             </Carousel>
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-white whitespace-nowrap">
-                {heroSettings.heroHeadline}
-              </h1>
-              <p className="mt-4 max-w-2xl mx-auto text-base text-white/90">
-                {heroSettings.heroSubheadline}
-              </p>
+              {heroSettings.heroHeadline && (
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-white whitespace-nowrap">
+                  {heroSettings.heroHeadline}
+                </h1>
+              )}
+              {heroSettings.heroSubheadline && (
+                <p className="mt-4 max-w-2xl mx-auto text-base text-white/90">
+                  {heroSettings.heroSubheadline}
+                </p>
+              )}
               <Button size="lg" className="mt-8" asChild>
                 <Link href="/categories">
                   Explorer les collections <ArrowRight className="ml-2" />
@@ -126,12 +130,16 @@ export default function Home() {
           </div>
         ) : (
           <div className="container mx-auto text-center py-16">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-foreground">
-              {heroSettings.heroHeadline}
-            </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-              {heroSettings.heroSubheadline}
-            </p>
+            {heroSettings.heroHeadline && (
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-foreground">
+                {heroSettings.heroHeadline}
+              </h1>
+            )}
+            {heroSettings.heroSubheadline && (
+              <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
+                {heroSettings.heroSubheadline}
+              </p>
+            )}
             <Button size="lg" className="mt-8" asChild>
               <Link href="/categories">
                 Explorer les collections <ArrowRight className="ml-2" />
