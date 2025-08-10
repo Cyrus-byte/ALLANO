@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
+import { useAuth } from '@/contexts/auth-context';
 import {
   Sheet,
   SheetContent,
@@ -23,6 +24,7 @@ export function MobileNav() {
   const pathname = usePathname();
   const { totalItems, loading: cartLoading } = useCart();
   const { wishlist, loading: wishlistLoading } = useWishlist();
+  const { isAdmin } = useAuth();
 
   const navItems = [
     { href: '/', label: 'Accueil', icon: Home, exact: true },
@@ -51,49 +53,51 @@ export function MobileNav() {
             </Link>
           );
         })}
-         <Sheet>
-            <SheetTrigger asChild>
-                <button className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
-                    <PanelLeft className="h-6 w-6 text-muted-foreground" />
-                    <span className="text-xs text-center text-muted-foreground">Admin</span>
-                </button>
-            </SheetTrigger>
-            <SheetContent side="left">
-                <SheetHeader>
-                <SheetTitle>Admin</SheetTitle>
-                <SheetDescription>
-                    Gérez votre boutique en ligne.
-                </SheetDescription>
-                </SheetHeader>
-                 <Separator className="my-4" />
-                <div className="flex flex-col gap-2">
-                    <Button variant="ghost" className="justify-start" asChild>
-                        <Link href="/admin/upload">
-                            <Plus className="mr-2 h-4 w-4" />
-                            <span>Ajouter un produit</span>
-                        </Link>
-                    </Button>
-                     <Button variant="ghost" className="justify-start" asChild>
-                        <Link href="/admin/products">
-                            <List className="mr-2 h-4 w-4" />
-                            <span>Gérer les produits</span>
-                        </Link>
-                    </Button>
-                     <Button variant="ghost" className="justify-start" asChild>
-                        <Link href="/admin/categories">
-                            <LayoutGrid className="mr-2 h-4 w-4" />
-                            <span>Gérer les catégories</span>
-                        </Link>
-                    </Button>
-                     <Button variant="ghost" className="justify-start" asChild>
-                        <Link href="/admin/settings">
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Personnalisation</span>
-                        </Link>
-                    </Button>
-                </div>
-            </SheetContent>
-        </Sheet>
+        {isAdmin && (
+            <Sheet>
+                <SheetTrigger asChild>
+                    <button className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
+                        <PanelLeft className="h-6 w-6 text-muted-foreground" />
+                        <span className="text-xs text-center text-muted-foreground">Admin</span>
+                    </button>
+                </SheetTrigger>
+                <SheetContent side="left">
+                    <SheetHeader>
+                    <SheetTitle>Admin</SheetTitle>
+                    <SheetDescription>
+                        Gérez votre boutique en ligne.
+                    </SheetDescription>
+                    </SheetHeader>
+                    <Separator className="my-4" />
+                    <div className="flex flex-col gap-2">
+                        <Button variant="ghost" className="justify-start" asChild>
+                            <Link href="/admin/upload">
+                                <Plus className="mr-2 h-4 w-4" />
+                                <span>Ajouter un produit</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" className="justify-start" asChild>
+                            <Link href="/admin/products">
+                                <List className="mr-2 h-4 w-4" />
+                                <span>Gérer les produits</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" className="justify-start" asChild>
+                            <Link href="/admin/categories">
+                                <LayoutGrid className="mr-2 h-4 w-4" />
+                                <span>Gérer les catégories</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" className="justify-start" asChild>
+                            <Link href="/admin/settings">
+                                <Settings className="mr-2 h-4 w-4" />
+                                <span>Personnalisation</span>
+                            </Link>
+                        </Button>
+                    </div>
+                </SheetContent>
+            </Sheet>
+        )}
          <Link href="/account" className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
             <User className={cn("h-6 w-6", pathname.startsWith('/account') ? "text-primary" : "text-muted-foreground")} />
             <span className={cn("text-xs text-center", pathname.startsWith('/account') ? "text-primary" : "text-muted-foreground")}>Profil</span>

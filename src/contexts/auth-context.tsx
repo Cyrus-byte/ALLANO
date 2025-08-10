@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, setDoc, getDoc } from "firebase/firestore"; 
@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
+  isAdmin: boolean;
   loading: boolean;
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   logIn: (email: string, password: string) => Promise<void>;
@@ -21,24 +22,40 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
+  
+  const checkUserRole = useCallback(async (user: User | null) => {
+    if (user) {
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists() && userDoc.data()?.role === 'admin') {
+            setIsAdmin(true);
+        } else {
+            setIsAdmin(false);
+        }
+    } else {
+        setIsAdmin(false);
+    }
+  }, []);
+
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      await checkUserRole(user);
       setLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [checkUserRole]);
 
   const createUserDocument = async (user: User, additionalData = {}) => {
     if (!user) return;
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     
-    // Only create document if it doesn't exist
     if (!userDoc.exists()) {
         const userData = {
             email: user.email,
@@ -46,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             createdAt: new Date(),
             cart: [],
             wishlist: [],
+            role: 'customer', // Default role
             ...additionalData
         };
         await setDoc(userRef, userData);
@@ -105,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const value = { user, loading, signUp, logIn, logInWithGoogle, logOut };
+  const value = { user, isAdmin, loading, signUp, logIn, logInWithGoogle, logOut };
 
   return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };

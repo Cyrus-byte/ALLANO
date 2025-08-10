@@ -19,11 +19,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from '@/contexts/auth-context';
 
 
 export function Header() {
   const { totalItems, loading: cartLoading } = useCart();
   const { wishlist, loading: wishlistLoading } = useWishlist();
+  const { isAdmin } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -54,6 +56,7 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
+            {isAdmin && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="transition-colors hover:text-white/80 text-white/80 px-0 hover:bg-white/10">Admin</Button>
@@ -87,6 +90,7 @@ export function Header() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            )}
           </nav>
         </div>
 
