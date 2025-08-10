@@ -16,6 +16,7 @@ export type Product = {
   onSale?: boolean;
   salePrice?: number;
   createdAt: any; 
+  aiDescription?: string;
 };
 
 export type CartItem = {

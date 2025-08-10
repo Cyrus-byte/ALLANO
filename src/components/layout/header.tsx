@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Search, ShoppingCart, User, Loader2, Plus, List, LayoutGrid, Settings } from 'lucide-react';
+import { Heart, Search, ShoppingCart, User, Loader2, Plus, List, LayoutGrid, Settings, Camera } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
@@ -108,10 +108,15 @@ export function Header() {
             <Input
               type="search"
               placeholder="Rechercher un produit..."
-              className="pl-10 h-9 rounded-full bg-muted border-transparent"
+              className="pl-10 pr-10 h-9 rounded-full bg-muted border-transparent"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <Link href="/visual-search" aria-label="Recherche visuelle">
+                    <Camera className="h-5 w-5 text-muted-foreground" />
+                </Link>
+            </div>
           </form>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" asChild aria-label="Liste de souhaits">

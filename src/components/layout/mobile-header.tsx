@@ -4,13 +4,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
-import { Search, X } from 'lucide-react';
+import { Search, X, Camera } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { getProducts } from '@/lib/product-service';
 import type { Product } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '../ui/button';
 
 export function MobileHeader() {
   const router = useRouter();
@@ -77,8 +78,8 @@ export function MobileHeader() {
         <Link href="/" className="flex items-center">
           <Logo className="h-6 w-auto" />
         </Link>
-        <div className="flex-1 flex justify-end" ref={searchRef}>
-          <form onSubmit={handleSearchSubmit} className="relative w-full max-w-xs">
+        <div className="flex-1 flex justify-end items-center gap-2" ref={searchRef}>
+          <form onSubmit={handleSearchSubmit} className="relative w-full">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                <button type="submit" className="p-0 m-0 h-full bg-transparent border-none" aria-label="Rechercher">
                 <Search className="h-5 w-5 text-muted-foreground" />
@@ -125,6 +126,11 @@ export function MobileHeader() {
                 </div>
             )}
           </form>
+            <Button variant="ghost" size="icon" asChild>
+                <Link href="/visual-search" aria-label="Recherche visuelle">
+                    <Camera className="h-6 w-6 text-muted-foreground" />
+                </Link>
+            </Button>
         </div>
       </div>
     </header>
