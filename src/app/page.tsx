@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <div className="flex-1">
-      <section className="w-full relative">
+      <section className="w-full relative -mt-16">
         {heroSettings.heroImageUrls.length > 0 ? (
           <div className="relative aspect-[9/16] md:aspect-[16/7] w-full">
             <Carousel

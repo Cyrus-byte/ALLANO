@@ -48,10 +48,10 @@ export function Header() {
 
   return (
     <header className={cn(
-        "hidden w-full md:block z-40 transition-colors duration-300",
+        "hidden w-full md:block z-40 transition-colors duration-300 sticky top-0",
         isHomePage 
-            ? "absolute top-0 border-transparent bg-gradient-to-b from-black/70 to-transparent text-white" 
-            : "sticky top-0 bg-background text-foreground border-b"
+            ? "bg-transparent text-white border-b border-transparent" 
+            : "bg-background text-foreground border-b"
     )}>
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
