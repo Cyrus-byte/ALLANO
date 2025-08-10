@@ -58,9 +58,11 @@ export const addReview = async (productId: string, userId: string, userName: str
             }
 
             // Get current reviews data
-            const currentReviews = await getReviewsByProductId(productId);
-            const newNumberOfReviews = currentReviews.length + 1;
-            const oldRatingTotal = (productDoc.data().rating || 0) * currentReviews.length;
+            const reviewsSnapshot = await getDocs(query(reviewsColRef));
+            const currentReviewsCount = reviewsSnapshot.size;
+            
+            const oldRatingTotal = (productDoc.data().rating || 0) * currentReviewsCount;
+            const newNumberOfReviews = currentReviewsCount + 1;
             const newAverageRating = (oldRatingTotal + rating) / newNumberOfReviews;
 
             // Update product with new average rating and review count
