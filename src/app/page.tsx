@@ -12,7 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getHomepageSettings, type HomepageSettings } from '@/lib/settings-service';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
 
 
@@ -87,10 +87,10 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <section className="w-full relative">
+    <div className="flex-1">
+      <section className="w-full relative -mt-16 md:-mt-20">
         {heroSettings.heroImageUrls.length > 0 ? (
-          <div className="relative aspect-video w-full">
+          <div className="relative aspect-[9/16] md:aspect-video w-full">
             <Carousel
               opts={{ align: "center", loop: true }}
               plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
@@ -99,7 +99,7 @@ export default function Home() {
               <CarouselContent>
                 {heroSettings.heroImageUrls.map((url, index) => (
                   <CarouselItem key={index}>
-                    <div className="relative w-full h-full aspect-video">
+                    <div className="relative w-full h-full aspect-[9/16] md:aspect-video">
                       <Image
                         src={url}
                         alt={`Hero image ${index + 1}`}
@@ -111,20 +111,22 @@ export default function Home() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
             </Carousel>
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
               {heroSettings.heroHeadline && (
-                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-white whitespace-nowrap">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight font-headline text-white">
                   {heroSettings.heroHeadline}
                 </h1>
               )}
               {heroSettings.heroSubheadline && (
-                <p className="mt-4 max-w-2xl mx-auto text-base text-white/90">
+                <p className="mt-4 max-w-2xl mx-auto text-base md:text-xl text-white/90">
                   {heroSettings.heroSubheadline}
                 </p>
               )}
               {heroSettings.heroButtonText && (
-                <Button size="lg" className="mt-8" asChild>
+                <Button size="lg" className="mt-8 text-base py-6 px-8">
                     <Link href="/categories">
                     {heroSettings.heroButtonText} <ArrowRight className="ml-2" />
                     </Link>
@@ -133,19 +135,19 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <div className="container mx-auto text-center py-16">
+          <div className="container mx-auto text-center py-24 md:py-32">
             {heroSettings.heroHeadline && (
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-foreground">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight font-headline text-foreground">
                 {heroSettings.heroHeadline}
               </h1>
             )}
             {heroSettings.heroSubheadline && (
-              <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
+              <p className="mt-4 max-w-2xl mx-auto text-base md:text-xl text-muted-foreground">
                 {heroSettings.heroSubheadline}
               </p>
             )}
             {heroSettings.heroButtonText && (
-                <Button size="lg" className="mt-8" asChild>
+                <Button size="lg" className="mt-8 text-base py-6 px-8">
                 <Link href="/categories">
                     {heroSettings.heroButtonText} <ArrowRight className="ml-2" />
                 </Link>
