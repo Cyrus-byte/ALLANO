@@ -111,7 +111,7 @@ export default function Home() {
               </CarouselContent>
             </Carousel>
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-white">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-white whitespace-nowrap">
                 {heroSettings.heroHeadline}
               </h1>
               <p className="mt-4 max-w-2xl mx-auto text-base text-white/90">
