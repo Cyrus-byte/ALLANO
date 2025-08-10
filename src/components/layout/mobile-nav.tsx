@@ -3,11 +3,21 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, ShoppingCart, User, Heart, Tag, Loader2 } from 'lucide-react';
+import { Home, LayoutGrid, ShoppingCart, User, Heart, Tag, Loader2, Plus, List, Settings, PanelLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -42,6 +52,49 @@ export function MobileNav() {
             </Link>
           );
         })}
+         <Sheet>
+            <SheetTrigger asChild>
+                <button className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
+                    <PanelLeft className="h-6 w-6 text-muted-foreground" />
+                    <span className="text-xs text-center text-muted-foreground">Admin</span>
+                </button>
+            </SheetTrigger>
+            <SheetContent side="left">
+                <SheetHeader>
+                <SheetTitle>Admin</SheetTitle>
+                <SheetDescription>
+                    Gérez votre boutique en ligne.
+                </SheetDescription>
+                </SheetHeader>
+                 <Separator className="my-4" />
+                <div className="flex flex-col gap-2">
+                    <Button variant="ghost" className="justify-start" asChild>
+                        <Link href="/admin/upload">
+                            <Plus className="mr-2 h-4 w-4" />
+                            <span>Ajouter un produit</span>
+                        </Link>
+                    </Button>
+                     <Button variant="ghost" className="justify-start" asChild>
+                        <Link href="/admin/products">
+                            <List className="mr-2 h-4 w-4" />
+                            <span>Gérer les produits</span>
+                        </Link>
+                    </Button>
+                     <Button variant="ghost" className="justify-start" asChild>
+                        <Link href="/admin/categories">
+                            <LayoutGrid className="mr-2 h-4 w-4" />
+                            <span>Gérer les catégories</span>
+                        </Link>
+                    </Button>
+                     <Button variant="ghost" className="justify-start" asChild>
+                        <Link href="/admin/settings">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Personnalisation</span>
+                        </Link>
+                    </Button>
+                </div>
+            </SheetContent>
+        </Sheet>
       </nav>
     </div>
   );
