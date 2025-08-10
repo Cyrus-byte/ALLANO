@@ -111,10 +111,10 @@ export default function Home() {
               </CarouselContent>
             </Carousel>
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
-              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-white whitespace-nowrap">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-white">
                 {heroSettings.heroHeadline}
               </h1>
-              <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
+              <p className="mt-4 max-w-2xl mx-auto text-base text-white/90">
                 {heroSettings.heroSubheadline}
               </p>
               <Button size="lg" className="mt-8" asChild>
@@ -129,7 +129,7 @@ export default function Home() {
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-foreground">
               {heroSettings.heroHeadline}
             </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+            <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
               {heroSettings.heroSubheadline}
             </p>
             <Button size="lg" className="mt-8" asChild>
