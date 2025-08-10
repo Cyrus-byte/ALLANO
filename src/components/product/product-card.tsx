@@ -73,8 +73,10 @@ export function ProductCard({ product }: ProductCardProps) {
                         </p>
                     )}
                 </div>
-                 <Button size="icon" className="h-9 w-9 shrink-0" aria-label="Ajouter au panier">
-                    <ShoppingCart className="h-4 w-4" />
+                 <Button asChild size="icon" className="h-9 w-9 shrink-0" aria-label="Ajouter au panier">
+                    <Link href={`/product/${product.id}`}>
+                        <ShoppingCart className="h-4 w-4" />
+                    </Link>
                 </Button>
             </div>
       </CardFooter>
