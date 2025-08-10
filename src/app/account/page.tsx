@@ -77,10 +77,9 @@ export default function AccountPage() {
         <Button onClick={logOut} variant="outline">Se déconnecter</Button>
       </div>
       <Tabs defaultValue="orders" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="orders">Mes Commandes</TabsTrigger>
           <TabsTrigger value="profile">Mon Profil</TabsTrigger>
-          <TabsTrigger value="addresses">Mes Adresses</TabsTrigger>
         </TabsList>
         <TabsContent value="orders" className="mt-6">
           <Card>
@@ -143,28 +142,6 @@ export default function AccountPage() {
             </CardContent>
             <CardFooter>
               <Button>Enregistrer les modifications</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        <TabsContent value="addresses" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Adresses de livraison</CardTitle>
-              <CardDescription>Gérez vos adresses de livraison pour un paiement plus rapide.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-               <div className="border p-4 rounded-lg">
-                   <p className="font-semibold">Adresse principale</p>
-                   <p className="text-muted-foreground">123 Rue de la Mode, Ouagadougou, Burkina Faso</p>
-                   <p className="text-muted-foreground">(+226) 70 00 00 00</p>
-                   <div className="mt-2">
-                       <Button variant="outline" size="sm" className="mr-2">Modifier</Button>
-                       <Button variant="ghost" size="sm" className="text-destructive">Supprimer</Button>
-                   </div>
-               </div>
-            </CardContent>
-            <CardFooter>
-                <Button>Ajouter une nouvelle adresse</Button>
             </CardFooter>
           </Card>
         </TabsContent>

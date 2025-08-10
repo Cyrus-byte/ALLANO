@@ -30,11 +30,10 @@ export function MobileNav() {
     { href: '/promotions', label: 'Promos', icon: Tag },
     { href: '/wishlist', label: 'Favoris', icon: Heart, loading: wishlistLoading, count: wishlist.length },
     { href: '/cart', label: 'Panier', icon: ShoppingCart, loading: cartLoading, count: totalItems },
-    { href: '/account', label: 'Profil', icon: User },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-20 pb-4 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
       <nav className="grid h-full grid-cols-6">
         {navItems.map(item => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
@@ -95,6 +94,10 @@ export function MobileNav() {
                 </div>
             </SheetContent>
         </Sheet>
+         <Link href="/account" className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
+            <User className={cn("h-6 w-6", pathname.startsWith('/account') ? "text-primary" : "text-muted-foreground")} />
+            <span className={cn("text-xs text-center", pathname.startsWith('/account') ? "text-primary" : "text-muted-foreground")}>Profil</span>
+        </Link>
       </nav>
     </div>
   );
