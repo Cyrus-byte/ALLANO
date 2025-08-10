@@ -13,13 +13,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getProductById, updateProduct } from '@/lib/product-service';
 import { getCategories } from '@/lib/category-service';
-import { Loader2, X, PlusCircle, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { Loader2, X, PlusCircle, Link as LinkIcon, AlertCircle, Calendar as CalendarIcon } from 'lucide-react';
 import type { Product, Category } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Image from 'next/image';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -43,6 +46,7 @@ export default function AdminEditProductPage() {
   const [loading, setLoading] = useState(true);
   const [onSale, setOnSale] = useState(false);
   const [salePrice, setSalePrice] = useState('');
+  const [promotionEndDate, setPromotionEndDate] = useState<Date | undefined>();
   const [categories, setCategories] = useState<Category[]>([]);
   const { toast } = useToast();
 
@@ -68,6 +72,7 @@ export default function AdminEditProductPage() {
                     setUploadedImageUrls(fetchedProduct.images);
                     setOnSale(fetchedProduct.onSale || false);
                     setSalePrice(fetchedProduct.salePrice?.toString() || '');
+                    setPromotionEndDate(fetchedProduct.promotionEndDate ? new Date(fetchedProduct.promotionEndDate) : undefined);
                 } else {
                     notFound();
                 }
@@ -187,6 +192,7 @@ export default function AdminEditProductPage() {
         colors: colors,
         onSale: onSale,
         salePrice: onSale ? parseFloat(salePrice) : undefined,
+        promotionEndDate: onSale ? promotionEndDate : undefined,
       };
       await updateProduct(productId, updatedProductData);
       toast({ title: "Produit mis à jour !", description: `${productName} a été modifié avec succès.` });
@@ -244,22 +250,38 @@ export default function AdminEditProductPage() {
                     <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ex: Tee shirt en coton" required />
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-4">
-                     <div className="space-y-2">
-                        <Label htmlFor="price">Prix d'origine (FCFA)</Label>
-                        <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 12000" required/>
-                    </div>
-                     {onSale && (
-                        <div className="space-y-2">
-                            <Label htmlFor="salePrice" className="text-destructive">Prix promotionnel (FCFA)</Label>
-                            <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Ex: 9000" required={onSale}/>
-                        </div>
-                     )}
+                 <div className="space-y-2">
+                    <Label htmlFor="price">Prix d'origine (FCFA)</Label>
+                    <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 12000" required/>
                 </div>
+
                 <div className="flex items-center space-x-2">
                     <Switch id="onSale" checked={onSale} onCheckedChange={setOnSale} />
                     <Label htmlFor="onSale">Mettre ce produit en promotion</Label>
                 </div>
+                
+                 {onSale && (
+                    <div className="grid sm:grid-cols-2 gap-4 items-end pl-6 border-l-2 border-destructive">
+                        <div className="space-y-2">
+                            <Label htmlFor="salePrice" className="text-destructive">Prix promotionnel (FCFA)</Label>
+                            <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Ex: 9000" required={onSale}/>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="promotionEndDate">Fin de la promotion (optionnel)</Label>
+                             <Popover>
+                                <PopoverTrigger asChild>
+                                <Button variant={"outline"} className="w-full justify-start text-left font-normal">
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {promotionEndDate ? format(promotionEndDate, 'PPP', { locale: fr }) : <span>Choisir une date</span>}
+                                </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                <Calendar mode="single" selected={promotionEndDate} onSelect={setPromotionEndDate} initialFocus />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                    </div>
+                 )}
                 
                  {onSale && parseFloat(salePrice) >= parseFloat(price) && (
                     <Alert variant="destructive">

@@ -16,6 +16,7 @@ export type Product = {
   isNew?: boolean;
   onSale?: boolean;
   salePrice?: number;
+  promotionEndDate?: any;
   createdAt: any; 
   aiDescription?: string;
 };

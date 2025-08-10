@@ -30,6 +30,7 @@ export const createProduct = async (productData: Partial<ProductInput>) => {
     isNew: true,
     onSale: productData.onSale || false,
     salePrice: productData.salePrice || null,
+    promotionEndDate: productData.promotionEndDate || null,
     createdAt: serverTimestamp(),
     aiDescription: aiDescription,
   };
@@ -73,6 +74,10 @@ export const getProducts = async (options: GetProductsOptions = {}): Promise<Pro
     const products: Product[] = [];
     querySnapshot.forEach((doc) => {
         const data = doc.data();
+        // Convert Firestore Timestamp to Date for client-side processing
+        if (data.promotionEndDate && typeof data.promotionEndDate.toDate === 'function') {
+            data.promotionEndDate = data.promotionEndDate.toDate();
+        }
         products.push({
             id: doc.id,
             ...data
@@ -97,7 +102,12 @@ export const getProductById = async (productId: string): Promise<Product | null>
         const productSnap = await getDoc(productRef);
 
         if (productSnap.exists()) {
-            return { id: productSnap.id, ...productSnap.data() } as Product;
+            const data = productSnap.data();
+            // Convert Firestore Timestamp to Date for client-side processing
+            if (data.promotionEndDate && typeof data.promotionEndDate.toDate === 'function') {
+                data.promotionEndDate = data.promotionEndDate.toDate();
+            }
+            return { id: productSnap.id, ...data } as Product;
         } else {
             console.warn(`Product with ID ${productId} not found.`);
             return null;
@@ -132,6 +142,7 @@ export const updateProduct = async (productId: string, productData: Partial<Prod
 
     if (dataToUpdate.onSale === false) {
         dataToUpdate.salePrice = null; 
+        dataToUpdate.promotionEndDate = null;
     }
     await updateDoc(productRef, dataToUpdate);
   } catch (error) {

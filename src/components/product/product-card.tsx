@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, ShoppingCart } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import type { Product } from '@/lib/types';
@@ -15,6 +15,51 @@ import { useEffect, useState } from 'react';
 interface ProductCardProps {
   product: Product;
 }
+
+const CountdownTimer = ({ expiryDate }: { expiryDate: Date }) => {
+  const calculateTimeLeft = () => {
+    const difference = +new Date(expiryDate) - +new Date();
+    let timeLeft = {};
+
+    if (difference > 0) {
+      timeLeft = {
+        jours: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        heures: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+      };
+    }
+    return timeLeft;
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  });
+
+  const timerComponents: string[] = [];
+  Object.entries(timeLeft).forEach(([interval, value]) => {
+    if (value > 0) {
+        timerComponents.push(`${value}${interval.charAt(0)}`);
+    }
+  });
+
+  if (timerComponents.length === 0) {
+    return <span className="text-xs text-destructive">Promotion terminée</span>;
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 text-xs font-medium text-destructive">
+      <Clock className="h-3 w-3" />
+      <span>Finit dans : {timerComponents.join(' ')}</span>
+    </div>
+  );
+};
+
 
 export function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -38,6 +83,10 @@ export function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
     toggleWishlist(product);
   }
+  
+  const discountPercentage = product.onSale && product.salePrice 
+    ? Math.round(((product.price - product.salePrice) / product.price) * 100)
+    : 0;
 
   return (
     <Card className="overflow-hidden border-0 shadow-none bg-transparent group">
@@ -78,7 +127,7 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
           {product.onSale && (
             <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-full z-10">
-              PROMO
+              -{discountPercentage}%
             </div>
           )}
            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -103,15 +152,18 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
         )}
         <div className="flex justify-between items-center w-full mt-1">
-          <div className="flex flex-col items-start">
-            <p className={cn("font-bold", product.onSale && "text-destructive")}>
-              {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
-            </p>
-            {product.onSale && (
-              <p className="text-sm text-muted-foreground line-through">
-                {product.price.toLocaleString('fr-FR')} FCFA
+          <div className="flex flex-col items-start gap-1">
+            <div className="flex items-baseline gap-2">
+              <p className={cn("font-bold", product.onSale && "text-destructive")}>
+                {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
               </p>
-            )}
+              {product.onSale && (
+                <p className="text-sm text-muted-foreground line-through">
+                  {product.price.toLocaleString('fr-FR')} FCFA
+                </p>
+              )}
+            </div>
+            {product.onSale && product.promotionEndDate && <CountdownTimer expiryDate={new Date(product.promotionEndDate)} />}
           </div>
           <Button asChild size="icon" className="h-9 w-9 shrink-0">
             <Link href={`/product/${product.id}`}>
