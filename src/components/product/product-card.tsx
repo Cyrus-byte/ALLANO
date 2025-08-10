@@ -89,7 +89,7 @@ export function ProductCard({ product }: ProductCardProps) {
     : 0;
 
   return (
-    <Card className="overflow-hidden border-0 shadow-none bg-transparent group">
+    <Card className="overflow-hidden border-0 shadow-none bg-transparent group flex flex-col h-full">
       <CardContent className="p-0">
         <Carousel setApi={setApi} className="relative">
           <CarouselContent>
@@ -141,8 +141,9 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
         </Carousel>
       </CardContent>
-      <CardFooter className="flex-col items-start p-2 pt-3">
+      <CardFooter className="flex-col items-start p-2 pt-3 flex-grow">
         <h3 className="font-semibold text-sm truncate w-full">{product.name}</h3>
+        
         {product.reviews > 0 && (
             <div className="flex items-center gap-1 mt-1">
                 {[...Array(5)].map((_, i) => (
@@ -151,26 +152,33 @@ export function ProductCard({ product }: ProductCardProps) {
                  <span className="text-xs text-muted-foreground ml-1">({product.reviews})</span>
             </div>
         )}
-        <div className="flex justify-between items-center w-full mt-1">
-          <div className="flex flex-col items-start gap-1">
-            <div className="flex items-baseline gap-2">
-              <p className={cn("font-bold", product.onSale && "text-destructive")}>
-                {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
-              </p>
-              {product.onSale && (
-                <p className="text-sm text-muted-foreground line-through">
-                  {product.price.toLocaleString('fr-FR')} FCFA
-                </p>
-              )}
-            </div>
-            {product.onSale && product.promotionEndDate && <CountdownTimer expiryDate={new Date(product.promotionEndDate)} />}
-          </div>
-          <Button asChild size="icon" className="h-9 w-9 shrink-0">
-            <Link href={`/product/${product.id}`}>
-              <ShoppingCart className="h-4 w-4" />
-            </Link>
-          </Button>
+
+        <div className="flex items-baseline gap-2 mt-2">
+            <p className={cn("font-bold", product.onSale && "text-destructive")}>
+            {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
+            </p>
+            {product.onSale && (
+            <p className="text-sm text-muted-foreground line-through">
+                {product.price.toLocaleString('fr-FR')} FCFA
+            </p>
+            )}
         </div>
+        
+        {product.onSale && product.promotionEndDate && 
+            <div className="mt-2">
+                <CountdownTimer expiryDate={new Date(product.promotionEndDate)} />
+            </div>
+        }
+        
+        <div className="mt-auto pt-2 w-full">
+            <Button asChild size="sm" variant="outline" className="w-full">
+                <Link href={`/product/${product.id}`}>
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Voir le produit
+                </Link>
+            </Button>
+        </div>
+
       </CardFooter>
     </Card>
   );
