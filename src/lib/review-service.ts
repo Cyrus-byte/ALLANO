@@ -43,7 +43,7 @@ export const addReview = async (productId: string, userId: string, userName: str
     // Check if product exists before adding a review to its subcollection
     const productDoc = await getDoc(productRef);
     if (!productDoc.exists()) {
-        throw "Le produit n'existe pas !";
+        throw new Error("Le produit n'existe pas ou la connexion à la base de données a échoué.");
     }
 
     const newReviewData = {
@@ -56,10 +56,17 @@ export const addReview = async (productId: string, userId: string, userName: str
     
     const newReviewRef = await addDoc(reviewsColRef, newReviewData);
     
+    const reviewSnapshot = await getDoc(newReviewRef);
+    const createdReview = reviewSnapshot.data();
+
+
     return {
         id: newReviewRef.id,
-        ...newReviewData,
-        createdAt: new Date().toISOString() // Approximate client-side date
+        userId: createdReview?.userId,
+        userName: createdReview?.userName,
+        rating: createdReview?.rating,
+        comment: createdReview?.comment,
+        createdAt: createdReview?.createdAt.toDate()
     } as Review;
 };
 
