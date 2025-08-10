@@ -1,59 +1,39 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if a user is signed in
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    // Helper function to check if the user is an administrator
-    function isAdmin() {
-      // In a real application, you would check for an admin role in the user's document
-      // e.g., get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
-      let adminUIDs = [
-        // TODO: REMPLACEZ_CECI_PAR_VOTRE_UID_FIREBASE
-        'REMPLACEZ_CECI_PAR_VOTRE_UID_FIREBASE' 
-      ];
-      return isSignedIn() && (request.auth.uid in adminUIDs);
-    }
-    
-    // Users: Can read/write their own data
+    // Users can read and write to their own user document
     match /users/{userId} {
-      allow read, update, delete: if isSignedIn() && request.auth.uid == userId;
-      allow create: if isSignedIn();
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Products: Read-only for everyone, write access for admins
+    // Anyone can read products and categories
     match /products/{productId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
-
-      // Reviews subcollection
-      match /reviews/{reviewId} {
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+       match /reviews/{reviewId} {
         allow read: if true;
-        allow create: if isSignedIn();
-        allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+        allow write: if request.auth != null;
       }
     }
-    
-    // Categories: Read-only for everyone, write access for admins
+
     match /categories/{categoryId} {
-        allow read: if true;
-        allow write: if isAdmin();
+      allow read: if true;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
-    
-    // Orders: Users can only access their own orders
+
+    // Users can read orders that belong to them
     match /orders/{orderId} {
-        allow read, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
-        allow update: if isAdmin(); // Admins can update order status
+      allow read, create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
-    // Settings: Read-only for everyone, write access for admins
-    match /settings/{docId} {
+    // Site settings are public
+    match /settings/homepage {
         allow read: if true;
-        allow write: if isAdmin();
+        allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
   }
 }
