@@ -10,6 +10,8 @@ import { useWishlist } from '@/contexts/wishlist-context';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import { Carousel, CarouselContent, CarouselItem, CarouselIndicator } from '@/components/ui/carousel';
+
 
 interface ProductCardProps {
   product: Product;
@@ -70,15 +72,30 @@ export function ProductCard({ product }: ProductCardProps) {
       style={{ animationFillMode: 'backwards' }}
     >
         <div className="relative overflow-hidden rounded-t-lg">
-            <div className="aspect-[4/5] overflow-hidden">
-                 <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                    data-ai-hint="product image"
-                />
-            </div>
+           <Carousel
+                opts={{ align: "center", loop: true }}
+                className="w-full h-full"
+            >
+                <CarouselContent>
+                {product.images.map((img, index) => (
+                  <CarouselItem key={index}>
+                    <div className="aspect-[4/5] overflow-hidden">
+                        <Image
+                            src={img}
+                            alt={product.name}
+                            fill
+                            className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                            data-ai-hint="product image"
+                        />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
+                    <CarouselIndicator />
+               </div>
+            </Carousel>
+
 
             {showBadge && (
                  <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
@@ -101,24 +118,24 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.name}
         </h3>
 
-        {timeLeft.days !== undefined ? (
+        {timeLeft.days !== undefined && (
              <div className="text-xs text-destructive font-medium tabular-nums">
                 Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
             </div>
-        ) : (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {ratingAverage > 0 && (
-                    <>
-                        <div className="flex items-center gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                                <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
-                            ))}
-                        </div>
-                        <span className="font-semibold text-foreground">({product.reviews})</span>
-                    </>
-                )}
-            </div>
         )}
+        
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        {ratingAverage > 0 && (
+                <>
+                    <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
+                        ))}
+                    </div>
+                    <span className="font-semibold text-foreground">({product.reviews})</span>
+                </>
+            )}
+        </div>
         
         <div className="flex flex-col mt-auto pt-2">
              <p className="font-bold text-lg text-orange-vif">
