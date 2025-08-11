@@ -39,9 +39,9 @@ export function ProductCard({ product }: ProductCardProps) {
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         const milliseconds = Math.floor((diff % 1000) / 10); // show 2 digits for ms
         
-        setCountdown(`${days}j ${hours}h ${minutes}m ${seconds}s ${milliseconds.toString().padStart(2, '0')}`);
+        setCountdown(`${days}j ${hours}h ${minutes}m ${seconds}s`);
 
-      }, 50); // Update every 50ms for smoother millisecond display
+      }, 1000); 
 
       return () => clearInterval(interval);
     }
@@ -59,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
 
   return (
-    <Link href={`/product/${product.id}`} className="group relative flex flex-col overflow-hidden rounded-lg shadow-sm bg-card transition-transform duration-300 ease-in-out hover:-translate-y-1">
+    <Link href={`/product/${product.id}`} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
         <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
              <Image
                 src={product.images[0]}
@@ -75,15 +75,15 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Badge className="absolute top-2 left-2" variant="secondary">Nouveau</Badge>
              )}
             <button
-                className="absolute top-2 right-2 h-8 w-8 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white transition-colors"
+                className="absolute top-2 right-2 h-9 w-9 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background transition-colors"
                 onClick={handleWishlistClick}
                 aria-label="Ajouter aux favoris"
             >
-                <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "fill-transparent text-gray-700")} />
+                <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "text-foreground")} />
             </button>
         </div>
       
-      <div className="p-2 pt-3 flex-1 flex flex-col">
+      <div className="p-3 flex-1 flex flex-col">
          <h3 className="font-medium text-sm leading-tight text-foreground flex-1 mb-1">
             <span className="hover:underline line-clamp-2">
                 {product.name}
