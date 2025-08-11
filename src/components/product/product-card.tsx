@@ -120,7 +120,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         
         <div className="p-3 flex-1 flex flex-col">
-            <h3 className="font-semibold text-base leading-tight flex-1">
+            <h3 className="font-semibold text-sm leading-tight flex-1">
                  <Link href={`/product/${product.id}`} className="hover:underline">
                     {product.name}
                 </Link>
@@ -134,11 +134,11 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
             )}
             <div className="mt-2 flex items-baseline gap-2">
-                 <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
+                 <p className={cn("font-bold text-base", product.onSale && "text-destructive")}>
                     {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                 </p>
                 {product.onSale && (
-                    <p className="text-sm text-muted-foreground line-through">
+                    <p className="text-xs text-muted-foreground line-through">
                         {product.price.toLocaleString('fr-FR')} FCFA
                     </p>
                 )}
@@ -149,7 +149,7 @@ export function ProductCard({ product }: ProductCardProps) {
         
         <CardFooter className="p-0 border-t mt-auto">
            <Link href={`/product/${product.id}`} className="w-full">
-                <Button variant="ghost" className="w-full rounded-t-none">
+                <Button variant="ghost" className="w-full h-9 text-sm rounded-t-none">
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Voir le produit
                 </Button>
