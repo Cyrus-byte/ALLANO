@@ -88,7 +88,7 @@ export default function CategoriesPage() {
                 {Array.from({length: 2}).map((_, i) => (
                     <section key={i}>
                         <Skeleton className="h-10 w-1/4 mb-8" />
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-8">
                             {Array.from({ length: 4 }).map((_, j) => (
                                 <div key={j}>
                                     <Skeleton className="aspect-[3/4] w-full" />
@@ -148,7 +148,7 @@ export default function CategoriesPage() {
                       </Link>
                    </Button>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {products.slice(0, 8).map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}

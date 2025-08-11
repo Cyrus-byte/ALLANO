@@ -209,7 +209,7 @@ export default function VisualSearchPage() {
         <div className="mt-12">
             <h2 className="text-2xl font-bold text-center mb-8">Résultats</h2>
             {loading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-8">
                     {Array.from({ length: 4 }).map((_, i) => (
                         <div key={i}><div className="animate-pulse rounded-md bg-muted aspect-[3/4] w-full" /></div>
                     ))}
@@ -217,7 +217,7 @@ export default function VisualSearchPage() {
             ) : error ? (
                 <p className="text-center text-destructive">{error}</p>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     {results.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}

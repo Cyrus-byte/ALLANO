@@ -170,7 +170,7 @@ export default function Home() {
             </Button>
           </div>
           {loadingProducts ? (
-             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i}>
                         <Skeleton className="aspect-[3/4] w-full" />
@@ -180,7 +180,7 @@ export default function Home() {
                 ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {products.filter(p => p.isNew).slice(0, 8).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
