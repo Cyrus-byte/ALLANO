@@ -70,7 +70,6 @@ export function ProductCard({ product }: ProductCardProps) {
       style={{ animationFillMode: 'backwards' }}
     >
         <div className="relative overflow-hidden rounded-t-lg">
-            {/* Image Container */}
             <div className="aspect-[4/5] overflow-hidden">
                  <Image
                     src={product.images[0]}
@@ -81,14 +80,12 @@ export function ProductCard({ product }: ProductCardProps) {
                 />
             </div>
 
-            {/* Badges */}
             {showBadge && (
                  <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
                     {product.onSale ? `-${salePercentage}%` : "Nouveau"}
                  </Badge>
             )}
 
-            {/* Wishlist Button */}
             <Button
                 size="icon"
                 className="absolute top-2 right-2 h-9 w-9 z-10 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background/80 transition-colors"
@@ -99,9 +96,8 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
         </div>
       
-      {/* Content Below Image */}
-      <div className="flex flex-col p-3 space-y-2 rounded-b-lg">
-         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 flex-grow">
+      <div className="flex flex-col p-3 space-y-2">
+         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
             {product.name}
         </h3>
 
@@ -113,17 +109,18 @@ export function ProductCard({ product }: ProductCardProps) {
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {ratingAverage > 0 && (
                     <>
-                        <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                        <span className="font-semibold text-foreground">{ratingAverage.toFixed(1)}</span>
-                        <span>({product.reviews})</span>
-                        <span className="text-gray-300">|</span>
+                        <div className="flex items-center gap-0.5">
+                            {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
+                            ))}
+                        </div>
+                        <span className="font-semibold text-foreground">({product.reviews})</span>
                     </>
                 )}
-                <span>{Math.floor(Math.random() * 500) + 20} vendus</span>
             </div>
         )}
         
-        <div className="flex items-baseline gap-2">
+        <div className="flex flex-col mt-auto pt-2">
              <p className="font-bold text-lg text-orange-vif">
                 {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
             </p>
