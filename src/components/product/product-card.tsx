@@ -72,28 +72,13 @@ export function ProductCard({ product }: ProductCardProps) {
       style={{ animationFillMode: 'backwards' }}
     >
         <div className="relative overflow-hidden rounded-t-lg aspect-[4/5]">
-             <Carousel
-                opts={{ align: "center" }}
-                className="w-full h-full"
-            >
-                <CarouselContent className="h-full">
-                {product.images.map((img, index) => (
-                  <CarouselItem key={index} className="relative h-full">
-                     <Image
-                        src={img}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                        data-ai-hint="product image"
-                      />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
-                    <CarouselIndicator />
-               </div>
-            </Carousel>
-
+             <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                data-ai-hint="product image"
+              />
 
             {showBadge && (
                  <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
@@ -111,7 +96,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
         </div>
       
-      <div className="flex flex-col p-3 space-y-1">
+      <div className="flex flex-col p-3 space-y-2">
          <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
             {product.name}
         </h3>
@@ -147,4 +132,3 @@ export function ProductCard({ product }: ProductCardProps) {
     </Link>
   );
 }
-
