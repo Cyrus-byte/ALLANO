@@ -21,15 +21,14 @@ export function ProductCard({ product }: ProductCardProps) {
 
   useEffect(() => {
     if (product.onSale && product.promotionEndDate) {
-      const interval = setInterval(() => {
+      const intervalId = setInterval(() => {
         const now = new Date();
-        // The promotionEndDate can be a Firestore Timestamp or a Date object
         const endDate = product.promotionEndDate.toDate ? product.promotionEndDate.toDate() : new Date(product.promotionEndDate);
         const diff = endDate.getTime() - now.getTime();
 
         if (diff <= 0) {
           setCountdown('Promotion terminée');
-          clearInterval(interval);
+          clearInterval(intervalId);
           return;
         }
 
@@ -42,7 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       }, 1000); 
 
-      return () => clearInterval(interval);
+      return () => clearInterval(intervalId);
     }
   }, [product.onSale, product.promotionEndDate]);
 
@@ -82,7 +81,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </button>
         </div>
       
-      <div className="p-2 flex flex-col">
+      <div className="p-2 flex flex-col flex-grow">
          <h3 className="font-medium text-sm leading-tight text-foreground mb-1">
             <span className="hover:underline line-clamp-2">
                 {product.name}
@@ -99,16 +98,14 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
         
             <div>
-                <div className="flex items-baseline gap-2">
-                    <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
-                        {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
+                <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
+                    {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
+                </p>
+                {product.onSale && (
+                    <p className="text-sm text-muted-foreground line-through">
+                        {product.price.toLocaleString('fr-FR')} FCFA
                     </p>
-                    {product.onSale && (
-                        <p className="text-sm text-muted-foreground line-through">
-                            {product.price.toLocaleString('fr-FR')} FCFA
-                        </p>
-                    )}
-                </div>
+                )}
             </div>
 
             {product.onSale && countdown && (
