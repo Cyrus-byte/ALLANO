@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -94,12 +93,12 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
         </div>
       
-      <div className="flex flex-col p-2 space-y-1">
+      <div className="flex flex-col flex-1 p-3 space-y-2">
          <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 min-h-[40px]">
             {product.name}
         </h3>
 
-        <div className="min-h-[18px]">
+        <div className="min-h-[20px]">
             {product.onSale && timeLeft.days !== undefined ? (
                  <div className="text-xs text-destructive font-medium tabular-nums">
                     Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h
@@ -107,7 +106,7 @@ export function ProductCard({ product }: ProductCardProps) {
             ) : null}
 
             {ratingAverage > 0 ? (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <div className="flex items-center gap-0.5">
                         {[...Array(5)].map((_, i) => (
                             <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
@@ -119,12 +118,12 @@ export function ProductCard({ product }: ProductCardProps) {
             }
         </div>
         
-        <div className="mt-auto pt-1">
-             <p className="font-bold text-base">
+        <div className="mt-auto pt-2">
+             <p className="font-bold text-lg">
                 {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
             </p>
             {product.onSale && (
-                <p className="text-xs text-muted-foreground line-through">
+                <p className="text-sm text-muted-foreground line-through">
                     {product.price.toLocaleString('fr-FR')} FCFA
                 </p>
             )}
