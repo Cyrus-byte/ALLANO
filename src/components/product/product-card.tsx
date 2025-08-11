@@ -8,6 +8,7 @@ import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { Badge } from '@/components/ui/badge';
+import { Carousel, CarouselContent, CarouselItem, CarouselIndicator } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
 
 interface ProductCardProps {
@@ -59,21 +60,40 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link href={`/product/${product.id}`} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
         <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
-             <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                data-ai-hint="product image"
-            />
+            <Carousel
+              opts={{
+                loop: true,
+              }}
+              className="w-full h-full"
+            >
+              <CarouselContent>
+                {product.images.map((imgSrc, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative w-full h-full aspect-[3/4]">
+                        <Image
+                            src={imgSrc}
+                            alt={`${product.name} image ${index + 1}`}
+                            fill
+                            className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                            data-ai-hint="product image"
+                        />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="absolute bottom-2 left-0 right-0">
+                  <CarouselIndicator />
+              </div>
+            </Carousel>
+
              {product.onSale && salePercentage > 0 && (
-                 <Badge className="absolute top-2 left-2" variant="destructive">-{salePercentage}%</Badge>
+                 <Badge className="absolute top-2 left-2 z-10" variant="destructive">-{salePercentage}%</Badge>
              )}
              {product.isNew && !product.onSale && (
-                <Badge className="absolute top-2 left-2" variant="secondary">Nouveau</Badge>
+                <Badge className="absolute top-2 left-2 z-10" variant="secondary">Nouveau</Badge>
              )}
             <button
-                className="absolute top-2 right-2 h-9 w-9 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background transition-colors"
+                className="absolute top-2 right-2 h-9 w-9 z-10 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background transition-colors"
                 onClick={handleWishlistClick}
                 aria-label="Ajouter aux favoris"
             >
@@ -97,7 +117,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
             )}
         
-            <div>
+            <div className="flex flex-col">
                 <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
                     {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                 </p>
