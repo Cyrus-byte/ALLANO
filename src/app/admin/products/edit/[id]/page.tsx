@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getProductById, updateProduct } from '@/lib/product-service';
 import { getCategories } from '@/lib/category-service';
-import { Loader2, X, PlusCircle, Link as LinkIcon, AlertCircle, Calendar as CalendarIcon } from 'lucide-react';
+import { Loader2, X, PlusCircle, Link as LinkIcon, AlertCircle, Calendar as CalendarIcon, Award, MapPin } from 'lucide-react';
 import type { Product, Category } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -47,6 +47,8 @@ export default function AdminEditProductPage() {
   const [onSale, setOnSale] = useState(false);
   const [salePrice, setSalePrice] = useState('');
   const [promotionEndDate, setPromotionEndDate] = useState<Date | undefined>();
+  const [isLocal, setIsLocal] = useState(false);
+  const [isStarSeller, setIsStarSeller] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const { toast } = useToast();
 
@@ -73,6 +75,8 @@ export default function AdminEditProductPage() {
                     setOnSale(fetchedProduct.onSale || false);
                     setSalePrice(fetchedProduct.salePrice?.toString() || '');
                     setPromotionEndDate(fetchedProduct.promotionEndDate ? new Date(fetchedProduct.promotionEndDate) : undefined);
+                    setIsLocal(fetchedProduct.isLocal || false);
+                    setIsStarSeller(fetchedProduct.isStarSeller || false);
                 } else {
                     notFound();
                 }
@@ -193,6 +197,8 @@ export default function AdminEditProductPage() {
         onSale: onSale,
         salePrice: onSale ? parseFloat(salePrice) : undefined,
         promotionEndDate: onSale ? promotionEndDate : undefined,
+        isLocal: isLocal,
+        isStarSeller: isStarSeller,
       };
       await updateProduct(productId, updatedProductData);
       toast({ title: "Produit mis à jour !", description: `${productName} a été modifié avec succès.` });
@@ -255,42 +261,47 @@ export default function AdminEditProductPage() {
                     <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 12000" required/>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                    <Switch id="onSale" checked={onSale} onCheckedChange={setOnSale} />
-                    <Label htmlFor="onSale">Mettre ce produit en promotion</Label>
-                </div>
-                
-                 {onSale && (
-                    <div className="grid sm:grid-cols-2 gap-4 items-end pl-6 border-l-2 border-destructive">
-                        <div className="space-y-2">
-                            <Label htmlFor="salePrice" className="text-destructive">Prix promotionnel (FCFA)</Label>
-                            <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Ex: 9000" required={onSale}/>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="promotionEndDate">Fin de la promotion (optionnel)</Label>
-                             <Popover>
-                                <PopoverTrigger asChild>
-                                <Button variant={"outline"} className="w-full justify-start text-left font-normal">
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {promotionEndDate ? format(promotionEndDate, 'PPP', { locale: fr }) : <span>Choisir une date</span>}
-                                </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                <Calendar mode="single" selected={promotionEndDate} onSelect={setPromotionEndDate} initialFocus />
-                                </PopoverContent>
-                            </Popover>
-                        </div>
+                <div className="space-y-4 border-b border-t pt-4 pb-6">
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="onSale" className="flex flex-col gap-1">
+                            <span>Mettre ce produit en promotion</span>
+                            <span className="text-xs font-normal text-muted-foreground">Active un prix barré et un badge "PROMO".</span>
+                        </Label>
+                        <Switch id="onSale" checked={onSale} onCheckedChange={setOnSale} />
                     </div>
-                 )}
-                
-                 {onSale && parseFloat(salePrice) >= parseFloat(price) && (
-                    <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>
-                            Le prix promotionnel doit être inférieur au prix d'origine.
-                        </AlertDescription>
-                    </Alert>
-                 )}
+                    
+                    {onSale && (
+                        <div className="grid sm:grid-cols-2 gap-4 items-end pl-6 border-l-2 border-destructive">
+                            <div className="space-y-2">
+                                <Label htmlFor="salePrice" className="text-destructive">Prix promotionnel (FCFA)</Label>
+                                <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Ex: 9000" required={onSale}/>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="promotionEndDate">Fin de la promotion (optionnel)</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <Button variant={"outline"} className="w-full justify-start text-left font-normal">
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {promotionEndDate ? format(promotionEndDate, 'PPP', { locale: fr }) : <span>Choisir une date</span>}
+                                    </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                    <Calendar mode="single" selected={promotionEndDate} onSelect={setPromotionEndDate} initialFocus />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {onSale && parseFloat(salePrice) >= parseFloat(price) && (
+                        <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>
+                                Le prix promotionnel doit être inférieur au prix d'origine.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
@@ -361,6 +372,24 @@ export default function AdminEditProductPage() {
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Ajouter une couleur
                     </Button>
+                </div>
+                
+                 <div className="space-y-4 border-t pt-6">
+                    <Label>Badges Spéciaux</Label>
+                     <div className="flex items-center justify-between">
+                        <Label htmlFor="isLocal" className="flex items-center gap-2 font-normal">
+                           <MapPin className="h-5 w-5 text-green-600"/>
+                           <span>Produit Local</span>
+                        </Label>
+                        <Switch id="isLocal" checked={isLocal} onCheckedChange={setIsLocal} />
+                    </div>
+                     <div className="flex items-center justify-between">
+                        <Label htmlFor="isStarSeller" className="flex items-center gap-2 font-normal">
+                           <Award className="h-5 w-5 text-amber-600"/>
+                           <span>Vendeur Vedette</span>
+                        </Label>
+                        <Switch id="isStarSeller" checked={isStarSeller} onCheckedChange={setIsStarSeller} />
+                    </div>
                 </div>
 
 
