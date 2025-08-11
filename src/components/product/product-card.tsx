@@ -75,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const ratingAverage = product.reviews > 0 ? product.rating : 0;
 
   return (
-    <Card className="group relative flex flex-col h-full overflow-hidden">
+    <Card className="group relative flex flex-col h-full overflow-hidden rounded-lg">
         <div className="relative aspect-[3/4] overflow-hidden">
             <Carousel
                 opts={{ align: "start", loop: true, }}
@@ -133,12 +133,12 @@ export function ProductCard({ product }: ProductCardProps) {
                     <span className="text-xs text-muted-foreground">({product.reviews})</span>
                 </div>
             )}
-            <div className="mt-2">
-                 <p className="font-bold text-lg">
+            <div className="mt-2 flex items-baseline gap-2">
+                 <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
                     {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                 </p>
                 {product.onSale && (
-                    <p className="text-sm text-muted-foreground line-through -mt-1">
+                    <p className="text-sm text-muted-foreground line-through">
                         {product.price.toLocaleString('fr-FR')} FCFA
                     </p>
                 )}
@@ -147,7 +147,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.onSale && product.promotionEndDate && <Countdown endDate={product.promotionEndDate} />}
         </div>
         
-        <CardFooter className="p-0 border-t">
+        <CardFooter className="p-0 border-t mt-auto">
            <Link href={`/product/${product.id}`} className="w-full">
                 <Button variant="ghost" className="w-full rounded-t-none">
                     <ShoppingCart className="mr-2 h-4 w-4" />
