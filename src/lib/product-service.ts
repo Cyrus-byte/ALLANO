@@ -32,13 +32,17 @@ export const createProduct = async (productData: Partial<ProductInput>) => {
     reviews: 0,
     isNew: true,
     onSale: productData.onSale || false,
-    salePrice: productData.salePrice || undefined,
-    promotionEndDate: productData.promotionEndDate || undefined,
+    salePrice: productData.salePrice,
     isLocal: productData.isLocal || false,
     isStarSeller: productData.isStarSeller || false,
     createdAt: serverTimestamp(),
     aiDescription: aiDescription,
   };
+  
+  if (productData.promotionEndDate) {
+    productWithDefaults.promotionEndDate = productData.promotionEndDate;
+  }
+
 
   const docRef = await addDoc(collection(db, 'products'), productWithDefaults);
   return docRef.id;
@@ -149,6 +153,13 @@ export const updateProduct = async (productId: string, productData: Partial<Prod
         dataToUpdate.salePrice = undefined; 
         dataToUpdate.promotionEndDate = undefined;
     }
+
+    // Explicitly handle undefined for promotionEndDate
+    if (dataToUpdate.promotionEndDate === undefined) {
+        delete dataToUpdate.promotionEndDate;
+    }
+
+
     await updateDoc(productRef, dataToUpdate);
   } catch (error) {
     console.error(`Error updating product with ID ${productId}:`, error);
