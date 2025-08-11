@@ -113,8 +113,8 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
         </div>
       
-      <div className="flex flex-col p-3 space-y-1">
-         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
+      <div className="flex-1 flex flex-col p-3 space-y-1">
+         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 flex-grow">
             {product.name}
         </h3>
 
