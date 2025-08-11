@@ -78,7 +78,7 @@ export function ProductCard({ product }: ProductCardProps) {
             >
                 <CarouselContent className="h-full">
                 {product.images.map((img, index) => (
-                  <CarouselItem key={index} className="relative">
+                  <CarouselItem key={index} className="relative h-full">
                      <Image
                         src={img}
                         alt={product.name}
@@ -111,7 +111,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
         </div>
       
-      <div className="flex-1 flex flex-col p-3 space-y-1">
+      <div className="flex flex-col p-3 space-y-1">
          <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
             {product.name}
         </h3>
