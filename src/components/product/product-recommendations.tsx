@@ -57,7 +57,7 @@ export function ProductRecommendations() {
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline mb-8 flex items-center gap-2">
             <Wand2 className="text-primary" /> Pour vous
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i}>
                     <Skeleton className="aspect-[3/4] w-full" />
@@ -79,7 +79,7 @@ export function ProductRecommendations() {
       <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-headline mb-8 flex items-center gap-2">
         <Wand2 className="text-primary" /> Pour vous
       </h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {recommendations.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}

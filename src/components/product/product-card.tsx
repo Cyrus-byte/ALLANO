@@ -66,7 +66,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link 
       href={`/product/${product.id}`} 
-      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 overflow-hidden odd:-translate-y-2"
+      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 overflow-hidden"
     >
         <div className="relative w-full overflow-hidden">
             <Image

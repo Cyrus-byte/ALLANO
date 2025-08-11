@@ -45,7 +45,7 @@ function SearchResults() {
         <div>
             <Skeleton className="h-10 w-1/3 mb-2" />
             <Skeleton className="h-5 w-1/4 mb-8" />
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {Array.from({ length: 8 }).map((_, i) => (
                     <div key={i}>
                         <Skeleton className="aspect-[3/4] w-full" />
@@ -68,7 +68,7 @@ function SearchResults() {
         </p>
 
         {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
             ))}

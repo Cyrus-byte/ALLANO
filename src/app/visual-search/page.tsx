@@ -217,7 +217,7 @@ export default function VisualSearchPage() {
             ) : error ? (
                 <p className="text-center text-destructive">{error}</p>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {results.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
