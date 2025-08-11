@@ -307,8 +307,8 @@ export default function ProductPage() {
 
         {/* Product Details */}
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold font-headline mt-1">{product.name}</h1>
-          <div className="flex items-center gap-4 mt-4">
+          <h1 className="text-2xl md:text-3xl font-bold font-headline">{product.name}</h1>
+          <div className="flex items-center gap-4 mt-2">
              {reviewCount > 0 ? (
                 <>
                   <div className="flex items-center">
@@ -316,68 +316,70 @@ export default function ProductPage() {
                       <Star key={i} className={cn("h-5 w-5", i < Math.round(ratingAverage) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
                     ))}
                   </div>
-                  <span className="text-muted-foreground text-sm">{reviewCount} avis</span>
+                  <a href="#reviews" className="text-muted-foreground text-sm hover:underline">{reviewCount} avis</a>
                 </>
               ) : (
                  <span className="text-muted-foreground text-sm">Aucun avis pour le moment</span>
               )}
           </div>
           
-          <div className="flex items-baseline gap-4 mt-4">
-            <p className={cn("text-3xl font-bold", product.onSale && "text-destructive")}>
+          <div className="flex items-baseline gap-2 mt-4">
+            <p className={cn("text-2xl font-bold", product.onSale && "text-destructive")}>
                 {currentPrice.toLocaleString('fr-FR')} FCFA
             </p>
             {product.onSale && (
-                <p className="text-xl text-muted-foreground line-through">
+                <p className="text-lg text-muted-foreground line-through">
                     {product.price.toLocaleString('fr-FR')} FCFA
                 </p>
             )}
            </div>
 
-          <p className="text-muted-foreground mt-4">{product.description}</p>
+          <p className="text-muted-foreground mt-4 text-sm">{product.description}</p>
           <Separator className="my-6" />
 
-          {/* Color Options */}
-          <div>
-            <h3 className="text-sm font-medium">Couleur: <span className="font-bold">{selectedColor}</span></h3>
-            <div className="flex items-center gap-2 mt-2">
-              {product.colors.map(color => (
-                <button
-                  key={color.name}
-                  onClick={() => handleColorSelect(color)}
-                  className={cn(
-                    "h-8 w-8 rounded-full border-2 ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring",
-                    selectedColor === color.name ? "ring-2 ring-primary" : "border-transparent"
-                  )}
-                  style={{ backgroundColor: color.hex }}
-                  aria-label={`Select color ${color.name}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Size Options */}
-          {allSizes.length > 0 && (
-            <div className="mt-6">
-                <h3 className="text-sm font-medium">Taille:</h3>
-                <div className="flex flex-wrap items-center gap-2 mt-2">
-                {allSizes.map(size => (
-                    <Button
-                    key={size}
-                    variant={selectedSize === size ? 'default' : 'outline'}
-                    onClick={() => setSelectedSize(size)}
-                    className="w-16"
-                    >
-                    {size}
-                    </Button>
+          <div className="space-y-4">
+            {/* Color Options */}
+            <div>
+              <Label className="text-sm font-medium">Couleur: <span className="font-bold">{selectedColor}</span></Label>
+              <div className="flex items-center gap-2 mt-2">
+                {product.colors.map(color => (
+                  <button
+                    key={color.name}
+                    onClick={() => handleColorSelect(color)}
+                    className={cn(
+                      "h-8 w-8 rounded-full border-2 ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring",
+                      selectedColor === color.name ? "ring-2 ring-primary" : "border-transparent"
+                    )}
+                    style={{ backgroundColor: color.hex }}
+                    aria-label={`Select color ${color.name}`}
+                  />
                 ))}
-                </div>
+              </div>
             </div>
-          )}
+
+            {/* Size Options */}
+            {allSizes.length > 0 && (
+              <div>
+                  <Label className="text-sm font-medium">Taille:</Label>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {allSizes.map(size => (
+                      <Button
+                      key={size}
+                      variant={selectedSize === size ? 'default' : 'outline'}
+                      onClick={() => setSelectedSize(size)}
+                      className="w-16"
+                      >
+                      {size}
+                      </Button>
+                  ))}
+                  </div>
+              </div>
+            )}
+          </div>
 
 
           {/* Actions */}
-          <div className="mt-8 flex items-center gap-4">
+          <div className="mt-6 flex items-center gap-4">
             <div className="flex items-center border rounded-md">
               <Button variant="ghost" size="icon" onClick={() => setQuantity(q => Math.max(1, q - 1))}>
                 <Minus className="h-4 w-4" />
@@ -387,7 +389,7 @@ export default function ProductPage() {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedColor || (allSizes.length > 0 && !selectedSize)}>
+            <Button className="flex-1" onClick={handleAddToCart} disabled={!selectedColor || (allSizes.length > 0 && !selectedSize)}>
               <ShoppingCart className="mr-2 h-5 w-5" /> Ajouter au panier
             </Button>
             <Button variant="outline" size="icon" aria-label="Ajouter aux favoris" onClick={() => toggleWishlist(product)}>
@@ -397,11 +399,9 @@ export default function ProductPage() {
         </div>
       </div>
 
-       <Separator className="my-10" />
+       <Separator className="my-10" id="reviews" />
 
        <ProductReviews productId={productId} onReviewsLoaded={setReviews} />
     </div>
   );
 }
-
-    
