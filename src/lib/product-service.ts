@@ -32,14 +32,17 @@ export const createProduct = async (productData: Partial<ProductInput>) => {
     reviews: 0,
     isNew: true,
     onSale: productData.onSale || false,
-    salePrice: productData.salePrice,
     isLocal: productData.isLocal || false,
     isStarSeller: productData.isStarSeller || false,
     createdAt: serverTimestamp(),
     aiDescription: aiDescription,
   };
   
-  if (productData.promotionEndDate) {
+  if (productWithDefaults.onSale && productData.salePrice) {
+    productWithDefaults.salePrice = productData.salePrice;
+  }
+
+  if (productWithDefaults.onSale && productData.promotionEndDate) {
     productWithDefaults.promotionEndDate = productData.promotionEndDate;
   }
 
@@ -153,10 +156,15 @@ export const updateProduct = async (productId: string, productData: Partial<Prod
         dataToUpdate.salePrice = undefined; 
         dataToUpdate.promotionEndDate = undefined;
     }
-
-    // Explicitly handle undefined for promotionEndDate
+    
+    // Explicitly handle undefined for promotionEndDate to avoid Firestore error
     if (dataToUpdate.promotionEndDate === undefined) {
-        delete dataToUpdate.promotionEndDate;
+      delete dataToUpdate.promotionEndDate;
+    }
+
+    // Explicitly handle undefined for salePrice to avoid Firestore error
+    if (dataToUpdate.salePrice === undefined) {
+      delete dataToUpdate.salePrice;
     }
 
 
@@ -184,3 +192,4 @@ export const deleteProduct = async (productId: string): Promise<void> => {
         throw new Error("Failed to delete product.");
     }
 };
+
