@@ -120,7 +120,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         
         <div className="mt-auto pt-1">
-             <p className="font-bold text-lg text-orange-vif">
+             <p className="font-bold text-lg">
                 {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
             </p>
             {product.onSale && (
