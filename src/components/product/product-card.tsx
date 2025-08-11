@@ -59,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/product/${product.id}`} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-t-lg">
+        <div className="relative aspect-[4/5] overflow-hidden">
             <Carousel
               opts={{
                 loop: true,
@@ -101,8 +101,8 @@ export function ProductCard({ product }: ProductCardProps) {
             </button>
         </div>
       
-      <div className="p-2 flex flex-col">
-         <h3 className="font-medium text-sm leading-tight text-foreground mb-1">
+      <div className="p-2 flex flex-col flex-grow">
+         <h3 className="font-medium text-sm leading-tight text-foreground mb-1 flex-grow">
             <span className="hover:underline line-clamp-2">
                 {product.name}
             </span>
