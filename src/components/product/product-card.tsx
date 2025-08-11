@@ -64,8 +64,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
 
   return (
-    <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid">
-      <Link href={`/product/${product.id}`} className="block overflow-hidden rounded-lg">
+    <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid rounded-lg overflow-hidden">
+      <Link href={`/product/${product.id}`} className="block">
         <div className="flex flex-col">
             <div className="relative w-full overflow-hidden">
                 <Image
@@ -93,31 +93,31 @@ export function ProductCard({ product }: ProductCardProps) {
                 </Button>
             </div>
         
-            <div className="flex flex-col flex-1 p-3 space-y-1">
-                <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 min-h-[40px]">
+            <div className="flex flex-col flex-1 p-2">
+                <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
                     {product.name}
                 </h3>
                 
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-h-[20px]">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
                     {product.isStarSeller && (
-                        <Badge variant="outline" className="text-amber-600 border-amber-600">
+                        <Badge variant="outline" className="text-amber-600 border-amber-600 px-1.5 py-0">
                            <Award className="mr-1 h-3 w-3" />
                            Star Seller
                         </Badge>
                     )}
                      {product.isLocal && (
-                        <Badge variant="outline" className="text-green-600 border-green-600">
+                        <Badge variant="outline" className="text-green-600 border-green-600 px-1.5 py-0">
                             <MapPin className="mr-1 h-3 w-3" />
                            Local
                         </Badge>
                     )}
                 </div>
 
-                <div className="min-h-[20px] mt-1">
+                <div className="mt-1">
                     {product.onSale && timeLeft.days !== undefined ? (
                         <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums">
                             <AlarmClock className="h-3 w-3"/>
-                            <span>Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s</span>
+                            <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m</span>
                         </div>
                     ) : product.reviews > 0 ? (
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -129,16 +129,16 @@ export function ProductCard({ product }: ProductCardProps) {
                             <span className="text-xs text-muted-foreground">({product.reviews})</span>
                         </div>
                     ) : (
-                      <div className="h-5" /> // Placeholder for consistent height
+                      <div className="h-5" /> 
                     )}
                 </div>
                 
-                <div className="mt-auto pt-1">
-                    <p className={cn("font-bold text-lg", product.onSale && "text-amber-600")}>
+                <div className="mt-1">
+                    <p className={cn("font-bold text-base", product.onSale && "text-amber-600")}>
                         {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                     </p>
                     {product.onSale && (
-                        <p className="text-sm text-muted-foreground line-through">
+                        <p className="text-xs text-muted-foreground line-through">
                             {product.price.toLocaleString('fr-FR')} FCFA
                         </p>
                     )}
