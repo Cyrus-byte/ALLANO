@@ -78,7 +78,7 @@ export function ProductCard({ product }: ProductCardProps) {
             >
                 <CarouselContent>
                 {product.images.map((img, index) => (
-                  <CarouselItem key={index}>
+                  <CarouselItem key={index} className="basis-full">
                     <div className="aspect-[4/5] overflow-hidden">
                         <Image
                             src={img}
