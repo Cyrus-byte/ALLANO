@@ -72,13 +72,32 @@ export function ProductCard({ product }: ProductCardProps) {
       style={{ animationFillMode: 'backwards' }}
     >
         <div className="relative overflow-hidden rounded-t-lg aspect-[4/5]">
-             <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                data-ai-hint="product image"
-              />
+             <Carousel
+                opts={{
+                    align: "start",
+                    loop: false,
+                }}
+                className="w-full h-full"
+            >
+                <CarouselContent>
+                    {product.images.map((image, index) => (
+                        <CarouselItem key={index} className="basis-full">
+                            <div className="relative h-full w-full">
+                                <Image
+                                    src={image}
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                                    data-ai-hint="product image"
+                                />
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <div className="absolute bottom-2 left-0 right-0">
+                    <CarouselIndicator />
+                </div>
+            </Carousel>
 
             {showBadge && (
                  <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
@@ -97,7 +116,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       
       <div className="flex flex-col p-3 space-y-2">
-         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
+         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 h-10">
             {product.name}
         </h3>
 
