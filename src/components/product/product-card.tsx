@@ -71,23 +71,21 @@ export function ProductCard({ product }: ProductCardProps) {
       className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 animate-fade-in-slide-up"
       style={{ animationFillMode: 'backwards' }}
     >
-        <div className="relative overflow-hidden rounded-t-lg">
-           <Carousel
+        <div className="relative overflow-hidden rounded-t-lg aspect-[4/5]">
+             <Carousel
                 opts={{ align: "center" }}
                 className="w-full h-full"
             >
-                <CarouselContent>
+                <CarouselContent className="h-full">
                 {product.images.map((img, index) => (
-                  <CarouselItem key={index} className="basis-full">
-                    <div className="aspect-[4/5] overflow-hidden">
-                        <Image
-                            src={img}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                            data-ai-hint="product image"
-                        />
-                    </div>
+                  <CarouselItem key={index} className="relative">
+                     <Image
+                        src={img}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                        data-ai-hint="product image"
+                      />
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -114,7 +112,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       
       <div className="flex-1 flex flex-col p-3 space-y-1">
-         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 flex-grow">
+         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
             {product.name}
         </h3>
 
@@ -149,3 +147,4 @@ export function ProductCard({ product }: ProductCardProps) {
     </Link>
   );
 }
+
