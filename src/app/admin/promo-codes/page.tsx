@@ -118,7 +118,7 @@ export default function AdminPromoCodesPage() {
 
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-2 py-8 md:py-12">
         <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Gérer les Codes Promo</h1>
              <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>

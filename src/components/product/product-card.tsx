@@ -64,7 +64,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
 
   return (
-    <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid rounded-lg overflow-hidden">
+    <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-2 break-inside-avoid rounded-lg overflow-hidden">
       <Link href={`/product/${product.id}`} className="block">
         <div className="flex flex-col h-full">
             <div className="relative w-full overflow-hidden">
@@ -120,8 +120,8 @@ export function ProductCard({ product }: ProductCardProps) {
                             <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m</span>
                         </div>
                     )}
-                    {product.reviews > 0 ? (
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    {product.reviews > 0 && (
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                             <div className="flex items-center">
                                 {[...Array(5)].map((_, i) => (
                                     <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
@@ -129,8 +129,6 @@ export function ProductCard({ product }: ProductCardProps) {
                             </div>
                             <span className="text-xs text-muted-foreground">({product.reviews})</span>
                         </div>
-                    ) : (
-                      <div className="h-5" /> // Placeholder for consistent height
                     )}
                 </div>
                 

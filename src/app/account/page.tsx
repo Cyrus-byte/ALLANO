@@ -50,7 +50,7 @@ export default function AccountPage() {
 
     if (isLoading) {
         return (
-            <div className="container mx-auto px-4 py-8 md:py-12">
+            <div className="container mx-auto px-2 py-8 md:py-12">
                 <Skeleton className="h-12 w-1/3 mb-8" />
                 <div className="w-full">
                     <Skeleton className="h-10 w-1/3 mb-6" />
@@ -71,7 +71,7 @@ export default function AccountPage() {
     const [firstName, lastName] = user.displayName?.split(' ') || ['',''];
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-2 py-8 md:py-12">
       <div className='flex justify-between items-center mb-8'>
         <h1 className="text-3xl md:text-4xl font-bold font-headline">Mon Compte</h1>
         <Button onClick={logOut} variant="outline">Se déconnecter</Button>

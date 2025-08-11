@@ -150,7 +150,7 @@ export default function CheckoutPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-2 py-8 md:py-12">
         <div className="grid md:grid-cols-2 gap-12">
           <div>
             <Skeleton className="h-8 w-48 mb-6" />
@@ -168,7 +168,7 @@ export default function CheckoutPage() {
   if (!user) return null;
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-2 py-8 md:py-12">
        <Button asChild variant="ghost" className="mb-6 pl-0">
           <Link href="/cart">
             <ArrowLeft className="mr-2 h-4 w-4" />

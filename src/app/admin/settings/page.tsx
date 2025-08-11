@@ -122,7 +122,7 @@ export default function AdminSettingsPage() {
 
   if(loading) {
     return (
-        <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="container mx-auto px-2 py-8 md:py-12">
             <Card className="max-w-4xl mx-auto">
                 <CardHeader>
                     <Skeleton className="h-8 w-1/2" />
@@ -147,7 +147,7 @@ export default function AdminSettingsPage() {
         type="text/javascript"
         strategy="lazyOnload"
       />
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-2 py-8 md:py-12">
         <form onSubmit={handleSubmit}>
           <Card className="max-w-4xl mx-auto">
             <CardHeader>

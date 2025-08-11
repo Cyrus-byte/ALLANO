@@ -13,7 +13,7 @@ export default function WishlistPage() {
 
   if (loading) {
     return (
-         <div className="container mx-auto px-4 py-8 md:py-12">
+         <div className="container mx-auto px-2 py-8 md:py-12">
             <Skeleton className="h-12 w-1/3 mb-8" />
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -29,7 +29,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-2 py-8 md:py-12">
       <h1 className="text-3xl md:text-4xl font-bold font-headline mb-8">Ma Liste de Souhaits</h1>
       {wishlist.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">

@@ -70,7 +70,7 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-        <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="container mx-auto px-2 py-8 md:py-12">
             <Skeleton className="h-8 w-48 mb-8" />
             <Skeleton className="h-10 w-1/3 mb-2" />
             <Skeleton className="h-5 w-1/4 mb-8" />
@@ -97,7 +97,7 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-2 py-8 md:py-12">
       <div className="mb-8">
         <Button asChild variant="ghost" className="pl-0">
           <Link href="/categories">

@@ -57,7 +57,7 @@ export default function CartPage() {
 
   if (loading) {
       return (
-          <div className="container mx-auto px-4 py-8 md:py-12">
+          <div className="container mx-auto px-2 py-8 md:py-12">
             <Skeleton className="h-12 w-1/3 mb-8" />
             <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
                 <div className="lg:col-span-2 space-y-4">
@@ -74,7 +74,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
+      <div className="container mx-auto px-2 py-16 text-center">
         <ShoppingCart className="mx-auto h-24 w-24 text-muted-foreground" />
         <h1 className="mt-4 text-2xl font-bold">Votre panier est vide</h1>
         <p className="mt-2 text-muted-foreground">Il est temps de faire du shopping !</p>
@@ -86,7 +86,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-2 py-8 md:py-12">
       <h1 className="text-3xl md:text-4xl font-bold font-headline mb-8">Votre Panier</h1>
       <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
         <div className="lg:col-span-2">
