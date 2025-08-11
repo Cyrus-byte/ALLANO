@@ -253,6 +253,49 @@ const CarouselNext = React.forwardRef<
 })
 CarouselNext.displayName = "CarouselNext"
 
+
+const CarouselIndicator = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button>
+>(({ className, ...props }, ref) => {
+    const { api } = useCarousel()
+    const [selectedIndex, setSelectedIndex] = React.useState(0)
+    const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([])
+
+    const onSelect = React.useCallback(() => {
+        if (!api) return
+        setSelectedIndex(api.selectedScrollSnap())
+    }, [api, setSelectedIndex])
+
+    React.useEffect(() => {
+        if (!api) return
+        onSelect()
+        setScrollSnaps(api.scrollSnapList())
+        api.on("select", onSelect)
+        api.on("reInit", onSelect)
+    }, [api, setScrollSnaps, onSelect])
+
+    if (scrollSnaps.length <= 1) return null
+
+    return (
+        <div className="flex items-center justify-center gap-1">
+            {scrollSnaps.map((_, index) => (
+                <button
+                    key={index}
+                    onClick={() => api?.scrollTo(index)}
+                    className={cn(
+                        "h-1.5 w-1.5 rounded-full bg-white/50 transition-all",
+                        selectedIndex === index && "w-3 bg-white"
+                    )}
+                    aria-label={`Go to slide ${index + 1}`}
+                />
+            ))}
+        </div>
+    )
+})
+CarouselIndicator.displayName = "CarouselIndicator"
+
+
 export {
   type CarouselApi,
   Carousel,
@@ -260,4 +303,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  CarouselIndicator,
 }
