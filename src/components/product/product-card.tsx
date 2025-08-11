@@ -64,72 +64,74 @@ export function ProductCard({ product }: ProductCardProps) {
 
 
   return (
-    <Link 
-      href={`/product/${product.id}`} 
-      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 overflow-hidden mb-4"
-    >
-        <div className="relative w-full">
-            <Image
-                src={product.images[0]}
-                alt={product.name}
-                width={500}
-                height={625}
-                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105 w-full h-auto"
-                data-ai-hint="product image"
-            />
+    <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid rounded-lg overflow-hidden">
+        <Link 
+        href={`/product/${product.id}`} 
+        className="flex flex-col"
+        >
+            <div className="relative w-full">
+                <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    width={500}
+                    height={625}
+                    className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105 w-full h-auto"
+                    data-ai-hint="product image"
+                />
 
-            {showBadge && (
-                 <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
-                    {product.onSale ? `-${salePercentage}%` : "Nouveau"}
-                 </Badge>
-            )}
+                {showBadge && (
+                    <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
+                        {product.onSale ? `-${salePercentage}%` : "Nouveau"}
+                    </Badge>
+                )}
 
-            <Button
-                size="icon"
-                className="absolute top-2 right-2 h-9 w-9 z-10 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background/80 transition-colors"
-                onClick={handleWishlistClick}
-                aria-label="Ajouter aux favoris"
-            >
-                <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "text-foreground")} />
-            </Button>
-        </div>
-      
-      <div className="flex flex-col flex-1 p-3 space-y-2">
-         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 min-h-[40px]">
-            {product.name}
-        </h3>
-
-        <div className="min-h-[20px]">
-            {product.onSale && timeLeft.days !== undefined ? (
-                 <div className="text-xs text-destructive font-medium tabular-nums">
-                    Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h
-                </div>
-            ) : null}
-
-            {ratingAverage > 0 ? (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
-                        ))}
-                    </div>
-                    {product.reviews > 0 && <span className="font-semibold text-foreground">({product.reviews})</span>}
-                </div>
-            ) : (product.onSale && timeLeft.days !== undefined) ? null : (<div className="h-5" />)
-            }
-        </div>
+                <Button
+                    size="icon"
+                    className="absolute top-2 right-2 h-9 w-9 z-10 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background/80 transition-colors"
+                    onClick={handleWishlistClick}
+                    aria-label="Ajouter aux favoris"
+                >
+                    <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "text-foreground")} />
+                </Button>
+            </div>
         
-        <div className="mt-auto pt-2">
-             <p className="font-bold text-lg">
-                {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
-            </p>
-            {product.onSale && (
-                <p className="text-sm text-muted-foreground line-through">
-                    {product.price.toLocaleString('fr-FR')} FCFA
-                </p>
-            )}
-        </div>
-      </div>
-    </Link>
+            <div className="flex flex-col flex-1 p-3 space-y-2">
+                <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 min-h-[40px]">
+                    {product.name}
+                </h3>
+
+                <div className="min-h-[20px]">
+                    {product.onSale && timeLeft.days !== undefined ? (
+                        <div className="text-xs text-destructive font-medium tabular-nums">
+                            Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h
+                        </div>
+                    ) : null}
+
+                    {ratingAverage > 0 ? (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
+                                ))}
+                            </div>
+                            {product.reviews > 0 && <span className="font-semibold text-foreground">({product.reviews})</span>}
+                        </div>
+                    ) : (product.onSale && timeLeft.days !== undefined) ? null : (<div className="h-5" />)
+                    }
+                </div>
+                
+                <div className="mt-auto pt-2">
+                    <p className="font-bold text-lg">
+                        {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
+                    </p>
+                    {product.onSale && (
+                        <p className="text-sm text-muted-foreground line-through">
+                            {product.price.toLocaleString('fr-FR')} FCFA
+                        </p>
+                    )}
+                </div>
+            </div>
+        </Link>
+    </div>
   );
 }
