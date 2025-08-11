@@ -3,12 +3,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, ShoppingCart } from 'lucide-react';
+import { Star, Heart } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 
 interface ProductCardProps {
   product: Product;
@@ -17,6 +18,12 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const isProductInWishlist = isInWishlist(product.id);
+  const [timeLeft, setTimeLeft] = useState<{
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+  }>({});
   
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,6 +31,33 @@ export function ProductCard({ product }: ProductCardProps) {
     toggleWishlist(product);
   };
   
+    useEffect(() => {
+    if (!product.onSale || !product.promotionEndDate) {
+      return;
+    }
+
+    const endDate = new Date(product.promotionEndDate);
+    const interval = setInterval(() => {
+      const now = new Date();
+      const difference = endDate.getTime() - now.getTime();
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      } else {
+        setTimeLeft({});
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [product.onSale, product.promotionEndDate]);
+
+
   const ratingAverage = product.rating || 0;
   const salePercentage = product.onSale && product.salePrice ? Math.round(((product.price - product.salePrice) / product.price) * 100) : 0;
   const showBadge = product.isNew || salePercentage > 0;
@@ -63,30 +97,31 @@ export function ProductCard({ product }: ProductCardProps) {
             >
                 <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "text-foreground")} />
             </Button>
-
-            {/* Floating Cart Button */}
-            <Button size="icon" className="absolute -bottom-4 right-4 h-10 w-10 z-20 rounded-full bg-primary text-primary-foreground shadow-lg transition-transform group-hover:scale-110">
-                <ShoppingCart className="h-5 w-5"/>
-            </Button>
         </div>
       
       {/* Content Below Image */}
-      <div className="flex flex-col flex-grow p-3 space-y-2 rounded-b-lg">
+      <div className="flex flex-col p-3 space-y-2 rounded-b-lg">
          <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 flex-grow">
             {product.name}
         </h3>
 
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-           {ratingAverage > 0 && (
-                <>
-                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                    <span className="font-semibold text-foreground">{ratingAverage.toFixed(1)}</span>
-                    <span>({product.reviews})</span>
-                    <span className="text-gray-300">|</span>
-                </>
-            )}
-            <span>{Math.floor(Math.random() * 500) + 20} vendus</span>
-        </div>
+        {timeLeft.days !== undefined ? (
+             <div className="text-xs text-destructive font-medium tabular-nums">
+                Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
+            </div>
+        ) : (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {ratingAverage > 0 && (
+                    <>
+                        <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                        <span className="font-semibold text-foreground">{ratingAverage.toFixed(1)}</span>
+                        <span>({product.reviews})</span>
+                        <span className="text-gray-300">|</span>
+                    </>
+                )}
+                <span>{Math.floor(Math.random() * 500) + 20} vendus</span>
+            </div>
+        )}
         
         <div className="flex items-baseline gap-2">
              <p className="font-bold text-lg text-orange-vif">
