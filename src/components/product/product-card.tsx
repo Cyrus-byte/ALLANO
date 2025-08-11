@@ -37,7 +37,6 @@ export function ProductCard({ product }: ProductCardProps) {
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        const milliseconds = Math.floor((diff % 1000) / 10); // show 2 digits for ms
         
         setCountdown(`${days}j ${hours}h ${minutes}m ${seconds}s`);
 
@@ -59,7 +58,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
 
   return (
-    <Link href={`/product/${product.id}`} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
+    <Link href={`/product/${product.id}`} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
         <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
              <Image
                 src={product.images[0]}
@@ -83,14 +82,14 @@ export function ProductCard({ product }: ProductCardProps) {
             </button>
         </div>
       
-      <div className="p-3 flex-1 flex flex-col">
-         <h3 className="font-medium text-sm leading-tight text-foreground flex-1 mb-1">
+      <div className="p-2 flex flex-col">
+         <h3 className="font-medium text-sm leading-tight text-foreground mb-1">
             <span className="hover:underline line-clamp-2">
                 {product.name}
             </span>
         </h3>
 
-        <div className="mb-1">
+        <div className="mt-auto space-y-1">
            {ratingAverage > 0 && (
                 <div className="flex items-center gap-1.5">
                     <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
@@ -98,26 +97,26 @@ export function ProductCard({ product }: ProductCardProps) {
                     <span className="text-xs text-muted-foreground">({product.reviews} avis)</span>
                 </div>
             )}
-        </div>
         
-        <div className="mb-1">
-            <div className="flex items-baseline gap-2">
-                 <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
-                    {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
-                </p>
-                {product.onSale && (
-                    <p className="text-sm text-muted-foreground line-through">
-                        {product.price.toLocaleString('fr-FR')} FCFA
+            <div>
+                <div className="flex items-baseline gap-2">
+                    <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
+                        {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                     </p>
-                )}
+                    {product.onSale && (
+                        <p className="text-sm text-muted-foreground line-through">
+                            {product.price.toLocaleString('fr-FR')} FCFA
+                        </p>
+                    )}
+                </div>
             </div>
-        </div>
 
-         {product.onSale && countdown && (
-            <div className="mt-auto text-xs text-center text-red-600 font-medium bg-red-100 py-1 rounded-sm">
-                {countdown}
-            </div>
-        )}
+            {product.onSale && countdown && (
+                <div className="text-xs text-center text-red-600 font-medium bg-red-100 py-1 rounded-sm">
+                    {countdown}
+                </div>
+            )}
+        </div>
 
       </div>
     </Link>
