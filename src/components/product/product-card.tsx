@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
-import { Button } from '../ui/button';
 
 interface ProductCardProps {
   product: Product;
@@ -38,10 +37,11 @@ export function ProductCard({ product }: ProductCardProps) {
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const milliseconds = Math.floor((diff % 1000) / 10); // show 2 digits for ms
         
-        setCountdown(`${days}j ${hours}h ${minutes}m ${seconds}s`);
+        setCountdown(`${days}j ${hours}h ${minutes}m ${seconds}s ${milliseconds.toString().padStart(2, '0')}`);
 
-      }, 1000);
+      }, 50); // Update every 50ms for smoother millisecond display
 
       return () => clearInterval(interval);
     }
@@ -74,25 +74,23 @@ export function ProductCard({ product }: ProductCardProps) {
              {product.isNew && !product.onSale && (
                 <Badge className="absolute top-2 left-2" variant="secondary">Nouveau</Badge>
              )}
-            <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-2 right-2 h-8 w-8 bg-transparent text-white drop-shadow-md hover:bg-black/20"
+            <button
+                className="absolute top-2 right-2 h-8 w-8 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white transition-colors"
                 onClick={handleWishlistClick}
                 aria-label="Ajouter aux favoris"
             >
-                <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "fill-black/30 text-white")} />
-            </Button>
+                <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "fill-transparent text-gray-700")} />
+            </button>
         </div>
       
       <div className="p-2 pt-3 flex-1 flex flex-col">
-         <h3 className="font-medium text-sm leading-tight text-foreground flex-1">
+         <h3 className="font-medium text-sm leading-tight text-foreground flex-1 mb-1">
             <span className="hover:underline line-clamp-2">
                 {product.name}
             </span>
         </h3>
 
-        <div className="mt-1">
+        <div className="mb-1">
            {ratingAverage > 0 && (
                 <div className="flex items-center gap-1.5">
                     <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
@@ -102,7 +100,7 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
         </div>
         
-        <div className="mt-1">
+        <div className="mb-1">
             <div className="flex items-baseline gap-2">
                  <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
                     {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
@@ -116,7 +114,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
          {product.onSale && countdown && (
-            <div className="mt-1 text-xs text-center text-red-600 font-medium bg-red-100 py-1 rounded-sm">
+            <div className="mt-auto text-xs text-center text-red-600 font-medium bg-red-100 py-1 rounded-sm">
                 {countdown}
             </div>
         )}
