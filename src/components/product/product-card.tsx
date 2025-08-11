@@ -1,14 +1,14 @@
+
 "use client";
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart } from 'lucide-react';
+import { Star, Heart, ShoppingCart } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem, CarouselIndicator } from '@/components/ui/carousel';
-import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface ProductCardProps {
   product: Product;
@@ -17,35 +17,7 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const isProductInWishlist = isInWishlist(product.id);
-  const [countdown, setCountdown] = useState('');
-
-  useEffect(() => {
-    if (product.onSale && product.promotionEndDate) {
-      const intervalId = setInterval(() => {
-        const now = new Date();
-        const endDate = product.promotionEndDate.toDate ? product.promotionEndDate.toDate() : new Date(product.promotionEndDate);
-        const diff = endDate.getTime() - now.getTime();
-
-        if (diff <= 0) {
-          setCountdown('Promotion terminée');
-          clearInterval(intervalId);
-          return;
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        
-        setCountdown(`${days}j ${hours}h ${minutes}m ${seconds}s`);
-
-      }, 1000); 
-
-      return () => clearInterval(intervalId);
-    }
-  }, [product.onSale, product.promotionEndDate]);
-
-
+  
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -54,86 +26,78 @@ export function ProductCard({ product }: ProductCardProps) {
   
   const ratingAverage = product.rating || 0;
   const salePercentage = product.onSale && product.salePrice ? Math.round(((product.price - product.salePrice) / product.price) * 100) : 0;
+  const showBadge = product.isNew || salePercentage > 0;
 
 
   return (
-    <Link href={`/product/${product.id}`} className="group relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
-        <div className="relative aspect-[4/5] overflow-hidden">
-            <Carousel
-              opts={{
-                loop: true,
-              }}
-              className="w-full h-full"
-            >
-              <CarouselContent>
-                {product.images.map((imgSrc, index) => (
-                  <CarouselItem key={index}>
-                    <div className="relative w-full h-full aspect-[4/5]">
-                        <Image
-                            src={imgSrc}
-                            alt={`${product.name} image ${index + 1}`}
-                            fill
-                            className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                            data-ai-hint="product image"
-                        />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <div className="absolute bottom-2 left-0 right-0">
-                  <CarouselIndicator />
-              </div>
-            </Carousel>
+    <Link 
+      href={`/product/${product.id}`} 
+      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 animate-fade-in-slide-up"
+      style={{ animationFillMode: 'backwards' }}
+    >
+        <div className="relative overflow-hidden rounded-t-lg">
+            {/* Image Container */}
+            <div className="aspect-[4/5] overflow-hidden">
+                 <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                    data-ai-hint="product image"
+                />
+            </div>
 
-             {product.onSale && salePercentage > 0 && (
-                 <Badge className="absolute top-2 left-2 z-10" variant="destructive">-{salePercentage}%</Badge>
-             )}
-             {product.isNew && !product.onSale && (
-                <Badge className="absolute top-2 left-2 z-10" variant="secondary">Nouveau</Badge>
-             )}
-            <button
-                className="absolute top-2 right-2 h-9 w-9 z-10 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background transition-colors"
+            {/* Badges */}
+            {showBadge && (
+                 <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
+                    {product.onSale ? `-${salePercentage}%` : "Nouveau"}
+                 </Badge>
+            )}
+
+            {/* Wishlist Button */}
+            <Button
+                size="icon"
+                className="absolute top-2 right-2 h-9 w-9 z-10 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm text-foreground hover:bg-background/80 transition-colors"
                 onClick={handleWishlistClick}
                 aria-label="Ajouter aux favoris"
             >
                 <Heart className={cn("h-5 w-5", isProductInWishlist ? "fill-red-500 text-red-500" : "text-foreground")} />
-            </button>
+            </Button>
+
+            {/* Floating Cart Button */}
+            <Button size="icon" className="absolute -bottom-4 right-4 h-10 w-10 z-20 rounded-full bg-primary text-primary-foreground shadow-lg transition-transform group-hover:scale-110">
+                <ShoppingCart className="h-5 w-5"/>
+            </Button>
         </div>
       
-      <div className="p-4">
-         <h3 className="font-semibold text-base leading-tight text-foreground mb-2">
-            <span className="hover:underline line-clamp-2">
-                {product.name}
-            </span>
+      {/* Content Below Image */}
+      <div className="flex flex-col flex-grow p-3 space-y-2">
+         <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 flex-grow">
+            {product.name}
         </h3>
 
-        <div className="space-y-2">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
            {ratingAverage > 0 && (
-                <div className="flex items-center gap-1.5">
+                <>
                     <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm font-semibold">{ratingAverage.toFixed(1)}</span>
-                    <span className="text-xs text-muted-foreground">({product.reviews} avis)</span>
-                </div>
+                    <span className="font-semibold text-foreground">{ratingAverage.toFixed(1)}</span>
+                    <span>({product.reviews})</span>
+                    <span className="text-gray-300">|</span>
+                </>
             )}
+            <span>{Math.floor(Math.random() * 500) + 20} vendus</span>
+        </div>
         
-            <div className="flex flex-col">
-                <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
-                    {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
+        <div className="flex items-baseline gap-2">
+             <p className="font-bold text-lg text-orange-vif">
+                {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
+            </p>
+            {product.onSale && (
+                <p className="text-sm text-muted-foreground line-through">
+                    {product.price.toLocaleString('fr-FR')} FCFA
                 </p>
-                {product.onSale && (
-                    <p className="text-sm text-muted-foreground line-through">
-                        {product.price.toLocaleString('fr-FR')} FCFA
-                    </p>
-                )}
-            </div>
-
-            {product.onSale && countdown && (
-                <div className="text-xs text-center text-red-600 font-medium bg-red-100 py-1 rounded-sm">
-                    {countdown}
-                </div>
             )}
         </div>
-
       </div>
     </Link>
   );
