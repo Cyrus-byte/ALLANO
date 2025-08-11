@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, Award, MapPin } from 'lucide-react';
+import { Star, Heart, Award, MapPin, AlarmClock } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
@@ -93,7 +93,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 </Button>
             </div>
         
-            <div className="flex flex-col flex-1 p-3 space-y-2">
+            <div className="flex flex-col flex-1 p-3 space-y-1">
                 <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 min-h-[40px]">
                     {product.name}
                 </h3>
@@ -113,27 +113,27 @@ export function ProductCard({ product }: ProductCardProps) {
                     )}
                 </div>
 
-                <div className="min-h-[20px]">
+                <div className="min-h-[20px] mt-1">
                     {product.onSale && timeLeft.days !== undefined ? (
-                        <div className="text-xs text-destructive font-medium tabular-nums">
-                            Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
+                        <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums">
+                            <AlarmClock className="h-3 w-3"/>
+                            <span>Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s</span>
                         </div>
-                    ) : null}
-
-                    {ratingAverage > 0 ? (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-0.5">
+                    ) : product.reviews > 0 ? (
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <div className="flex items-center">
                                 {[...Array(5)].map((_, i) => (
                                     <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
                                 ))}
                             </div>
-                            {product.reviews > 0 && <span className="font-semibold text-foreground">({product.reviews})</span>}
+                            <span className="text-xs text-muted-foreground">({product.reviews})</span>
                         </div>
-                    ) : (product.onSale && timeLeft.days !== undefined) ? null : (<div className="h-5" />)
-                    }
+                    ) : (
+                      <div className="h-5" /> // Placeholder for consistent height
+                    )}
                 </div>
                 
-                <div className="mt-auto pt-2">
+                <div className="mt-auto pt-1">
                     <p className={cn("font-bold text-lg", product.onSale && "text-amber-600")}>
                         {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                     </p>
