@@ -132,7 +132,7 @@ export function ProductCard({ product }: ProductCardProps) {
                             <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
                         ))}
                     </div>
-                    <span className="font-semibold text-foreground">({product.reviews})</span>
+                    {product.reviews > 0 && <span className="font-semibold text-foreground">({product.reviews})</span>}
                 </>
             )}
         </div>
