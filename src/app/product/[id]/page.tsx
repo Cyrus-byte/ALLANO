@@ -265,7 +265,7 @@ export default function ProductPage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         {/* Image Gallery */}
         <div className="flex flex-col gap-4">
             <Carousel setApi={setMainApi} className="w-full group">
@@ -308,7 +308,7 @@ export default function ProductPage() {
         {/* Product Details */}
         <div>
           <h1 className="text-2xl md:text-3xl font-bold font-headline">{product.name}</h1>
-          <div className="flex items-center gap-4 mt-2">
+          <div className="flex items-center gap-4 mt-2 mb-4">
              {reviewCount > 0 ? (
                 <>
                   <div className="flex items-center">
@@ -316,26 +316,25 @@ export default function ProductPage() {
                       <Star key={i} className={cn("h-5 w-5", i < Math.round(ratingAverage) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
                     ))}
                   </div>
-                  <a href="#reviews" className="text-muted-foreground text-sm hover:underline">{reviewCount} avis</a>
+                  <a href="#reviews" className="text-sm text-muted-foreground hover:underline">{reviewCount} avis</a>
                 </>
               ) : (
-                 <span className="text-muted-foreground text-sm">Aucun avis pour le moment</span>
+                 <span className="text-sm text-muted-foreground">Aucun avis pour le moment</span>
               )}
           </div>
           
-          <div className="flex items-baseline gap-2 mt-4">
-            <p className={cn("text-2xl font-bold", product.onSale && "text-destructive")}>
+          <div className="flex items-baseline gap-2 mt-2">
+            <p className={cn("text-xl font-bold", product.onSale && "text-destructive")}>
                 {currentPrice.toLocaleString('fr-FR')} FCFA
             </p>
             {product.onSale && (
-                <p className="text-lg text-muted-foreground line-through">
+                <p className="text-md text-muted-foreground line-through">
                     {product.price.toLocaleString('fr-FR')} FCFA
                 </p>
             )}
            </div>
 
-          <p className="text-muted-foreground mt-4 text-sm">{product.description}</p>
-          <Separator className="my-6" />
+          <Separator className="my-4" />
 
           <div className="space-y-4">
             {/* Color Options */}
@@ -367,6 +366,7 @@ export default function ProductPage() {
                       key={size}
                       variant={selectedSize === size ? 'default' : 'outline'}
                       onClick={() => setSelectedSize(size)}
+                      size="sm"
                       className="w-16"
                       >
                       {size}
@@ -379,7 +379,7 @@ export default function ProductPage() {
 
 
           {/* Actions */}
-          <div className="mt-6 flex items-center gap-4">
+          <div className="mt-6 flex items-center gap-2">
             <div className="flex items-center border rounded-md">
               <Button variant="ghost" size="icon" onClick={() => setQuantity(q => Math.max(1, q - 1))}>
                 <Minus className="h-4 w-4" />
@@ -389,7 +389,7 @@ export default function ProductPage() {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <Button className="flex-1" onClick={handleAddToCart} disabled={!selectedColor || (allSizes.length > 0 && !selectedSize)}>
+            <Button size="default" className="flex-1" onClick={handleAddToCart} disabled={!selectedColor || (allSizes.length > 0 && !selectedSize)}>
               <ShoppingCart className="mr-2 h-5 w-5" /> Ajouter au panier
             </Button>
             <Button variant="outline" size="icon" aria-label="Ajouter aux favoris" onClick={() => toggleWishlist(product)}>
@@ -399,9 +399,16 @@ export default function ProductPage() {
         </div>
       </div>
 
+        <div id="description" className="mt-10">
+            <h2 className="text-xl font-bold mb-4">Description</h2>
+            <p className="text-muted-foreground text-sm">{product.description}</p>
+        </div>
+
        <Separator className="my-10" id="reviews" />
 
        <ProductReviews productId={productId} onReviewsLoaded={setReviews} />
     </div>
   );
 }
+
+    
