@@ -148,7 +148,7 @@ export default function CategoriesPage() {
                       </Link>
                    </Button>
               </div>
-              <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+              <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4">
                 {products.slice(0, 8).map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}

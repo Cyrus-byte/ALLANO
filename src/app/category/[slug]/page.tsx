@@ -121,7 +121,7 @@ export default function CategoryPage() {
             </p>
 
             {filteredProducts.length > 0 ? (
-                <div className="sm:columns-2 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+                <div className="sm:columns-2 md:columns-2 lg:columns-3 xl:columns-4 gap-4">
                 {filteredProducts.map(product => (
                     <ProductCard key={product.id} product={product} />
                 ))}

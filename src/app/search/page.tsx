@@ -45,9 +45,9 @@ function SearchResults() {
         <div>
             <Skeleton className="h-10 w-1/3 mb-2" />
             <Skeleton className="h-5 w-1/4 mb-8" />
-            <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4">
                 {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="break-inside-avoid">
+                    <div key={i} className="break-inside-avoid mb-4">
                         <Skeleton className="aspect-[3/4] w-full" />
                         <Skeleton className="h-5 w-3/4 mt-4" />
                         <Skeleton className="h-5 w-1/2 mt-2" />
@@ -68,7 +68,7 @@ function SearchResults() {
         </p>
 
         {filteredProducts.length > 0 ? (
-            <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4">
             {filteredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
             ))}
