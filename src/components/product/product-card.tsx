@@ -118,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
         
             <div className="flex flex-col">
-                <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
+                <p className={cn("font-bold", product.onSale && "text-destructive")}>
                     {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                 </p>
                 {product.onSale && (
