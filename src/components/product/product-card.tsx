@@ -73,7 +73,7 @@ export function ProductCard({ product }: ProductCardProps) {
     >
         <div className="relative overflow-hidden rounded-t-lg">
            <Carousel
-                opts={{ align: "center", loop: true }}
+                opts={{ align: "center" }}
                 className="w-full h-full"
             >
                 <CarouselContent>
@@ -113,31 +113,29 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
         </div>
       
-      <div className="flex flex-col p-3 space-y-2">
+      <div className="flex flex-col p-3 space-y-1">
          <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
             {product.name}
         </h3>
 
-        {timeLeft.days !== undefined && (
+        {product.onSale && timeLeft.days !== undefined && (
              <div className="text-xs text-destructive font-medium tabular-nums">
                 Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
             </div>
         )}
         
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {ratingAverage > 0 && (
-                <>
-                    <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
-                        ))}
-                    </div>
-                    {product.reviews > 0 && <span className="font-semibold text-foreground">({product.reviews})</span>}
-                </>
-            )}
-        </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
+                    ))}
+                </div>
+                {product.reviews > 0 && <span className="font-semibold text-foreground">({product.reviews})</span>}
+            </div>
+        )}
         
-        <div className="flex flex-col mt-auto pt-2">
+        <div className="flex flex-col mt-auto pt-1">
              <p className="font-bold text-lg text-orange-vif">
                 {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
             </p>
