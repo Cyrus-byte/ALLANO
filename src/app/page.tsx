@@ -73,7 +73,7 @@ export default function Home() {
 
   if (isLoading) {
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4">
             <section className="w-full py-12 md:py-20">
                 <Skeleton className="w-full aspect-video md:aspect-[16/7] rounded-lg" />
                  <div className="text-center mt-8">
@@ -135,7 +135,7 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <div className="container mx-auto text-center py-24 md:py-32">
+          <div className="container mx-auto text-center py-24 md:py-32 px-4">
             {heroSettings.heroHeadline && (
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight font-headline text-foreground">
                 {heroSettings.heroHeadline}
@@ -157,7 +157,7 @@ export default function Home() {
         )}
       </section>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4">
         <ProductRecommendations />
 
         <section className="py-12 md:py-16">

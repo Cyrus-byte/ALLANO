@@ -74,7 +74,7 @@ export default function AdminProductsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-8 md:py-12">
         <h1 className="text-3xl font-bold mb-8">Gérer les produits</h1>
         <div className="space-y-4">
           <Skeleton className="h-12 w-full" />
@@ -87,7 +87,7 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="container mx-auto px-4 py-8 md:py-12">
       <h1 className="text-3xl font-bold mb-8">Gérer les produits</h1>
       <Table>
         <TableHeader>

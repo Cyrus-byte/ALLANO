@@ -36,7 +36,7 @@ export default function PromotionsPage() {
 
   if (loading) {
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="container mx-auto px-4 py-8 md:py-12">
             <Skeleton className="h-12 w-1/3 mb-8" />
             <div className="grid md:grid-cols-4 gap-8">
                 <div className="md:col-span-1">
@@ -57,7 +57,7 @@ export default function PromotionsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid md:grid-cols-4 gap-8">
             <aside className="md:col-span-1">
                 <ProductFilters products={initialProducts} onFilterChange={handleFilterChange} />

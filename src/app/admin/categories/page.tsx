@@ -114,7 +114,7 @@ export default function AdminCategoriesPage() {
 
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-1">
             <Card>

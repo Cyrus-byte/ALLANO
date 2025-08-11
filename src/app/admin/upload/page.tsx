@@ -198,7 +198,7 @@ export default function AdminUploadPage() {
         type="text/javascript"
         strategy="lazyOnload"
       />
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-8 md:py-12">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Ajouter un nouveau produit</CardTitle>

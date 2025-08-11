@@ -69,7 +69,7 @@ export default function CategoriesPage() {
 
   if (loading) {
      return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="text-center mb-12">
                 <Skeleton className="h-12 w-2/3 mx-auto" />
                 <Skeleton className="h-6 w-1/3 mx-auto mt-4" />
@@ -105,7 +105,7 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold font-headline tracking-tight">Explorez Nos Catégories</h1>
         <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
