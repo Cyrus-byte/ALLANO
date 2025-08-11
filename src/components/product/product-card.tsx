@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart } from 'lucide-react';
+import { Star, Heart, Award, MapPin } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/contexts/wishlist-context';
@@ -64,12 +64,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
 
   return (
-    <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid rounded-lg overflow-hidden">
+    <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid">
         <Link 
         href={`/product/${product.id}`} 
         className="flex flex-col"
         >
-            <div className="relative w-full">
+            <div className="relative w-full overflow-hidden">
                 <Image
                     src={product.images[0]}
                     alt={product.name}
@@ -99,6 +99,21 @@ export function ProductCard({ product }: ProductCardProps) {
                 <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 min-h-[40px]">
                     {product.name}
                 </h3>
+                
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-h-[20px]">
+                    {product.isStarSeller && (
+                        <Badge variant="outline" className="text-amber-600 border-amber-600">
+                           <Award className="mr-1 h-3 w-3" />
+                           Star Seller
+                        </Badge>
+                    )}
+                     {product.isLocal && (
+                        <Badge variant="outline" className="text-green-600 border-green-600">
+                            <MapPin className="mr-1 h-3 w-3" />
+                           Local
+                        </Badge>
+                    )}
+                </div>
 
                 <div className="min-h-[20px]">
                     {product.onSale && timeLeft.days !== undefined ? (

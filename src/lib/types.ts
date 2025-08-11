@@ -19,6 +19,8 @@ export type Product = {
   promotionEndDate?: any;
   createdAt: any; 
   aiDescription?: string;
+  isLocal?: boolean;
+  isStarSeller?: boolean;
 };
 
 export type CartItem = {

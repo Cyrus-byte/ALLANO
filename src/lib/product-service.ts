@@ -31,6 +31,8 @@ export const createProduct = async (productData: Partial<ProductInput>) => {
     onSale: productData.onSale || false,
     salePrice: productData.salePrice || null,
     promotionEndDate: productData.promotionEndDate || null,
+    isLocal: productData.isLocal || false,
+    isStarSeller: productData.isStarSeller || false,
     createdAt: serverTimestamp(),
     aiDescription: aiDescription,
   };
