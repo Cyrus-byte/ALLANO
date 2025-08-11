@@ -71,7 +71,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       
       {/* Content Below Image */}
-      <div className="flex flex-col flex-grow p-3 space-y-2">
+      <div className="flex flex-col flex-grow p-3 space-y-2 rounded-b-lg">
          <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2 flex-grow">
             {product.name}
         </h3>
