@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -58,7 +57,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
 
   return (
-    <Link href={`/product/${product.id}`} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
+    <Link href={`/product/${product.id}`} className="group relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
         <div className="relative aspect-[4/5] overflow-hidden">
             <Carousel
               opts={{
@@ -101,24 +100,24 @@ export function ProductCard({ product }: ProductCardProps) {
             </button>
         </div>
       
-      <div className="p-2 flex flex-col flex-grow">
-         <h3 className="font-medium text-sm leading-tight text-foreground mb-1 flex-grow">
+      <div className="p-4">
+         <h3 className="font-semibold text-base leading-tight text-foreground mb-2">
             <span className="hover:underline line-clamp-2">
                 {product.name}
             </span>
         </h3>
 
-        <div className="mt-auto space-y-1">
+        <div className="space-y-2">
            {ratingAverage > 0 && (
                 <div className="flex items-center gap-1.5">
                     <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                    <span className="text-xs font-semibold">{ratingAverage.toFixed(1)}</span>
+                    <span className="text-sm font-semibold">{ratingAverage.toFixed(1)}</span>
                     <span className="text-xs text-muted-foreground">({product.reviews} avis)</span>
                 </div>
             )}
         
             <div className="flex flex-col">
-                <p className={cn("font-bold", product.onSale && "text-destructive")}>
+                <p className={cn("font-bold text-lg", product.onSale && "text-destructive")}>
                     {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                 </p>
                 {product.onSale && (
