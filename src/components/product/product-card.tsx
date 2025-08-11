@@ -114,12 +114,13 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
 
                 <div className="mt-auto pt-1">
-                    {product.onSale && timeLeft.days !== undefined ? (
+                    {product.onSale && timeLeft.days !== undefined && (
                         <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums">
                             <AlarmClock className="h-3 w-3"/>
                             <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m</span>
                         </div>
-                    ) : product.reviews > 0 ? (
+                    )}
+                    {product.reviews > 0 ? (
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <div className="flex items-center">
                                 {[...Array(5)].map((_, i) => (
@@ -129,7 +130,7 @@ export function ProductCard({ product }: ProductCardProps) {
                             <span className="text-xs text-muted-foreground">({product.reviews})</span>
                         </div>
                     ) : (
-                      <div className="h-5" /> 
+                      <div className="h-5" /> // Placeholder for consistent height
                     )}
                 </div>
                 
