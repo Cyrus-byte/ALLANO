@@ -66,7 +66,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid rounded-lg overflow-hidden">
       <Link href={`/product/${product.id}`} className="block">
-        <div className="flex flex-col">
+        <div className="flex flex-col h-full">
             <div className="relative w-full overflow-hidden">
                 <Image
                     src={product.images[0]}
@@ -113,7 +113,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     )}
                 </div>
 
-                <div className="mt-1">
+                <div className="mt-auto pt-1">
                     {product.onSale && timeLeft.days !== undefined ? (
                         <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums">
                             <AlarmClock className="h-3 w-3"/>
@@ -134,11 +134,11 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
                 
                 <div className="mt-1">
-                    <p className={cn("font-bold text-base", product.onSale && "text-amber-600")}>
+                    <p className={cn("font-bold text-base leading-tight", product.onSale && "text-amber-600")}>
                         {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                     </p>
                     {product.onSale && (
-                        <p className="text-xs text-muted-foreground line-through">
+                        <p className="text-xs text-muted-foreground line-through leading-tight">
                             {product.price.toLocaleString('fr-FR')} FCFA
                         </p>
                     )}
