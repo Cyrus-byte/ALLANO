@@ -10,8 +10,6 @@ import { useWishlist } from '@/contexts/wishlist-context';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import { Carousel, CarouselContent, CarouselItem, CarouselIndicator } from '@/components/ui/carousel';
-
 
 interface ProductCardProps {
   product: Product;
@@ -68,35 +66,17 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link 
       href={`/product/${product.id}`} 
-      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 animate-fade-in-slide-up"
+      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 animate-fade-in-slide-up overflow-hidden"
       style={{ animationFillMode: 'backwards' }}
     >
-        <div className="relative overflow-hidden rounded-t-lg aspect-[4/5]">
-             <Carousel
-                opts={{
-                    align: "start",
-                    loop: false,
-                }}
-                className="w-full h-full"
-            >
-                <CarouselContent>
-                    {product.images.map((image, index) => (
-                        <CarouselItem key={index} className="basis-full h-full relative">
-                            <Image
-                                src={image}
-                                alt={product.name}
-                                fill
-                                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                                data-ai-hint="product image"
-                            />
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <div className="absolute bottom-2 left-0 right-0">
-                    <CarouselIndicator />
-                </div>
-            </Carousel>
-
+        <div className="relative aspect-[4/5] w-full overflow-hidden">
+            <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                data-ai-hint="product image"
+            />
             {showBadge && (
                  <Badge className="absolute top-2 left-2 z-10" variant={product.onSale ? "destructive" : "secondary"}>
                     {product.onSale ? `-${salePercentage}%` : "Nouveau"}
