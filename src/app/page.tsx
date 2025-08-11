@@ -170,9 +170,9 @@ export default function Home() {
             </Button>
           </div>
           {loadingProducts ? (
-             <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4">
+             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="break-inside-avoid mb-4">
+                    <div key={i}>
                         <Skeleton className="aspect-[3/4] w-full" />
                         <Skeleton className="h-5 w-3/4 mt-4" />
                         <Skeleton className="h-5 w-1/2 mt-2" />
@@ -180,7 +180,7 @@ export default function Home() {
                 ))}
             </div>
           ) : (
-            <div className="sm:columns-2 md:columns-3 lg:columns-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {products.filter(p => p.isNew).slice(0, 8).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
