@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -65,15 +66,15 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link 
       href={`/product/${product.id}`} 
-      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 animate-fade-in-slide-up overflow-hidden"
-      style={{ animationFillMode: 'backwards' }}
+      className="group relative flex flex-col bg-card text-card-foreground rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 overflow-hidden break-inside-avoid"
     >
-        <div className="relative aspect-[4/5] w-full overflow-hidden">
+        <div className="relative w-full overflow-hidden">
             <Image
                 src={product.images[0]}
                 alt={product.name}
-                fill
-                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                width={500}
+                height={625}
+                className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105 w-full h-auto"
                 data-ai-hint="product image"
             />
 

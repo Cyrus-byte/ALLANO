@@ -68,7 +68,7 @@ export default function PromotionsPage() {
                     {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} en promotion
                  </p>
                 {filteredProducts.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                    <div className="sm:columns-2 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
                     {filteredProducts.map(product => (
                         <ProductCard key={product.id} product={product} />
                     ))}
@@ -84,4 +84,3 @@ export default function PromotionsPage() {
     </div>
   );
 }
-
