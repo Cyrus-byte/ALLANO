@@ -65,10 +65,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="group relative bg-card text-card-foreground shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg odd:-translate-y-2 mb-4 break-inside-avoid">
-        <Link 
-        href={`/product/${product.id}`} 
-        className="flex flex-col"
-        >
+      <Link href={`/product/${product.id}`} className="block overflow-hidden rounded-lg">
+        <div className="flex flex-col">
             <div className="relative w-full overflow-hidden">
                 <Image
                     src={product.images[0]}
@@ -118,7 +116,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 <div className="min-h-[20px]">
                     {product.onSale && timeLeft.days !== undefined ? (
                         <div className="text-xs text-destructive font-medium tabular-nums">
-                            Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h
+                            Fin promo: {String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
                         </div>
                     ) : null}
 
@@ -136,7 +134,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
                 
                 <div className="mt-auto pt-2">
-                    <p className="font-bold text-lg">
+                    <p className={cn("font-bold text-lg", product.onSale && "text-amber-600")}>
                         {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                     </p>
                     {product.onSale && (
@@ -146,7 +144,8 @@ export function ProductCard({ product }: ProductCardProps) {
                     )}
                 </div>
             </div>
-        </Link>
+        </div>
+      </Link>
     </div>
   );
 }
