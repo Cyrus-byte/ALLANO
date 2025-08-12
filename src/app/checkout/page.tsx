@@ -83,7 +83,7 @@ export default function CheckoutPage() {
         window.CinetPay.setConfig({
             apikey: process.env.NEXT_PUBLIC_CINETPAY_API_KEY,
             site_id: parseInt(process.env.NEXT_PUBLIC_CINETPAY_SITE_ID || '0'),
-            notify_url: window.location.origin,
+            // notify_url is best configured in your CinetPay dashboard for security and reliability
             mode: 'PRODUCTION'
         });
 
@@ -93,6 +93,8 @@ export default function CheckoutPage() {
             currency: 'XOF',
             channels: 'ALL',
             description: `Achat sur Allano - Commande ${transactionId}`,
+            // Add the return_url to redirect the user after payment
+            return_url: `${window.location.origin}/account`,
             customer_name: firstName,
             customer_surname: lastName,
             customer_email: user?.email,
