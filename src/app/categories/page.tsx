@@ -133,7 +133,7 @@ export default function CategoriesPage() {
         </div>
       </section>
 
-      <div className="space-y-16">
+      <div className="space-y-12">
         {categories.map((category) => {
           const products = productsByCategory[category.name] || [];
           if(products.length === 0) return null;
