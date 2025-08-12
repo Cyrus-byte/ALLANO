@@ -39,7 +39,7 @@ export default function AdminEditProductPage() {
   const [category, setCategory] = useState<Category | null>(null);
   const [sizes, setSizes] = useState('');
   const [shoeSizes, setShoeSizes] = useState('');
-  const [colors, setColors] = useState<{ name: string; hex?: string; imageUrl?: string }[]>([{ name: '', hex: '#ffffff' }]);
+  const [colors, setColors] = useState<{ name: string; hex?: string; imageUrl?: string }[]>([{ name: '' }]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,7 +70,7 @@ export default function AdminEditProductPage() {
                     setCategory(currentCategory || null);
                     setSizes(fetchedProduct.sizes.join(', '));
                     setShoeSizes(fetchedProduct.shoeSizes?.join(', ') || '');
-                    setColors(fetchedProduct.colors || [{ name: '', hex: '#ffffff' }]);
+                    setColors(fetchedProduct.colors || [{ name: '' }]);
                     setUploadedImageUrls(fetchedProduct.images);
                     setOnSale(fetchedProduct.onSale || false);
                     setSalePrice(fetchedProduct.salePrice?.toString() || '');
@@ -152,7 +152,7 @@ export default function AdminEditProductPage() {
     setColors(prev => prev.map(color => color.imageUrl === urlToRemove ? { ...color, imageUrl: undefined } : color));
   };
 
-  const handleColorChange = (index: number, field: 'name' | 'imageUrl' | 'hex', value: string) => {
+  const handleColorChange = (index: number, field: 'name' | 'imageUrl', value: string) => {
     const newColors = [...colors];
     // @ts-ignore
     newColors[index][field] = value;
@@ -160,7 +160,7 @@ export default function AdminEditProductPage() {
   };
 
   const addColor = () => {
-    setColors([...colors, { name: '', hex: '#ffffff' }]);
+    setColors([...colors, { name: '' }]);
   };
 
   const removeColor = (index: number) => {
@@ -334,15 +334,6 @@ export default function AdminEditProductPage() {
                                 onChange={(e) => handleColorChange(index, 'name', e.target.value)}
                                 required
                             />
-                             <div className="relative">
-                                <input 
-                                    type="color" 
-                                    value={color.hex || '#ffffff'}
-                                    onChange={(e) => handleColorChange(index, 'hex', e.target.value)}
-                                    className="w-8 h-8 rounded-full cursor-pointer appearance-none border-none p-0 bg-transparent"
-                                    style={{'--color': color.hex || '#ffffff'} as React.CSSProperties}
-                                />
-                            </div>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button type="button" variant="outline" size="icon" disabled={uploadedImageUrls.length === 0}>
@@ -451,5 +442,7 @@ export default function AdminEditProductPage() {
     </>
   );
 }
+
+    
 
     
