@@ -253,8 +253,8 @@ export default function ProductPage() {
     setSelectedColor(color.name);
     if (color.imageUrl) {
         const imageIndex = product.images.findIndex(img => img === color.imageUrl);
-        if (imageIndex !== -1) {
-            onThumbClick(imageIndex);
+        if (imageIndex !== -1 && mainApi) {
+            mainApi.scrollTo(imageIndex);
         }
     }
   }
@@ -290,7 +290,7 @@ export default function ProductPage() {
             <Carousel setApi={setThumbApi} opts={{ align: "start", slidesToScroll: 1, dragFree: true, containScroll: 'keepSnaps' }} className="w-full">
                 <CarouselContent className="-ml-2">
                     {product.images.map((img, index) => (
-                    <CarouselItem key={index} className="pl-2 basis-1/8">
+                    <CarouselItem key={index} className="pl-2 basis-1/5 sm:basis-1/6 md:basis-1/8">
                        <button
                             onClick={() => onThumbClick(index)}
                             className={cn(
@@ -429,5 +429,3 @@ export default function ProductPage() {
     </div>
   );
 }
-
-    
