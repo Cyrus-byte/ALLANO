@@ -112,13 +112,13 @@ export function ProductCard({ product }: ProductCardProps) {
                     )}
                 </div>
                 {product.onSale && product.promotionEndDate && timeLeft.days !== undefined && (
-                    <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums mt-1">
+                    <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums">
                         <AlarmClock className="h-3 w-3"/>
                         <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s</span>
                     </div>
                 )}
                 {product.reviews > 0 && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <div className="flex items-center">
                             {[...Array(5)].map((_, i) => (
                                 <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
@@ -127,8 +127,8 @@ export function ProductCard({ product }: ProductCardProps) {
                         <span className="text-xs text-muted-foreground">({product.reviews})</span>
                     </div>
                 )}
-                <div className="leading-tight mt-1">
-                    <p className={cn("font-bold text-base", product.onSale && "text-amber-600")}>
+                <div className="leading-tight">
+                    <p className={cn("font-bold text-base", product.onSale && "text-destructive")}>
                         {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                     </p>
                     {product.onSale && (
