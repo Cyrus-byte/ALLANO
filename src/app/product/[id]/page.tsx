@@ -23,6 +23,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
 import { SimilarProducts } from '@/components/product/similar-products';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 
 function ProductReviews({ 
@@ -84,8 +85,7 @@ function ProductReviews({
     };
     
     return (
-        <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-6">Avis des clients</h2>
+        <div className="mt-6">
             {user && (
                  <form onSubmit={handleReviewSubmit} className="mb-8 p-6 border rounded-lg">
                     <h3 className="font-semibold mb-4">Laissez votre avis</h3>
@@ -290,7 +290,7 @@ export default function ProductPage() {
             <Carousel setApi={setThumbApi} opts={{ align: "start", slidesToScroll: 1, dragFree: true, containScroll: 'keepSnaps' }} className="w-full">
                 <CarouselContent className="-ml-2">
                     {product.images.map((img, index) => (
-                    <CarouselItem key={index} className="pl-2 basis-1/5 sm:basis-1/6 md:basis-1/8">
+                    <CarouselItem key={index} className="pl-2 basis-1/8">
                        <button
                             onClick={() => onThumbClick(index)}
                             className={cn(
@@ -406,8 +406,21 @@ export default function ProductPage() {
         </div>
 
        <Separator className="my-10" id="reviews" />
+        
+        <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="reviews">
+                <AccordionTrigger>
+                    <h2 className="text-2xl font-bold flex items-center gap-4">
+                        Avis des clients 
+                        <span className="text-base font-normal text-muted-foreground">({reviewCount} avis)</span>
+                    </h2>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ProductReviews productId={productId} onReviewsLoaded={setReviews} />
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
 
-       <ProductReviews productId={productId} onReviewsLoaded={setReviews} />
        
        <Separator className="my-10" />
 
@@ -416,3 +429,5 @@ export default function ProductPage() {
     </div>
   );
 }
+
+    
