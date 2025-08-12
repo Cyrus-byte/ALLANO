@@ -114,10 +114,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
 
                 <div className="mt-auto pt-1">
-                    {product.onSale && timeLeft.days !== undefined && (
-                        <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums">
+                     {product.onSale && product.promotionEndDate && timeLeft.days !== undefined && (
+                        <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums mt-1">
                             <AlarmClock className="h-3 w-3"/>
-                            <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m</span>
+                            <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s</span>
                         </div>
                     )}
                     {product.reviews > 0 && (
