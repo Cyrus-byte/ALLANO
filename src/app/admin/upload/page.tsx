@@ -32,7 +32,7 @@ export default function AdminUploadPage() {
   const [category, setCategory] = useState<Category | null>(null);
   const [sizes, setSizes] = useState('');
   const [shoeSizes, setShoeSizes] = useState('');
-  const [colors, setColors] = useState<{ name: string; hex?: string; imageUrl?: string }[]>([{ name: '' }]);
+  const [colors, setColors] = useState<{ name: string; hex?: string; imageUrl?: string }[]>([{ name: '', hex: '#ffffff' }]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,7 +116,7 @@ export default function AdminUploadPage() {
     setColors(prev => prev.map(color => color.imageUrl === urlToRemove ? { ...color, imageUrl: undefined } : color));
   };
 
-  const handleColorChange = (index: number, field: 'name' | 'imageUrl', value: string) => {
+  const handleColorChange = (index: number, field: 'name' | 'imageUrl' | 'hex', value: string) => {
     const newColors = [...colors];
     // @ts-ignore
     newColors[index][field] = value;
@@ -124,7 +124,7 @@ export default function AdminUploadPage() {
   };
 
   const addColor = () => {
-    setColors([...colors, { name: '' }]);
+    setColors([...colors, { name: '', hex: '#ffffff' }]);
   };
 
   const removeColor = (index: number) => {
@@ -174,7 +174,7 @@ export default function AdminUploadPage() {
       setCategory(null);
       setSizes('');
       setShoeSizes('');
-      setColors([{ name: '' }]);
+      setColors([{ name: '', hex: '#ffffff' }]);
       setUploadedImageUrls([]);
       setOnSale(false);
       setSalePrice('');
@@ -291,6 +291,15 @@ export default function AdminUploadPage() {
                                 onChange={(e) => handleColorChange(index, 'name', e.target.value)}
                                 required
                             />
+                            <div className="relative">
+                                <input 
+                                    type="color" 
+                                    value={color.hex || '#ffffff'}
+                                    onChange={(e) => handleColorChange(index, 'hex', e.target.value)}
+                                    className="w-8 h-8 rounded-full cursor-pointer appearance-none border-none p-0 bg-transparent"
+                                    style={{'--color': color.hex || '#ffffff'} as React.CSSProperties}
+                                />
+                            </div>
                              <Popover>
                               <PopoverTrigger asChild>
                                 <Button type="button" variant="outline" size="icon" disabled={uploadedImageUrls.length === 0}>
@@ -399,3 +408,5 @@ export default function AdminUploadPage() {
     </>
   );
 }
+
+    
