@@ -430,13 +430,8 @@ export default function ProductPage() {
             </AccordionItem>
         </Accordion>
 
-       
-       <Separator className="my-10" />
-
        <SimilarProducts product={product} />
 
     </div>
   );
 }
-
-    
