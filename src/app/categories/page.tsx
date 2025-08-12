@@ -69,12 +69,12 @@ export default function CategoriesPage() {
 
   if (loading) {
      return (
-        <div className="container mx-auto px-2 py-8 md:py-12">
-            <div className="text-center mb-12">
+        <div className="container mx-auto px-2 py-4 md:py-8">
+            <div className="text-center mb-6">
                 <Skeleton className="h-12 w-2/3 mx-auto" />
                 <Skeleton className="h-6 w-1/3 mx-auto mt-4" />
             </div>
-            <section className="mb-16">
+            <section className="mb-8">
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-x-2 gap-y-6 md:gap-x-4">
                     {Array.from({length: 6}).map((_, i) => 
                         <div key={i} className="flex flex-col items-center gap-2">
@@ -84,7 +84,7 @@ export default function CategoriesPage() {
                     )}
                 </div>
             </section>
-            <div className="space-y-16">
+            <div className="space-y-8">
                 {Array.from({length: 2}).map((_, i) => (
                     <section key={i}>
                         <Skeleton className="h-10 w-1/4 mb-8" />
@@ -105,10 +105,10 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="container mx-auto px-2 py-8 md:py-12">
+    <div className="container mx-auto px-2 py-4 md:py-8">
       <div className="text-center mb-6">
-        <h1 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Explorez Nos Catégories</h1>
-        <p className="mt-2 max-w-2xl mx-auto text-lg text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Explorez Nos Catégories</h1>
+        <p className="mt-2 max-w-2xl mx-auto text-base text-muted-foreground">
           Trouvez exactement ce que vous cherchez, des vêtements aux accessoires.
         </p>
       </div>
