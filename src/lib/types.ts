@@ -12,7 +12,7 @@ export type Product = {
   reviews: number;
   sizes: string[];
   shoeSizes?: string[];
-  colors: { name: string; hex: string; imageUrl?: string }[];
+  colors: { name: string; hex?: string; imageUrl?: string }[];
   isNew?: boolean;
   onSale?: boolean;
   salePrice?: number;

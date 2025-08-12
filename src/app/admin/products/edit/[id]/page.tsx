@@ -39,7 +39,7 @@ export default function AdminEditProductPage() {
   const [category, setCategory] = useState<Category | null>(null);
   const [sizes, setSizes] = useState('');
   const [shoeSizes, setShoeSizes] = useState('');
-  const [colors, setColors] = useState<{ name: string; hex: string; imageUrl?: string }[]>([{ name: '', hex: '#ffffff' }]);
+  const [colors, setColors] = useState<{ name: string; hex?: string; imageUrl?: string }[]>([{ name: '' }]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,7 +70,7 @@ export default function AdminEditProductPage() {
                     setCategory(currentCategory || null);
                     setSizes(fetchedProduct.sizes.join(', '));
                     setShoeSizes(fetchedProduct.shoeSizes?.join(', ') || '');
-                    setColors(fetchedProduct.colors || [{ name: '', hex: '#ffffff' }]);
+                    setColors(fetchedProduct.colors || [{ name: '' }]);
                     setUploadedImageUrls(fetchedProduct.images);
                     setOnSale(fetchedProduct.onSale || false);
                     setSalePrice(fetchedProduct.salePrice?.toString() || '');
@@ -152,7 +152,7 @@ export default function AdminEditProductPage() {
     setColors(prev => prev.map(color => color.imageUrl === urlToRemove ? { ...color, imageUrl: undefined } : color));
   };
 
-  const handleColorChange = (index: number, field: 'name' | 'hex' | 'imageUrl', value: string) => {
+  const handleColorChange = (index: number, field: 'name' | 'imageUrl', value: string) => {
     const newColors = [...colors];
     // @ts-ignore
     newColors[index][field] = value;
@@ -160,7 +160,7 @@ export default function AdminEditProductPage() {
   };
 
   const addColor = () => {
-    setColors([...colors, { name: '', hex: '#ffffff' }]);
+    setColors([...colors, { name: '' }]);
   };
 
   const removeColor = (index: number) => {
@@ -324,21 +324,15 @@ export default function AdminEditProductPage() {
 
 
                  <div className="space-y-4">
-                    <Label>Couleurs disponibles</Label>
+                    <Label>Couleurs / Motifs disponibles</Label>
                     {colors.map((color, index) => (
                         <div key={index} className="flex items-center gap-2">
                             <Input 
                                 type="text" 
-                                placeholder="Nom de la couleur (ex: Bleu Ciel)" 
+                                placeholder="Ex: Rayé Bleu/Blanc, Motif Floral..." 
                                 value={color.name}
                                 onChange={(e) => handleColorChange(index, 'name', e.target.value)}
                                 required
-                            />
-                            <Input 
-                                type="color" 
-                                value={color.hex}
-                                onChange={(e) => handleColorChange(index, 'hex', e.target.value)}
-                                className="w-16 p-1 h-10"
                             />
                             <Popover>
                               <PopoverTrigger asChild>
@@ -370,7 +364,7 @@ export default function AdminEditProductPage() {
                     ))}
                      <Button type="button" variant="outline" size="sm" onClick={addColor} className="mt-2">
                         <PlusCircle className="mr-2 h-4 w-4" />
-                        Ajouter une couleur
+                        Ajouter une couleur/motif
                     </Button>
                 </div>
                 
