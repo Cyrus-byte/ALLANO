@@ -93,46 +93,41 @@ export function ProductCard({ product }: ProductCardProps) {
                 </Button>
             </div>
         
-            <div className="flex flex-col flex-1 p-2">
+            <div className="flex flex-col p-2">
                 <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
                     {product.name}
                 </h3>
-                
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     {product.isStarSeller && (
-                        <Badge variant="outline" className="text-amber-600 border-amber-600 px-1.5 py-0">
+                        <Badge variant="outline" className="text-amber-600 border-amber-600 px-1.5 py-0 text-xs">
                            <Award className="mr-1 h-3 w-3" />
                            Star Seller
                         </Badge>
                     )}
                      {product.isLocal && (
-                        <Badge variant="outline" className="text-green-600 border-green-600 px-1.5 py-0">
+                        <Badge variant="outline" className="text-green-600 border-green-600 px-1.5 py-0 text-xs">
                             <MapPin className="mr-1 h-3 w-3" />
                            Local
                         </Badge>
                     )}
                 </div>
-
-                <div className="mt-auto">
-                     {product.onSale && product.promotionEndDate && timeLeft.days !== undefined && (
-                        <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums">
-                            <AlarmClock className="h-3 w-3"/>
-                            <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s</span>
+                {product.onSale && product.promotionEndDate && timeLeft.days !== undefined && (
+                    <div className="flex items-center gap-1 text-xs text-destructive font-medium tabular-nums mt-1">
+                        <AlarmClock className="h-3 w-3"/>
+                        <span>{String(timeLeft.days).padStart(2, '0')}j {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s</span>
+                    </div>
+                )}
+                {product.reviews > 0 && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                        <div className="flex items-center">
+                            {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
+                            ))}
                         </div>
-                    )}
-                    {product.reviews > 0 && (
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <div className="flex items-center">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className={cn("h-4 w-4", ratingAverage > i ? "text-yellow-400 fill-yellow-400" : "text-gray-300")} />
-                                ))}
-                            </div>
-                            <span className="text-xs text-muted-foreground">({product.reviews})</span>
-                        </div>
-                    )}
-                </div>
-                
-                <div className="leading-tight">
+                        <span className="text-xs text-muted-foreground">({product.reviews})</span>
+                    </div>
+                )}
+                <div className="leading-tight mt-1">
                     <p className={cn("font-bold text-base", product.onSale && "text-amber-600")}>
                         {(product.onSale && product.salePrice ? product.salePrice.toLocaleString('fr-FR') : product.price.toLocaleString('fr-FR'))} FCFA
                     </p>
