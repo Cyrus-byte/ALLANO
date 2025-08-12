@@ -26,120 +26,107 @@ import { SimilarProducts } from '@/components/product/similar-products';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 
-function ProductReviews({ 
-    productId, 
-    onReviewsLoaded 
-}: { 
-    productId: string,
-    onReviewsLoaded: (reviews: Review[]) => void
+function ProductReviews({
+  productId,
+  initialReviews,
+  onReviewAdded
+}: {
+  productId: string,
+  initialReviews: Review[],
+  onReviewAdded: (newReview: Review) => void
 }) {
-    const { user } = useAuth();
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [newRating, setNewRating] = useState(0);
-    const [newComment, setNewComment] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const { toast } = useToast();
+  const { user } = useAuth();
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [newRating, setNewRating] = useState(0);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
-    useEffect(() => {
-        const fetchReviews = async () => {
-            setLoading(true);
-            try {
-                const fetchedReviews = await getReviewsByProductId(productId);
-                setReviews(fetchedReviews);
-                onReviewsLoaded(fetchedReviews);
-            } catch (error) {
-                console.error("Failed to fetch reviews:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchReviews();
-    }, [productId, onReviewsLoaded]);
+  useEffect(() => {
+    setReviews(initialReviews);
+  }, [initialReviews]);
 
-    const handleReviewSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) {
-            toast({ title: "Connexion requise", description: "Vous devez être connecté pour laisser un avis.", variant: "destructive" });
-            return;
-        }
-        if (newRating === 0 || !newComment) {
-            toast({ title: "Champs requis", description: "Veuillez donner une note et un commentaire.", variant: "destructive" });
-            return;
-        }
-        setIsSubmitting(true);
-        try {
-            const newReview = await addReview(productId, user.uid, user.displayName || 'Anonyme', newRating, newComment);
-            const updatedReviews = [newReview, ...reviews];
-            setReviews(updatedReviews);
-            onReviewsLoaded(updatedReviews);
-            setNewComment('');
-            setNewRating(0);
-            toast({ title: "Avis ajouté", description: "Merci pour votre contribution !" });
-        } catch (error) {
-            console.error(error);
-            toast({ title: "Erreur", description: "Impossible d'ajouter l'avis.", variant: "destructive" });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-    
-    return (
-        <div className="mt-6">
-            {user && (
-                 <form onSubmit={handleReviewSubmit} className="mb-8 p-6 border rounded-lg">
-                    <h3 className="font-semibold mb-4">Laissez votre avis</h3>
-                    <div className="mb-4">
-                        <Label>Note</Label>
-                        <div className="flex items-center gap-1 mt-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                    key={star}
-                                    className={cn("h-6 w-6 cursor-pointer", newRating >= star ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')}
-                                    onClick={() => setNewRating(star)}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                     <div className="mb-4">
-                        <Label htmlFor="comment">Commentaire</Label>
-                        <Textarea id="comment" value={newComment} onChange={(e) => setNewComment(e.target.value)} required className="mt-2" />
-                    </div>
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? 'Publication...' : 'Publier mon avis'}
-                    </Button>
-                </form>
-            )}
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast({ title: "Connexion requise", description: "Vous devez être connecté pour laisser un avis.", variant: "destructive" });
+      return;
+    }
+    if (newRating === 0 || !newComment) {
+      toast({ title: "Champs requis", description: "Veuillez donner une note et un commentaire.", variant: "destructive" });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const newReview = await addReview(productId, user.uid, user.displayName || 'Anonyme', newRating, newComment);
+      const updatedReviews = [newReview, ...reviews];
+      setReviews(updatedReviews);
+      onReviewAdded(newReview);
+      setNewComment('');
+      setNewRating(0);
+      toast({ title: "Avis ajouté", description: "Merci pour votre contribution !" });
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Erreur", description: "Impossible d'ajouter l'avis.", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-            <div className="space-y-6">
-                {loading ? (
-                    <p>Chargement des avis...</p>
-                ) : reviews.length > 0 ? (
-                    reviews.map(review => (
-                        <div key={review.id} className="flex gap-4">
-                            <Avatar>
-                                <AvatarFallback>{review.userName.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                    <p className="font-semibold">{review.userName}</p>
-                                    <span className="text-sm text-muted-foreground">{format(new Date(review.createdAt), 'd MMMM yyyy', { locale: fr })}</span>
-                                </div>
-                                <div className="flex items-center gap-1 my-1">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={cn("h-4 w-4", i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
-                                    ))}
-                                </div>
-                                <p className="text-muted-foreground">{review.comment}</p>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-muted-foreground">Aucun avis pour ce produit pour le moment.</p>
-                )}
+  return (
+    <div className="mt-6">
+      {user && (
+        <form onSubmit={handleReviewSubmit} className="mb-8 p-6 border rounded-lg">
+          <h3 className="font-semibold mb-4">Laissez votre avis</h3>
+          <div className="mb-4">
+            <Label>Note</Label>
+            <div className="flex items-center gap-1 mt-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={cn("h-6 w-6 cursor-pointer", newRating >= star ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')}
+                  onClick={() => setNewRating(star)}
+                />
+              ))}
             </div>
-        </div>
-    );
+          </div>
+          <div className="mb-4">
+            <Label htmlFor="comment">Commentaire</Label>
+            <Textarea id="comment" value={newComment} onChange={(e) => setNewComment(e.target.value)} required className="mt-2" />
+          </div>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Publication...' : 'Publier mon avis'}
+          </Button>
+        </form>
+      )}
+
+      <div className="space-y-6">
+        {reviews.length > 0 ? (
+          reviews.map(review => (
+            <div key={review.id} className="flex gap-4">
+              <Avatar>
+                <AvatarFallback>{review.userName.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold">{review.userName}</p>
+                  <span className="text-sm text-muted-foreground">{format(new Date(review.createdAt), 'd MMMM yyyy', { locale: fr })}</span>
+                </div>
+                <div className="flex items-center gap-1 my-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={cn("h-4 w-4", i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground')} />
+                  ))}
+                </div>
+                <p className="text-muted-foreground">{review.comment}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-muted-foreground">Aucun avis pour ce produit pour le moment.</p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 
@@ -156,14 +143,16 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   const [mainApi, setMainApi] = useState<CarouselApi>()
   const [thumbApi, setThumbApi] = useState<CarouselApi>()
   const [selectedThumb, setSelectedThumb] = useState(0)
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductAndReviews = async () => {
       setLoading(true);
+      setReviewsLoading(true);
       try {
         const fetchedProduct = await getProductById(productId);
         if (fetchedProduct) {
@@ -180,9 +169,18 @@ export default function ProductPage() {
       } finally {
         setLoading(false);
       }
+      
+      try {
+        const fetchedReviews = await getReviewsByProductId(productId);
+        setReviews(fetchedReviews);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      } finally {
+        setReviewsLoading(false);
+      }
     };
     if(productId) {
-        fetchProduct();
+        fetchProductAndReviews();
     }
   }, [productId]);
 
@@ -263,6 +261,9 @@ export default function ProductPage() {
 
   const currentPrice = (product.onSale && product.salePrice) ? product.salePrice : product.price;
 
+  const handleReviewAdded = (newReview: Review) => {
+    setReviews(prev => [newReview, ...prev]);
+  };
 
   return (
     <div className="container mx-auto px-2 py-8 md:py-12">
@@ -412,11 +413,19 @@ export default function ProductPage() {
                 <AccordionTrigger>
                     <h2 className="text-2xl font-bold flex items-center gap-4">
                         Avis des clients 
-                        <span className="text-base font-normal text-muted-foreground">({reviewCount} avis)</span>
+                        <span className="text-base font-normal text-muted-foreground">({reviewsLoading ? '...' : `${reviewCount} avis`})</span>
                     </h2>
                 </AccordionTrigger>
                 <AccordionContent>
-                    <ProductReviews productId={productId} onReviewsLoaded={setReviews} />
+                    {reviewsLoading ? (
+                        <p>Chargement des avis...</p>
+                    ) : (
+                        <ProductReviews 
+                            productId={productId} 
+                            initialReviews={reviews}
+                            onReviewAdded={handleReviewAdded}
+                        />
+                    )}
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -429,3 +438,5 @@ export default function ProductPage() {
     </div>
   );
 }
+
+    
