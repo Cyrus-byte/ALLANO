@@ -355,11 +355,7 @@ export default function ProductPage() {
                     )}
                     style={{ backgroundColor: color.hex }}
                   >
-                      {color.imageUrl ? (
-                        <Image src={color.imageUrl} alt={color.name} fill className="object-cover rounded-full"/>
-                      ) : (
-                          <span className="sr-only">{color.name}</span>
-                      )}
+                      <span className="sr-only">{color.name}</span>
                   </button>
                 ))}
               </div>
