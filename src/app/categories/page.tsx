@@ -106,14 +106,14 @@ export default function CategoriesPage() {
 
   return (
     <div className="container mx-auto px-2 py-8 md:py-12">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold font-headline tracking-tight">Explorez Nos Catégories</h1>
-        <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+      <div className="text-center mb-6">
+        <h1 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Explorez Nos Catégories</h1>
+        <p className="mt-2 max-w-2xl mx-auto text-lg text-muted-foreground">
           Trouvez exactement ce que vous cherchez, des vêtements aux accessoires.
         </p>
       </div>
 
-      <section className="mb-12">
+      <section className="mb-8">
         <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-x-2 gap-y-6 md:gap-x-4">
           {categories.map((category) => (
             <Link key={category.id} href={`/category/${slugify(category.name)}`} passHref>
