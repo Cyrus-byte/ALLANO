@@ -342,17 +342,25 @@ export default function ProductPage() {
             {/* Color Options */}
             <div>
               <Label className="text-sm font-medium">Couleur: <span className="font-bold">{selectedColor}</span></Label>
-              <div className="flex flex-wrap items-center gap-2 mt-2">
+              <div className="flex flex-wrap items-center gap-3 mt-2">
                 {product.colors.map(color => (
-                  <Button
+                  <button
                     key={color.name}
-                    variant={selectedColor === color.name ? 'default' : 'outline'}
+                    type="button"
+                    title={color.name}
                     onClick={() => handleColorSelect(color)}
-                    size="sm"
+                    className={cn(
+                        "relative h-8 w-8 rounded-full border-2 transition-transform duration-100 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+                        selectedColor === color.name ? 'ring-2 ring-offset-2 ring-primary scale-110' : 'border-muted-foreground/20'
+                    )}
+                    style={{ backgroundColor: color.hex }}
                   >
-                    {color.imageUrl && <Image src={color.imageUrl} alt={color.name} width={20} height={20} className="mr-2 rounded-sm"/>}
-                    {color.name}
-                  </Button>
+                      {color.imageUrl ? (
+                        <Image src={color.imageUrl} alt={color.name} fill className="object-cover rounded-full"/>
+                      ) : (
+                          <span className="sr-only">{color.name}</span>
+                      )}
+                  </button>
                 ))}
               </div>
             </div>
@@ -434,3 +442,5 @@ export default function ProductPage() {
     </div>
   );
 }
+
+    
