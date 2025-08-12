@@ -278,7 +278,7 @@ export default function ProductPage() {
                                     PROMO
                                 </div>
                              )}
-                            <Image src={img} alt={`${product.name} image ${index + 1}`} fill className="object-cover" />
+                            <Image src={img} alt={`${product.name} image ${index + 1}`} fill className="object-contain" />
                         </div>
                     </CarouselItem>
                 ))}
@@ -289,7 +289,7 @@ export default function ProductPage() {
             <Carousel setApi={setThumbApi} opts={{ align: "start", slidesToScroll: 1, dragFree: true, containScroll: 'keepSnaps' }} className="w-full">
                 <CarouselContent className="-ml-2">
                     {product.images.map((img, index) => (
-                    <CarouselItem key={index} className="pl-2 basis-1/4 sm:basis-1/5 md:basis-1/6">
+                    <CarouselItem key={index} className="pl-2 basis-1/5 sm:basis-1/6 md:basis-1/8">
                        <button
                             onClick={() => onThumbClick(index)}
                             className={cn(
