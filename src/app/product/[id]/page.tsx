@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
+import { SimilarProducts } from '@/components/product/similar-products';
 
 
 function ProductReviews({ 
@@ -297,7 +298,7 @@ export default function ProductPage() {
                             selectedThumb === index && "ring-2 ring-primary"
                             )}
                         >
-                            <Image src={img} alt={`${product.name} thumbnail ${index + 1}`} fill className="object-cover" />
+                            <Image src={img} alt={`${product.name} thumbnail ${index + 1}`} fill className="object-contain" />
                         </button>
                     </CarouselItem>
                 ))}
@@ -407,8 +408,11 @@ export default function ProductPage() {
        <Separator className="my-10" id="reviews" />
 
        <ProductReviews productId={productId} onReviewsLoaded={setReviews} />
+       
+       <Separator className="my-10" />
+
+       <SimilarProducts product={product} />
+
     </div>
   );
 }
-
-    
