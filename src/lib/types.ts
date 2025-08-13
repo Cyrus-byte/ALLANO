@@ -51,7 +51,7 @@ export type Order = {
   items: CartItem[]; // Now includes the full product object
   shippingDetails: ShippingDetails;
   totalAmount: number;
-  status: 'Payée' | 'Expédiée' | 'Livrée' | 'Annulée';
+  status: 'En attente' | 'Payée' | 'Expédiée' | 'Livrée' | 'Annulée';
   createdAt: any; // Firestore timestamp, will be Date object on client
   paymentDetails?: any;
   promoCode?: {

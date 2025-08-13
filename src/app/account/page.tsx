@@ -102,6 +102,18 @@ export default function AccountPage() {
             </div>
         );
     }
+    
+    const getBadgeVariant = (status: Order['status']) => {
+        switch (status) {
+            case 'Livrée': return 'secondary';
+            case 'Annulée': return 'destructive';
+            case 'Payée': return 'default';
+            case 'En attente': return 'outline';
+            case 'Expédiée': return 'default';
+            default: return 'default';
+        }
+    }
+
 
   return (
     <div className="container mx-auto px-2 py-8 md:py-12">
@@ -135,7 +147,7 @@ export default function AccountPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">{order.totalAmount.toLocaleString('fr-FR')} FCFA</p>
-                        <Badge variant={order.status === 'Livrée' ? 'secondary' : order.status === 'Annulée' ? 'destructive' : 'default'} className="mt-1">
+                        <Badge variant={getBadgeVariant(order.status)} className="mt-1">
                           {order.status}
                         </Badge>
                       </div>

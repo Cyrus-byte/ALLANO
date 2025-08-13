@@ -15,7 +15,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import { createOrder } from '@/lib/order-service';
+import { createOrder, updateOrderStatus } from '@/lib/order-service';
 import type { Order } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -99,12 +99,22 @@ export default function CheckoutPage() {
         return;
     }
 
-
     setPaymentLoading(true);
 
-    const transactionId = `ALLANO-${Date.now()}`;
-    
     try {
+        // Step 1: Create the order in Firestore with "En attente" status
+        const orderData: Omit<Order, 'id' | 'createdAt'> = {
+            userId: user.uid,
+            items: cart.map(({ product, ...rest }) => rest),
+            shippingDetails: { firstName, lastName, address, indication, city, phone },
+            totalAmount: grandTotal,
+            status: 'En attente', // <-- Important: status is 'En attente'
+            ...(promoCode && discount > 0 && { promoCode: { code: promoCode, discount } })
+        };
+        const orderId = await createOrder(orderData);
+
+
+        // Step 2: Initialize CinetPay payment
         window.CinetPay.setConfig({
             apikey: apiKey,
             site_id: parseInt(siteId),
@@ -113,18 +123,20 @@ export default function CheckoutPage() {
         });
 
         window.CinetPay.getCheckout({
-            transaction_id: transactionId,
+            transaction_id: orderId, // <-- Use our Firestore order ID as the transaction ID
             amount: grandTotal,
             currency: 'XOF',
             channels: 'ALL',
-            description: `Achat sur Allano - Commande ${transactionId}`,
-            return_url: `${window.location.origin}/account?order_id=${transactionId}`,
+            description: `Achat sur Allano - Commande ${orderId.substring(0, 8)}`,
+            
+            // These URLs are for when the user is redirected back to the site
+            return_url: `${window.location.origin}/account/order/${orderId}`,
             cancel_url: `${window.location.origin}/cart`,
             
             // Customer data
             customer_name: firstName,
             customer_surname: lastName,
-            customer_email: user.email,
+            customer_email: user.email || undefined,
             customer_phone_number: phone,
             customer_address: address,
             customer_city: city,
@@ -133,44 +145,31 @@ export default function CheckoutPage() {
         });
 
         window.CinetPay.waitResponse(async (data: any) => {
-            if (data.status === "REFUSED") {
+            if (data.status === "ACCEPTED") {
+                // The client knows the payment was accepted.
+                // We clear the cart and redirect. The backend notification will finalize the order status.
+                toast({ title: "Paiement réussi", description: "Merci pour votre commande ! Redirection..." });
+                clearCart();
+                router.push(`/account/order/${orderId}`);
+            } else {
+                 // If payment is refused or fails on the client side, we can update our order to "Annulée"
+                await updateOrderStatus(orderId, 'Annulée');
                 toast({ title: "Paiement refusé", description: "Votre paiement a été refusé.", variant: "destructive" });
                 setPaymentLoading(false);
-            } else if (data.status === "ACCEPTED") {
-                try {
-                     const orderData: Omit<Order, 'id' | 'createdAt'> = {
-                        userId: user.uid,
-                        items: cart.map(({ product, ...rest }) => rest),
-                        shippingDetails: { firstName, lastName, address, indication, city, phone },
-                        totalAmount: grandTotal,
-                        status: 'Payée',
-                        paymentDetails: data,
-                        ...(promoCode && discount > 0 && { promoCode: { code: promoCode, discount } })
-                    };
-
-                    await createOrder(orderData);
-                    
-                    toast({ title: "Paiement réussi", description: "Merci pour votre commande !" });
-                    clearCart();
-                    router.push('/account');
-                } catch (orderError) {
-                     console.error("Erreur lors de la création de la commande:", orderError);
-                     toast({ title: "Erreur de commande", description: "Votre paiement a réussi, mais nous n'avons pas pu enregistrer votre commande. Veuillez nous contacter.", variant: "destructive" });
-                } finally {
-                    setPaymentLoading(false);
-                }
             }
         });
 
-        window.CinetPay.onError(function(err: any) {
+        window.CinetPay.onError(async (err: any) => {
             console.error('CinetPay Error:', err);
+            // Also mark the order as "Annulée" if there's a technical error
+            await updateOrderStatus(orderId, 'Annulée');
             toast({ title: "Erreur de paiement", description: "Une erreur est survenue. Veuillez réessayer.", variant: "destructive" });
             setPaymentLoading(false);
         });
 
     } catch(e) {
-        console.error("CinetPay initialization error", e);
-        toast({ title: "Erreur", description: "Impossible d'initialiser le paiement.", variant: "destructive" });
+        console.error("Erreur lors de la création de la commande ou de l'initialisation CinetPay:", e);
+        toast({ title: "Erreur", description: "Impossible de créer la commande ou d'initialiser le paiement.", variant: "destructive" });
         setPaymentLoading(false);
     }
   }

@@ -1,48 +1,56 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createOrder, getOrderById, updateOrderStatus } from '@/lib/order-service';
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { getOrderById, updateOrderStatus } from '@/lib/order-service';
+import crypto from 'crypto';
 
 // This is the server-to-server notification endpoint for CinetPay
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // CinetPay sends transaction details in the request body
-    const { cpm_trans_id, cpm_site_id, cpm_amount, cpm_currency, cpm_signature, cpm_payment_date, cpm_payment_time, cpm_error_message, cpm_trans_status } = body;
-
     console.log("CinetPay Notification Received:", body);
 
-    // TODO: You should verify the signature here for security
-    // This requires making a request back to CinetPay to check the transaction status
-    // For now, we trust the notification if the status is "ACCEPTED"
+    const { cpm_trans_id, cpm_trans_status, cpm_site_id, signature } = body;
+
+    // It's crucial to verify the signature to ensure the request is from CinetPay
+    // The verification logic can be complex. For production, you must implement
+    // a robust way to verify the transaction by calling CinetPay's check status endpoint.
+    // For now, we will trust the notification if the status is ACCEPTED.
+    // This is a simplified approach for demonstration.
+
+    if (!cpm_trans_id) {
+        console.error("Notification received without transaction ID.");
+        return NextResponse.json({ success: false, error: 'Transaction ID missing' }, { status: 400 });
+    }
+
+    // The `cpm_trans_id` should be the ID of our order document in Firestore
+    const orderId = cpm_trans_id;
+    const order = await getOrderById(orderId);
+
+    if (!order) {
+        console.error(`Order with ID ${orderId} not found for notification.`);
+        // Even if not found, we must return a 200 OK to CinetPay
+        return NextResponse.json({ success: true, message: `Order ${orderId} not found but acknowledged.` });
+    }
+
+    if (order.status !== 'En attente') {
+        console.log(`Order ${orderId} has already been processed. Current status: ${order.status}`);
+        return NextResponse.json({ success: true, message: 'Order already processed.' });
+    }
 
     if (cpm_trans_status === 'ACCEPTED') {
-      // The transaction ID from your side, which you sent when initializing
-      // Note: CinetPay doesn't send back the initial transaction_id in the standard notification.
-      // A common pattern is to find the order using cpm_trans_id (CinetPay's ID)
-      // or to rely on the client-side creation and use this endpoint as a backup/confirmation.
-
-      // Let's assume for now that the client-side creation has worked,
-      // and this is just a confirmation. We can log it or update the status if needed.
-      // A more robust implementation would check if an order with `paymentDetails.cpm_trans_id`
-      // exists and is still 'Pending', then update it to 'Paid'.
-      
-      console.log(`Payment confirmed for CinetPay transaction ${cpm_trans_id}. Amount: ${cpm_amount} ${cpm_currency}`);
-      
-      // Here you could implement logic to:
-      // 1. Check if an order with this `cpm_trans_id` already exists.
-      // 2. If it exists and its status is 'Pending', update it to 'Paid'.
-      // 3. If it doesn't exist, you might need to create it, but this would require
-      //    passing more metadata (like cart items) during CinetPay initialization,
-      //    which is an advanced feature.
+      // Payment is successful, update order status to "Payée"
+      await updateOrderStatus(orderId, 'Payée');
+      console.log(`Payment confirmed for order ${orderId}. Status updated to Payée.`);
       
     } else {
-       console.log(`Payment was not successful for CinetPay transaction ${cpm_trans_id}. Status: ${cpm_trans_status}, Message: ${cpm_error_message}`);
+       // Payment failed or was cancelled, update order status to "Annulée"
+       await updateOrderStatus(orderId, 'Annulée');
+       console.log(`Payment failed for order ${orderId}. Status updated to Annulée.`);
     }
 
     // Respond to CinetPay to acknowledge receipt of the notification
+    // It's critical to always return a 200 OK status.
     return NextResponse.json({ success: true });
 
   } catch (error) {

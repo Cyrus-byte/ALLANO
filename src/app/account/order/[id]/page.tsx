@@ -100,6 +100,16 @@ function OrderDetailsPage() {
     
     const shippingCost = 300;
     const subtotal = order.totalAmount - shippingCost + (order.promoCode?.discount || 0);
+    const getBadgeVariant = (status: Order['status']) => {
+        switch (status) {
+            case 'Livrée': return 'secondary';
+            case 'Annulée': return 'destructive';
+            case 'Payée': return 'default';
+            case 'En attente': return 'outline';
+            case 'Expédiée': return 'default';
+            default: return 'default';
+        }
+    }
 
     return (
         <div className="container mx-auto px-2 py-8 md:py-12">
@@ -170,7 +180,7 @@ function OrderDetailsPage() {
                         <CardHeader>
                             <div className="flex justify-between items-center">
                                 <CardTitle>Total</CardTitle>
-                                <Badge variant={order.status === 'Livrée' ? 'secondary' : order.status === 'Annulée' ? 'destructive' : 'default'} className="mt-1">
+                                <Badge variant={getBadgeVariant(order.status)} className="mt-1">
                                     {order.status}
                                 </Badge>
                             </div>
@@ -204,6 +214,7 @@ function OrderDetailsPage() {
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="En attente">En attente</SelectItem>
                                         <SelectItem value="Payée">Payée</SelectItem>
                                         <SelectItem value="Expédiée">Expédiée</SelectItem>
                                         <SelectItem value="Livrée">Livrée</SelectItem>
