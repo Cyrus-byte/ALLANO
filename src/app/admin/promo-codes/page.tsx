@@ -211,7 +211,7 @@ export default function AdminPromoCodesPage() {
                                     : `${code.value.toLocaleString('fr-FR')} FCFA`}
                             </TableCell>
                              <TableCell>
-                                {code.expiresAt ? format(code.expiresAt.toDate(), 'dd/MM/yyyy') : 'N/A'}
+                                {code.expiresAt ? format(new Date(code.expiresAt), 'dd/MM/yyyy') : 'N/A'}
                             </TableCell>
                             <TableCell className="text-right space-x-2">
                                 <AlertDialog>

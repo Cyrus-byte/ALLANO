@@ -12,10 +12,17 @@ export const createPromoCode = async (data: Omit<PromoCode, 'createdAt'> & {id: 
     throw new Error('Un code promotionnel avec cet ID existe déjà.');
   }
 
-  const promoCodeWithTimestamp = {
+  const promoCodeWithTimestamp: any = {
     ...data,
     createdAt: serverTimestamp(),
   };
+
+  // Firestore doesn't allow `undefined` values.
+  // If expiresAt is not provided, remove it from the object.
+  if (!promoCodeWithTimestamp.expiresAt) {
+    delete promoCodeWithTimestamp.expiresAt;
+  }
+
 
   await setDoc(promoCodeRef, promoCodeWithTimestamp);
   return data.id;
@@ -30,6 +37,10 @@ export const getPromoCodes = async (): Promise<PromoCode[]> => {
     const promoCodes: PromoCode[] = [];
     querySnapshot.forEach((doc) => {
         const data = doc.data();
+        // Convert timestamp to Date object if it exists
+        if (data.expiresAt && data.expiresAt.toDate) {
+            data.expiresAt = data.expiresAt.toDate();
+        }
         promoCodes.push({
             ...data,
             id: doc.id,
@@ -45,7 +56,15 @@ export const updatePromoCode = async (codeId: string, data: Partial<Omit<PromoCo
     throw new Error("L'ID du code est requis pour la mise à jour.");
   }
   const promoCodeRef = doc(db, 'promoCodes', codeId);
-  await updateDoc(promoCodeRef, data);
+  
+  const dataToUpdate = { ...data };
+
+  // If expiresAt is explicitly set to undefined, delete it.
+  if (dataToUpdate.expiresAt === undefined) {
+      delete dataToUpdate.expiresAt;
+  }
+
+  await updateDoc(promoCodeRef, dataToUpdate);
 };
 
 
@@ -66,10 +85,16 @@ export const applyPromoCode = async (code: string, cartTotal: number): Promise<{
         throw new Error("Le code promotionnel n'est pas valide.");
     }
 
-    const promoCode = promoCodeSnap.data() as PromoCode;
+    const promoCodeData = promoCodeSnap.data();
+    
+    if (promoCodeData.expiresAt && promoCodeData.expiresAt.toDate) {
+        promoCodeData.expiresAt = promoCodeData.expiresAt.toDate();
+    }
+    
+    const promoCode = promoCodeData as PromoCode;
 
     // Check expiry
-    if (promoCode.expiresAt && promoCode.expiresAt.toDate() < new Date()) {
+    if (promoCode.expiresAt && new Date(promoCode.expiresAt) < new Date()) {
         throw new Error("Ce code promotionnel a expiré.");
     }
 
