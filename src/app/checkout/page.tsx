@@ -97,8 +97,8 @@ export default function CheckoutPage() {
         window.CinetPay.setConfig({
             apikey: apiKey,
             site_id: parseInt(siteId),
-            // notify_url is best configured in your CinetPay dashboard for security and reliability
-            mode: 'PRODUCTION'
+            mode: 'PRODUCTION',
+            notify_url: `${window.location.origin}/api/cinetpay-notify`
         });
 
         window.CinetPay.getCheckout({
@@ -107,11 +107,13 @@ export default function CheckoutPage() {
             currency: 'XOF',
             channels: 'ALL',
             description: `Achat sur Allano - Commande ${transactionId}`,
-            // Add the return_url to redirect the user after payment
-            return_url: `${window.location.origin}/account`,
+            return_url: `${window.location.origin}/account?order_id=${transactionId}`,
+            cancel_url: `${window.location.origin}/cart`,
+            
+            // Customer data
             customer_name: firstName,
             customer_surname: lastName,
-            customer_email: user?.email,
+            customer_email: user.email,
             customer_phone_number: phone,
             customer_address: address,
             customer_city: city,
@@ -282,3 +284,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+    
