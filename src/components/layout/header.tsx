@@ -68,6 +68,12 @@ export function Header() {
                 <DropdownMenuContent>
                   <DropdownMenuLabel>Gestion du site</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                   <DropdownMenuItem asChild>
+                      <Link href="/admin/orders">
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          <span>Commandes</span>
+                      </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                       <Link href="/admin/upload">
                           <Plus className="mr-2 h-4 w-4" />

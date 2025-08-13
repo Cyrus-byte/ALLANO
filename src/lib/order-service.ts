@@ -54,6 +54,25 @@ export const getOrdersByUserId = async (userId: string): Promise<Order[]> => {
     return orders;
 }
 
+export const getAllOrders = async (): Promise<Order[]> => {
+    const ordersCol = collection(db, 'orders');
+    const q = query(ordersCol, orderBy("createdAt", "desc"));
+    
+    const querySnapshot = await getDocs(q);
+    const orders: Order[] = [];
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        orders.push({
+            ...data,
+            id: doc.id,
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+        } as Order);
+    });
+
+    return orders;
+}
+
+
 export const getOrderById = async (orderId: string): Promise<Order | null> => {
     if (!orderId) {
         console.error("getOrderById: orderId is required.");

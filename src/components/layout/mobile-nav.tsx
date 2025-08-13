@@ -77,6 +77,12 @@ export function MobileNav() {
                     <Separator className="my-4" />
                     <div className="flex flex-col gap-2">
                         <Button variant="ghost" className="justify-start" asChild>
+                            <Link href="/admin/orders">
+                                <ShoppingCart className="mr-2 h-4 w-4" />
+                                <span>Commandes</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" className="justify-start" asChild>
                             <Link href="/admin/upload">
                                 <Plus className="mr-2 h-4 w-4" />
                                 <span>Ajouter un produit</span>

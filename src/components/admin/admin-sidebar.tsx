@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Logo } from '@/components/icons';
 
 const adminNavItems = [
+  { href: '/admin/orders', label: 'Commandes', icon: ShoppingCart },
   { href: '/admin/upload', label: 'Ajouter un produit', icon: Plus },
   { href: '/admin/products', label: 'Gérer les produits', icon: List },
   { href: '/admin/categories', label: 'Gérer les catégories', icon: LayoutGrid },
