@@ -74,6 +74,15 @@ export default function CheckoutPage() {
         toast({ title: "Utilisateur non connecté", description: "Veuillez vous connecter pour continuer.", variant: "destructive" });
         return;
     }
+
+    if (typeof window.CinetPay === 'undefined') {
+        toast({
+            title: "Service de paiement non prêt",
+            description: "Veuillez patienter un instant et réessayer.",
+            variant: "destructive",
+        });
+        return;
+    }
     
     const apiKey = process.env.NEXT_PUBLIC_CINETPAY_API_KEY;
     const siteId = process.env.NEXT_PUBLIC_CINETPAY_SITE_ID;
