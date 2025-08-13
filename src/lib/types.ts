@@ -39,7 +39,8 @@ export type WishlistItem = {
 export type ShippingDetails = {
   firstName: string;
   lastName: string;
-  address: string;
+  address: string; // Now represents "Quartier"
+  indication: string; // New field for additional details
   city: string;
   phone: string;
 };

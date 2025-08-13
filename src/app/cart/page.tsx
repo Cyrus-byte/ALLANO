@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Minus, Plus, Trash2, ShoppingCart, Loader2, Tag, X } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart, Loader2, Tag, X, Clock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -51,7 +51,7 @@ export default function CartPage() {
     toast({ title: "Code retiré", description: "La réduction a été retirée." });
   }
 
-  const shippingCost = totalItems > 0 ? 2000 : 0;
+  const shippingCost = totalItems > 0 ? 300 : 0;
   const grandTotal = totalPrice - discount + shippingCost;
 
 
@@ -175,7 +175,10 @@ export default function CartPage() {
               <Button asChild size="lg" className="w-full">
                 <Link href={`/checkout?promoCode=${appliedPromo?.id || ''}&discount=${discount}`}>Passer au paiement</Link>
               </Button>
-               <p className="text-xs text-muted-foreground text-center">Paiements sécurisés par CinetPay</p>
+               <div className="flex items-center text-xs text-muted-foreground gap-2 mt-2">
+                  <Clock className="h-3 w-3"/>
+                  <span>Délai de livraison estimé : 48h</span>
+               </div>
             </CardFooter>
           </Card>
         </div>

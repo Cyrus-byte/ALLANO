@@ -14,7 +14,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, MapPin, Phone, User as UserIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, User as UserIcon, Loader2, FileText } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -98,7 +98,7 @@ function OrderDetailsPage() {
     
     if (!order) return null; // Should be handled by notFound, but as a safeguard.
     
-    const shippingCost = 2000;
+    const shippingCost = 300;
     const subtotal = order.totalAmount - shippingCost + (order.promoCode?.discount || 0);
 
     return (
@@ -150,6 +150,12 @@ function OrderDetailsPage() {
                                 <MapPin className="h-4 w-4 text-muted-foreground" />
                                 <span>{order.shippingDetails.address}, {order.shippingDetails.city}</span>
                             </div>
+                            {order.shippingDetails.indication && (
+                                <div className="flex items-start gap-3">
+                                    <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                    <span>{order.shippingDetails.indication}</span>
+                                </div>
+                            )}
                             <div className="flex items-center gap-3">
                                 <Phone className="h-4 w-4 text-muted-foreground" />
                                 <span>{order.shippingDetails.phone}</span>
@@ -214,4 +220,3 @@ function OrderDetailsPage() {
 }
 
 export default OrderDetailsPage;
-

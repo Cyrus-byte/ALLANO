@@ -17,6 +17,7 @@ import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { createOrder } from '@/lib/order-service';
 import type { Order } from '@/lib/types';
+import { Textarea } from '@/components/ui/textarea';
 
 
 declare global {
@@ -35,6 +36,7 @@ export default function CheckoutPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [address, setAddress] = useState('');
+  const [indication, setIndication] = useState('');
   const [city, setCity] = useState('Ouagadougou');
   const [phone, setPhone] = useState('');
   const [paymentLoading, setPaymentLoading] = useState(false);
@@ -57,7 +59,7 @@ export default function CheckoutPage() {
     }
   }, [user]);
   
-  const shippingCost = totalItems > 0 ? 2000 : 0;
+  const shippingCost = totalItems > 0 ? 300 : 0;
   const grandTotal = totalPrice - discount + shippingCost;
 
 
@@ -139,7 +141,7 @@ export default function CheckoutPage() {
                      const orderData: Omit<Order, 'id' | 'createdAt'> = {
                         userId: user.uid,
                         items: cart.map(({ product, ...rest }) => rest),
-                        shippingDetails: { firstName, lastName, address, city, phone },
+                        shippingDetails: { firstName, lastName, address, indication, city, phone },
                         totalAmount: grandTotal,
                         status: 'Payée',
                         paymentDetails: data,
@@ -218,8 +220,12 @@ export default function CheckoutPage() {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="address">Adresse</Label>
-              <Input id="address" placeholder="Ex: 123 Rue de la Soie, Secteur 15" value={address} onChange={e => setAddress(e.target.value)} required />
+              <Label htmlFor="address">Quartier de résidence</Label>
+              <Input id="address" placeholder="Ex: Saaba" value={address} onChange={e => setAddress(e.target.value)} required />
+            </div>
+             <div className="grid gap-2">
+              <Label htmlFor="indication">Indication (bâtiment, point de repère)</Label>
+              <Textarea id="indication" placeholder="Ex: non loin du marché de Saaba ou près de la nouvelle mairie..." value={indication} onChange={e => setIndication(e.target.value)} />
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="city">Ville</Label>
@@ -271,7 +277,7 @@ export default function CheckoutPage() {
                         </div>
                      )}
                      <div className="flex justify-between text-sm">
-                        <span>Livraison</span>
+                        <span>Livraison (48h)</span>
                         <span>{shippingCost.toLocaleString('fr-FR')} FCFA</span>
                     </div>
                      <div className="flex justify-between font-bold text-lg">
@@ -293,5 +299,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
-    

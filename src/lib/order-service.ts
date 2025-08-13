@@ -4,13 +4,17 @@ import { collection, addDoc, serverTimestamp, doc, setDoc, arrayUnion, query, wh
 import type { Order } from './types';
 import { getProducts } from './product-service';
 
-export const createOrder = async (orderData: Omit<Order, 'createdAt'>) => {
+export const createOrder = async (orderData: Omit<Order, 'id' | 'createdAt'>) => {
   if (!orderData.userId) {
     throw new Error("L'ID de l'utilisateur est requis pour créer une commande.");
   }
 
   const orderWithTimestamp = {
     ...orderData,
+    shippingDetails: {
+      ...orderData.shippingDetails,
+      indication: orderData.shippingDetails.indication || '' // Ensure indication is not undefined
+    },
     createdAt: serverTimestamp(),
   };
 
