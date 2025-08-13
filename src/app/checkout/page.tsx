@@ -74,6 +74,20 @@ export default function CheckoutPage() {
         toast({ title: "Utilisateur non connecté", description: "Veuillez vous connecter pour continuer.", variant: "destructive" });
         return;
     }
+    
+    const apiKey = process.env.NEXT_PUBLIC_CINETPAY_API_KEY;
+    const siteId = process.env.NEXT_PUBLIC_CINETPAY_SITE_ID;
+
+    if (!apiKey || !siteId) {
+        console.error("Les clés API CinetPay ne sont pas configurées dans le fichier .env.local");
+        toast({
+            title: "Erreur de configuration",
+            description: "Les clés de paiement ne sont pas configurées. Veuillez contacter le support.",
+            variant: "destructive"
+        });
+        return;
+    }
+
 
     setPaymentLoading(true);
 
@@ -81,8 +95,8 @@ export default function CheckoutPage() {
     
     try {
         window.CinetPay.setConfig({
-            apikey: process.env.NEXT_PUBLIC_CINETPAY_API_KEY,
-            site_id: parseInt(process.env.NEXT_PUBLIC_CINETPAY_SITE_ID || '0'),
+            apikey: apiKey,
+            site_id: parseInt(siteId),
             // notify_url is best configured in your CinetPay dashboard for security and reliability
             mode: 'PRODUCTION'
         });
