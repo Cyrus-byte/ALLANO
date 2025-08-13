@@ -47,7 +47,7 @@ export type ShippingDetails = {
 export type Order = {
   id: string; // Firestore document ID
   userId: string;
-  items: Omit<CartItem, 'product'>[];
+  items: CartItem[]; // Now includes the full product object
   shippingDetails: ShippingDetails;
   totalAmount: number;
   status: 'Payée' | 'Expédiée' | 'Livrée' | 'Annulée';

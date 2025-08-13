@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getOrdersByUserId } from '@/lib/order-service';
 import type { Order } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
 
 export default function AccountPage() {
@@ -106,7 +107,9 @@ export default function AccountPage() {
                           {order.status}
                         </Badge>
                       </div>
-                      <Button variant="outline" size="sm">Voir les détails</Button>
+                       <Button asChild variant="outline" size="sm">
+                          <Link href={`/account/order/${order.id}`}>Voir les détails</Link>
+                       </Button>
                     </div>
                   ))}
                 </div>
