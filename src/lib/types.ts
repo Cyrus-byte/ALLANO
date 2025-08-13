@@ -86,3 +86,15 @@ export type PromoCode = {
     expiresAt?: any; // Firestore timestamp
     createdAt: any;
 }
+
+export type UserProfile = {
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    address?: string; // Quartier de résidence
+    role: 'customer' | 'admin';
+    createdAt: any;
+    cart?: any[];
+    wishlist?: any[];
+};

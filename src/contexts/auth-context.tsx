@@ -4,40 +4,49 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, getDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore"; 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
+import type { UserProfile } from '@/lib/types';
+
 
 interface AuthContextType {
   user: User | null;
+  userProfile: UserProfile | null;
   isAdmin: boolean;
   loading: boolean;
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   logIn: (email: string, password: string) => Promise<void>;
   logInWithGoogle: () => Promise<void>;
   logOut: () => Promise<void>;
+  updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
   
-  const checkUserRole = useCallback(async (user: User | null) => {
+  const fetchUserData = useCallback(async (user: User | null) => {
     if (user) {
         const userRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userRef);
-        if (userDoc.exists() && userDoc.data()?.role === 'admin') {
-            setIsAdmin(true);
+        if (userDoc.exists()) {
+            const data = userDoc.data() as UserProfile;
+            setUserProfile(data);
+            setIsAdmin(data.role === 'admin');
         } else {
-            setIsAdmin(false);
+             setIsAdmin(false);
+             setUserProfile(null);
         }
     } else {
         setIsAdmin(false);
+        setUserProfile(null);
     }
   }, []);
 
@@ -45,21 +54,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
-      await checkUserRole(user);
+      await fetchUserData(user);
       setLoading(false);
     });
     return () => unsubscribe();
-  }, [checkUserRole]);
+  }, [fetchUserData]);
 
-  const createUserDocument = async (user: User, additionalData = {}) => {
+  const createUserDocument = async (user: User, additionalData: Partial<UserProfile> = {}) => {
     if (!user) return;
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-        const userData = {
-            email: user.email,
-            displayName: user.displayName,
+        const [firstName, ...lastNameParts] = user.displayName?.split(' ') || ['', ''];
+        const lastName = lastNameParts.join(' ');
+        
+        const userData: UserProfile = {
+            email: user.email!,
+            firstName: firstName,
+            lastName: lastName,
             createdAt: new Date(),
             cart: [],
             wishlist: [],
@@ -67,6 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...additionalData
         };
         await setDoc(userRef, userData);
+        setUserProfile(userData);
     }
   }
 
@@ -76,8 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const displayName = `${firstName} ${lastName}`;
       await updateProfile(userCredential.user, { displayName });
       
-      const userWithProfile = { ...userCredential.user, displayName };
-      await createUserDocument(userWithProfile);
+      await createUserDocument(userCredential.user, { firstName, lastName });
 
       router.push('/');
       toast({ title: "Compte créé", description: "Bienvenue sur Allano !" });
@@ -123,7 +136,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const value = { user, isAdmin, loading, signUp, logIn, logInWithGoogle, logOut };
+  const updateUserProfile = async (data: Partial<UserProfile>) => {
+    if (!user) throw new Error("Utilisateur non connecté.");
+    
+    const userRef = doc(db, 'users', user.uid);
+    await updateDoc(userRef, data);
+    
+    // Update displayName in Firebase Auth if names are changed
+    if (data.firstName || data.lastName) {
+        const newDisplayName = `${data.firstName || userProfile?.firstName} ${data.lastName || userProfile?.lastName}`.trim();
+        if (newDisplayName && auth.currentUser) {
+            await updateProfile(auth.currentUser, { displayName: newDisplayName });
+        }
+    }
+
+    // Refresh local profile state
+    await fetchUserData(user);
+  };
+
+
+  const value = { user, userProfile, isAdmin, loading, signUp, logIn, logInWithGoogle, logOut, updateUserProfile };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

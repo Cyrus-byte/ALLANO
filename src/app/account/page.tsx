@@ -15,19 +15,41 @@ import { getOrdersByUserId } from '@/lib/order-service';
 import type { Order } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 
 export default function AccountPage() {
-    const { user, loading: authLoading, logOut } = useAuth();
+    const { user, userProfile, loading: authLoading, logOut, updateUserProfile } = useAuth();
     const router = useRouter();
+    const { toast } = useToast();
     const [orders, setOrders] = useState<Order[]>([]);
     const [ordersLoading, setOrdersLoading] = useState(true);
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) {
             router.push('/login');
         }
     }, [user, authLoading, router]);
+    
+    useEffect(() => {
+        if (userProfile) {
+            setFirstName(userProfile.firstName || '');
+            setLastName(userProfile.lastName || '');
+            setPhone(userProfile.phone || '');
+            setAddress(userProfile.address || '');
+        } else if (user?.displayName) {
+             const nameParts = user.displayName.split(' ');
+             setFirstName(nameParts[0] || '');
+             setLastName(nameParts.slice(1).join(' ') || '');
+        }
+
+    }, [userProfile, user]);
 
     useEffect(() => {
         if (user) {
@@ -46,6 +68,18 @@ export default function AccountPage() {
         }
     }, [user]);
 
+    const handleProfileSave = async () => {
+      setIsSavingProfile(true);
+      try {
+        await updateUserProfile({ firstName, lastName, phone, address });
+        toast({ title: "Profil mis à jour", description: "Vos informations ont été enregistrées avec succès." });
+      } catch (error) {
+        console.error(error);
+        toast({ title: "Erreur", description: "Impossible d'enregistrer les modifications.", variant: "destructive" });
+      } finally {
+        setIsSavingProfile(false);
+      }
+    };
 
     const isLoading = authLoading || !user;
 
@@ -68,8 +102,6 @@ export default function AccountPage() {
             </div>
         );
     }
-    
-    const [firstName, lastName] = user.displayName?.split(' ') || ['',''];
 
   return (
     <div className="container mx-auto px-2 py-8 md:py-12">
@@ -131,20 +163,31 @@ export default function AccountPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label htmlFor="firstName">Prénom</Label>
-                  <Input id="firstName" defaultValue={firstName} />
+                  <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="lastName">Nom</Label>
-                  <Input id="lastName" defaultValue={lastName} />
+                  <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} />
                 </div>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue={user.email || ''} readOnly />
+                <Input id="email" type="email" value={user.email || ''} readOnly disabled />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+226 XX XX XX XX" />
+              </div>
+               <div className="space-y-1">
+                <Label htmlFor="address">Quartier de résidence</Label>
+                <Input id="address" value={address} onChange={e => setAddress(e.target.value)} placeholder="Ex: Saaba" />
               </div>
             </CardContent>
             <CardFooter>
-              <Button>Enregistrer les modifications</Button>
+              <Button onClick={handleProfileSave} disabled={isSavingProfile}>
+                  {isSavingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Enregistrer les modifications
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
