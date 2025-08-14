@@ -134,13 +134,19 @@ function OrderDetailsPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                             <div className="space-y-4">
-                                {order.items.map(item => (
-                                    <div key={item.id} className="flex items-center gap-4">
-                                        <div className="flex-1">
-                                            <p className="font-semibold">{item.quantity} x Article (ID: {item.productId.substring(0,6)}...)</p>
-                                            <p className="text-xs text-muted-foreground">{item.size} / {item.color}</p>
+                             <div className="space-y-4 divide-y">
+                                {order.items.map(item => item.product && (
+                                    <div key={item.id} className="flex items-center gap-4 pt-4 first:pt-0">
+                                        <div className="relative w-20 h-24 rounded-md overflow-hidden bg-muted">
+                                            <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover"/>
                                         </div>
+                                        <div className="flex-1">
+                                            <p className="font-semibold">{item.product.name}</p>
+                                            <p className="text-sm text-muted-foreground">{item.quantity} x {item.size} / {item.color}</p>
+                                        </div>
+                                        <p className="font-medium text-sm">
+                                            {(item.product.price * item.quantity).toLocaleString('fr-FR')} FCFA
+                                        </p>
                                     </div>
                                 ))}
                             </div>
@@ -208,7 +214,7 @@ function OrderDetailsPage() {
                             </div>
                         </CardContent>
                          {isAdmin && (
-                            <CardFooter className="flex-col gap-2">
+                            <CardFooter className="flex-col items-start gap-2">
                                 <Label className="text-xs text-muted-foreground self-start">Changer le statut (Admin)</Label>
                                 <Select onValueChange={(value: Order['status']) => handleStatusChange(value)} defaultValue={order.status} disabled={isUpdating}>
                                     <SelectTrigger>
@@ -232,3 +238,5 @@ function OrderDetailsPage() {
 }
 
 export default OrderDetailsPage;
+
+    
