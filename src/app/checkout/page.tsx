@@ -160,7 +160,7 @@ export default function CheckoutPage() {
         });
 
         window.CinetPay.onError(async (err: any) => {
-            console.error('CinetPay Error:', err);
+            console.error('CinetPay Error: l\'objet erreur est vide, ce qui suggère un problème de configuration (clé API, ID de site) ou un compte non validé.', err);
             // Also mark the order as "Annulée" if there's a technical error
             await updateOrderStatus(orderId, 'Annulée');
             toast({ title: "Erreur de paiement", description: "Une erreur est survenue. Veuillez réessayer.", variant: "destructive" });
