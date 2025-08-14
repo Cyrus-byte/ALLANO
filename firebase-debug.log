@@ -1528,3 +1528,19 @@ INFO: Detected non-HTTP/2 connection.
 [debug] [2025-08-14T22:20:40.538Z] Aug 14, 2025 10:20:40 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
  {"metadata":{"emulator":{"name":"firestore"},"message":"Aug 14, 2025 10:20:40 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2025-08-14T22:20:43.101Z] <<< [apiv2][status] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules 200
+[debug] [2025-08-14T22:20:43.101Z] <<< [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules {}
+[info] ✔  firestore: Rules updated. 
+[debug] [2025-08-14T22:20:43.108Z] <<< [apiv2][status] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules 200
+[debug] [2025-08-14T22:20:43.108Z] <<< [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules {"issues":[{"sourcePosition":{"fileName":"security.rules"},"description":"Rules content empty. Compilation aborted.","severity":"ERROR"}]}
+[warn] ⚠  firestore.rules:0:0 - ERROR Rules content empty. Compilation aborted. 
+[info] ✔  firestore: Rules updated. 
+[info] i  firestore: Change detected, updating rules... 
+[debug] [2025-08-14T22:25:35.026Z] >>> [apiv2][query] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules [none]
+[debug] [2025-08-14T22:25:35.027Z] >>> [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules {"ignore_errors":true,"rules":{"files":[{"name":"security.rules","content":"\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n\n    function isAdmin() {\n      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';\n    }\n\n    match /products/{productId}/{reviews}/{reviewId} {\n      allow read: if true;\n      allow create: if request.auth != null;\n      allow update, delete: if isAdmin();\n    }\n\n    match /products/{productId} {\n      allow read: if true;\n      allow create, update, delete: if isAdmin();\n    }\n\n    match /categories/{categoryId} {\n      allow read: if true;\n      allow create, update, delete: if isAdmin();\n    }\n\n    match /promoCodes/{promoCodeId} {\n        allow read: if request.auth != null;\n        allow create, update, delete: if isAdmin();\n    }\n\n    match /settings/{settingId} {\n        allow read: if true;\n        allow write: if isAdmin();\n    }\n\n    match /users/{userId} {\n      allow read, update, write: if request.auth.uid == userId;\n      allow create: if request.auth.uid == userId;\n    }\n\n    match /orders/{orderId} {\n      allow read, create: if request.auth.uid == resource.data.userId || isAdmin();\n      // This rule allows a user to query their own orders.\n      allow list: if request.auth.uid == request.query.where.userId || isAdmin();\n      allow update: if isAdmin();\n    }\n  }\n}\n"}]}}
+[debug] [2025-08-14T22:25:35.050Z] Aug 14, 2025 10:25:35 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Aug 14, 2025 10:25:35 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2025-08-14T22:25:35.258Z] <<< [apiv2][status] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules 200
+[debug] [2025-08-14T22:25:35.258Z] <<< [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/demo-app:securityRules {}
+[info] ✔  firestore: Rules updated. 
