@@ -1,21 +1,30 @@
-
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
 
     function isAdmin() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    match /products/{productId}/{reviews}/{reviewId} {
-      allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if isAdmin();
+    match /users/{userId} {
+      allow read, update, delete: if isOwner(userId) || isAdmin();
+      allow create: if request.auth.uid != null;
     }
 
     match /products/{productId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
+      
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if request.auth.uid != null;
+        allow update, delete: if isOwner(request.resource.data.userId) || isAdmin();
+      }
     }
 
     match /categories/{categoryId} {
@@ -23,26 +32,23 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
-    match /promoCodes/{promoCodeId} {
-        allow read: if request.auth != null;
-        allow create, update, delete: if isAdmin();
+    match /promoCodes/{code} {
+      allow read: if request.auth.uid != null;
+      allow create, update, delete: if isAdmin();
     }
-
-    match /settings/{settingId} {
+    
+    match /settings/{docId} {
         allow read: if true;
         allow write: if isAdmin();
     }
 
-    match /users/{userId} {
-      allow read, update, write: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
-    }
-
     match /orders/{orderId} {
-      allow read, create: if request.auth.uid == resource.data.userId || isAdmin();
-      // This rule allows a user to query their own orders.
-      allow list: if request.auth.uid == request.query.where.userId || isAdmin();
-      allow update: if isAdmin();
+      // Any authenticated user can create an order if they are the owner.
+      allow create: if request.auth.uid != null && isOwner(request.resource.data.userId);
+      // Only the owner or an admin can read or update an order.
+      allow read, update: if isOwner(resource.data.userId) || isAdmin();
+      // Allow a user to list their own orders.
+      allow list: if (request.query.limit <= 100 && isOwner(request.query.userId)) || isAdmin();
     }
   }
 }
