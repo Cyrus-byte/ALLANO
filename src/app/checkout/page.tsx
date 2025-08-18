@@ -88,12 +88,14 @@ export default function CheckoutPage() {
     
     const apiKey = process.env.NEXT_PUBLIC_CINETPAY_API_KEY;
     const siteId = process.env.NEXT_PUBLIC_CINETPAY_SITE_ID;
+    const notifyUrl = process.env.NEXT_PUBLIC_CINETPAY_NOTIFY_URL;
 
-    if (!apiKey || !siteId) {
-        console.error("Les clés API CinetPay ne sont pas configurées dans le fichier .env.local");
+
+    if (!apiKey || !siteId || !notifyUrl) {
+        console.error("Les clés API ou l'URL de notification CinetPay ne sont pas configurées dans le fichier .env.local");
         toast({
             title: "Erreur de configuration",
-            description: "Les clés de paiement ne sont pas configurées. Veuillez contacter le support.",
+            description: "Les clés de paiement ou l'URL de notification ne sont pas configurées. Veuillez contacter le support.",
             variant: "destructive"
         });
         return;
@@ -119,7 +121,7 @@ export default function CheckoutPage() {
             apikey: apiKey,
             site_id: parseInt(siteId),
             mode: 'PRODUCTION',
-            notify_url: `${window.location.origin}/api/cinetpay-notify`
+            notify_url: notifyUrl
         });
 
         window.CinetPay.getCheckout({
