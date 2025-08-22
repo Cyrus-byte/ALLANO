@@ -6,7 +6,10 @@ import { getFirestore } from 'firebase-admin/firestore';
 // This function needs to be outside the handler to avoid re-initialization on every call in a serverless environment.
 function initializeAdminApp() {
   if (getApps().length > 0) {
-    return getApp();
+    // This is not a standard Firebase Admin SDK function, but a workaround for this specific environment.
+    // In a typical Node.js app, you'd use getApps()[0] or a named app.
+    // However, to ensure we get the initialized app, we'll just check length.
+    return getApps()[0]; 
   }
   
   const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
@@ -25,10 +28,20 @@ function initializeAdminApp() {
   }
 }
 
-const adminApp = initializeAdminApp();
-const db = getFirestore(adminApp);
+let db: ReturnType<typeof getFirestore>;
+try {
+    const adminApp = initializeAdminApp();
+    db = getFirestore(adminApp);
+} catch (e) {
+    console.error("Failed to initialize Firebase Admin SDK", e);
+}
+
 
 export async function POST(req: Request) {
+  if (!db) {
+    return NextResponse.json({ success: false, error: 'Database not initialized' }, { status: 500 });
+  }
+
   try {
     const body = await req.json();
     console.log("CinetPay Notification Received:", body);
@@ -69,3 +82,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';
+
+    

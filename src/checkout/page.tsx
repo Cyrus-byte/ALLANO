@@ -119,7 +119,7 @@ export default function CheckoutPage() {
             site_id: parseInt(siteId),
             mode: 'PRODUCTION',
             // Use the relative API route URL. Vercel will handle this.
-            notify_url: new URL('/api/cinetpay-notify', window.location.origin).href
+            notify_url: new URL('/app/api/cinetpay-notify', window.location.origin).href
         });
 
         window.CinetPay.getCheckout({
@@ -298,3 +298,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+    
