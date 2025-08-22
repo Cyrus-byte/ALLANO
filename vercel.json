@@ -1,3 +1,7 @@
 {
-
+  "functions": {
+    "src/api/cinetpay-notify/route.ts": {
+      "maxDuration": 30
+    }
+  }
 }
