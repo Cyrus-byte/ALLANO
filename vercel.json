@@ -1,0 +1,8 @@
+
+{
+  "functions": {
+    "src/app/api/cinetpay-notify/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}
